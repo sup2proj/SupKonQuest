@@ -11,8 +11,6 @@ public class UnitsData : ScriptableObject
 
     [Header("Health")]
     [Min(0)] public float maxHealth;
-    [Min(0)] public float health;
-    
 
     [Header("Attack")]
     [Min(0)] public float attack;
