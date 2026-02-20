@@ -7,7 +7,7 @@ public class HeavyInstance : MonoBehaviour
     [SerializeField] private UnitsData unitData;
     
     [Header("Weapon")]
-    [SerializeField] private GameObject swordModel; // Référence au modèle 3D de l'épée
+    [SerializeField] private GameObject swordModel; 
 
     private float currentHealth;
     private Animator animator;
