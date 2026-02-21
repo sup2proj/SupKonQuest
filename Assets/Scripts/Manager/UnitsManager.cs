@@ -23,7 +23,7 @@ public class UnitsManager : MonoBehaviour
 
         UnitsData data = unitsDatas[index];
         GameObject unitGO = Instantiate(unitPrefab, position, Quaternion.identity);
-        InfanterieInstance instance = unitGO.GetComponent<InfanterieInstance>();
+        UnitsSoldierInstance instance = unitGO.GetComponent<UnitsSoldierInstance>();
         if (instance != null)
         {
             instance.Init(data);
