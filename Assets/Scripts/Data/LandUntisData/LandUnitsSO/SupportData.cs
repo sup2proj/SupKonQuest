@@ -14,8 +14,14 @@ public class Support : ScriptableObject
     [Min(0)] public float maxHealth;
 
     [Header("Buff")]
-    [Min(0)] public float buff;
+    [Min(0)] public float buffAttackSpeed;
     [Min(0)] public float buffSpeed;
+    [Min(0)] public float buffDamage;
+    
+    [Header("Buff Settings")]
+    [Min(0)] public float buffAttackSpeedCooldown;
+    [Min(0)] public float buffSpeedCooldown;
+    [Min(0)] public float buffDamageCooldown;
     [Min(0)] public float buffRange;
 
     [Header("Movement")]

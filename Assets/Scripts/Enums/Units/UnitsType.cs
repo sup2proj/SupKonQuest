@@ -2,8 +2,10 @@
 public enum UnitsType
 {
     Infantry,
-    LongRange,
-    Canon,
+    Archer,
     Mortar,
-    Heavy
+    Heavy,
+    AntiBlindage,
+    Healer,
+    Support
 }
