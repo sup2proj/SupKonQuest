@@ -683,9 +683,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4172635347591046925}
   - component: {fileID: 8000646289364286839}
-  - component: {fileID: 6145010084821592957}
+  - component: {fileID: 6331732975931290674}
   m_Layer: 0
-  m_Name: SoldierWithMortier
+  m_Name: Mortar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -700,7 +700,7 @@ Transform:
   m_GameObject: {fileID: 3649038373308825015}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 12.88902, y: -0, z: -1.32288}
+  m_LocalPosition: {x: 11.404119, y: -0.00000018726712, z: -3.4359813}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -731,7 +731,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &6145010084821592957
+--- !u!114 &6331732975931290674
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -740,10 +740,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 3649038373308825015}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a696a3e5c4013c54ca23ce8d6153ad8d, type: 3}
+  m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PorteurMortierInstance
+  m_EditorClassIdentifier: Assembly-CSharp::UnitsSoldierInstance
   unitData: {fileID: 11400000, guid: da12d52b0c20343b99633a36edbd3113, type: 2}
+  weaponModel: {fileID: 0}
+  currentHealth: 0
+  maxHealth: 0
+  animator: {fileID: 0}
+  price: 0
+  attackRange: 0
+  speed: 0
+  creationTime: 0
+  type: 0
+  isPoweredUnit: 0
 --- !u!1 &3734395858838237890
 GameObject:
   m_ObjectHideFlags: 0

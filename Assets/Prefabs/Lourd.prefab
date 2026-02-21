@@ -362,7 +362,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2202412860217328633}
   - component: {fileID: 5219854518518045059}
-  - component: {fileID: 7356271996813753801}
+  - component: {fileID: 4297987601476956549}
   m_Layer: 0
   m_Name: Lourd
   m_TagString: Untagged
@@ -379,7 +379,7 @@ Transform:
   m_GameObject: {fileID: 1574951997490190659}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 13.41575, y: -0, z: -2.40985}
+  m_LocalPosition: {x: 9.99534, y: 0.00000033796232, z: -3.6785781}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -409,7 +409,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &7356271996813753801
+--- !u!114 &4297987601476956549
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -418,11 +418,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 1574951997490190659}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd75f852817d22d488a53e25886fc6c8, type: 3}
+  m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HeavyInstance
+  m_EditorClassIdentifier: Assembly-CSharp::UnitsSoldierInstance
   unitData: {fileID: 11400000, guid: 156b9e8658b0c49afb787de6726abdce, type: 2}
-  swordModel: {fileID: 7453840816469974741}
+  weaponModel: {fileID: 6972348287640944665}
+  currentHealth: 0
+  maxHealth: 0
+  animator: {fileID: 0}
+  price: 0
+  attackRange: 0
+  speed: 0
+  creationTime: 0
+  type: 0
+  isPoweredUnit: 0
 --- !u!1 &1594049083235908120
 GameObject:
   m_ObjectHideFlags: 0
