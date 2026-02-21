@@ -1,9 +1,9 @@
 ﻿Console/
 .DS_Store
-SupKonQuest/Library/
-SupKonQuest/Logs/
-SupKonQuest/Temp/
-SupKonQuest/UserSettings/Layouts/
-SupKonQuest/Build/
+Library/
+Logs/
+Temp/
+UserSettings/Layouts/
+Build/
 *.log
 *.pid
