@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class UnitsBufferInstance : MonoBehaviour
 {
     [Header("Data")]
-    [SerializeField] private Support buffData;
+    [SerializeField] private SupportData supportData;
     public GameObject itemModel;
     public float currentHealth;
     public float maxHealth;
@@ -26,28 +26,28 @@ public class UnitsBufferInstance : MonoBehaviour
     
     // Méthode d'initialisation pour configurer les données de l'unité buffer à partir du scriptable object
     
-    void Initialize(Support data)
+    void Initialize(SupportData data)
     {
-        buffData = data;
-        if (buffData != null)
+        supportData = data;
+        if (supportData != null)
         {
-            currentHealth = buffData.maxHealth;
-            maxHealth = buffData.maxHealth;
-            price = buffData.price;
-            buffAttackSpeed = buffData.buffAttackSpeed;
-            buffSpeed = buffData.buffSpeed;
-            buffDamage = buffData.buffDamage;
-            buffRange = buffData.buffRange;
-            speed = buffData.speed;
-            creationTime = buffData.creationTime;
-            type = buffData.type;
-            isPoweredUnit = buffData.isPoweredUnit;
+            currentHealth = supportData.maxHealth;
+            maxHealth = supportData.maxHealth;
+            price = supportData.price;
+            buffAttackSpeed = supportData.buffAttackSpeed;
+            buffSpeed = supportData.buffSpeed;
+            buffDamage = supportData.buffDamage;
+            buffRange = supportData.buffRange;
+            speed = supportData.speed;
+            creationTime = supportData.creationTime;
+            type = supportData.type;
+            isPoweredUnit = supportData.isPoweredUnit;
         }
     }
 
     void Start()
     {
-        Initialize(buffData);
+        Initialize(supportData);
         itemModel.SetActive(false);
     }
 
@@ -100,12 +100,12 @@ public class UnitsBufferInstance : MonoBehaviour
         animator.SetBool("isAttacking", isActivatingBuff);
     }
 
-    public void Init(Support data)
+    public void Init(SupportData data)
     {
-        buffData = data;
-        if (buffData != null)
+        supportData = data;
+        if (supportData != null)
         {
-            currentHealth = buffData.maxHealth;
+            currentHealth = supportData.maxHealth;
         }
     }
 }

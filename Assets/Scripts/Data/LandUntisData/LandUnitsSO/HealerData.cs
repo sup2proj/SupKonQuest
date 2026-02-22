@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Healer", menuName = "Scriptable Objects/Healer")]
-public class Healer : ScriptableObject
+[CreateAssetMenu(fileName = "HealerData", menuName = "Scriptable Objects/HealerData")]
+public class HealerData : ScriptableObject
 {
     [Header("Economy")] 
     [Min(0)] public int price;
@@ -14,6 +14,7 @@ public class Healer : ScriptableObject
 
     [Header("Buff Settings")] 
     [Min(0)] public float buffHealingCooldown;
+    [Min(0)] public float buffTime;
     [Min(0)] public float buffRange;
 
     [Header("Movement")] 

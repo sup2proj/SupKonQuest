@@ -1,11 +1,11 @@
 using UnityEngine;
 
 [CreateAssetMenu(
-	fileName = "Support", 
-	menuName = "Scriptable Objects/Support"
+	fileName = "SupportData", 
+	menuName = "Scriptable Objects/SupportData"
 )]
 
-public class Support : ScriptableObject
+public class SupportData : ScriptableObject
 {
     [Header("Economy")]
     [Min(0)] public int price;
@@ -20,6 +20,7 @@ public class Support : ScriptableObject
     
     [Header("Buff Settings")]
     [Min(0)] public float buffAttackSpeedCooldown;
+    [Min(0)] public float buffTime;
     [Min(0)] public float buffSpeedCooldown;
     [Min(0)] public float buffDamageCooldown;
     [Min(0)] public float buffRange;
