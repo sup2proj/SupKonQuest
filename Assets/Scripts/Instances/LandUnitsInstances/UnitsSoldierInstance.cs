@@ -45,16 +45,19 @@ public class UnitsSoldierInstance : MonoBehaviour
     void Start()
     {
         initialize(unitData);
-        weaponModel.SetActive(false);
-
+        if (weaponModel != null)
+        {
+            weaponModel.SetActive(false);
+        }
     }
+
     void Update()
     {
         bool isMoving = Keyboard.current.spaceKey.isPressed;
         Move(isMoving);
         
         bool isAttacking = Keyboard.current.wKey.isPressed;
-        if (isAttacking)
+        if (isAttacking && weaponModel != null)
         {
             weaponModel.SetActive(isAttacking);
         }
