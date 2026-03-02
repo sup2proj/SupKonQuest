@@ -1112,7 +1112,7 @@ Transform:
   m_GameObject: {fileID: 2206464339169037478}
   serializedVersion: 2
   m_LocalRotation: {x: -0.718869, y: -0, z: -0, w: 0.6951457}
-  m_LocalPosition: {x: 0.02, y: 0.0009994507, z: 0.070999146}
+  m_LocalPosition: {x: -0.006, y: 0.0009994507, z: 0.070999146}
   m_LocalScale: {x: 0.48736, y: 0.48736003, z: 0.48736003}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1168,7 +1168,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 0.9433962, g: 0.10234961, b: 0.10234961, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2588,6 +2588,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4819992888369507587}
   - component: {fileID: 1442314245446416249}
+  - component: {fileID: 7815668917705613647}
   m_Layer: 0
   m_Name: Archer
   m_TagString: Untagged
@@ -2604,7 +2605,7 @@ Transform:
   m_GameObject: {fileID: 5309705829977175993}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 792.09, y: 10.67, z: 53.314}
+  m_LocalPosition: {x: 8.647607, y: -0.00000006360466, z: 2.4577124}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2635,6 +2636,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7815668917705613647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5309705829977175993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitInstance
+  unitData: {fileID: 11400000, guid: 07e81fd0ba5b94888b7c67a91496798f, type: 2}
+  objectModel: {fileID: 6244019195384724075}
+  circleUnderFeet: {fileID: 2206464339169037478}
+  animator: {fileID: 0}
+  currentHealth: 0
 --- !u!1 &5318343401952282283
 GameObject:
   m_ObjectHideFlags: 0

@@ -80,16 +80,22 @@ public class UnitInstance : MonoBehaviour
 
     void HandleAttack()
     {
-        if (unitData == null || !unitData.canAttack)
-            return;
-        bool isAttacking = Keyboard.current.wKey.isPressed;
+        // if (unitData == null || !unitData.canAttack)
+        //     return;
+        bool isAttacking = Keyboard.current.gKey.isPressed;
 
-        animator.SetBool("isAttacking", isAttacking);
-        if (objectModel == null) {
-            Debug.Log("Handling attack for " + gameObject.name);
+        if (animator != null)
+        {
+            animator.SetBool("isAttacking", isAttacking);
+            Debug.Log("Animation isAttacking définie à: " + isAttacking + " pour " + gameObject.name);
         }
-        if (objectModel != null) {
-            Debug.Log("Handling attack for " + gameObject.name);
+        else
+        {
+            Debug.LogError("Animator est null dans HandleAttack pour " + gameObject.name);
+        }
+        
+        if (objectModel != null)
+        {
             objectModel.SetActive(isAttacking);
         }
     }
