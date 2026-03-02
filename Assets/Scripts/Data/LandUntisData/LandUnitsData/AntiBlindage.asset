@@ -16,7 +16,7 @@ MonoBehaviour:
   maxHealth: 0
   speed: 0
   creationTime: 0
-  canAttack: 0
+  canAttack: 1
   attack: 0
   attackSpeed: 0
   attackRange: 0
@@ -34,5 +34,5 @@ MonoBehaviour:
   buffDamageCooldown: 0
   buffDuration: 0
   buffRange: 0
-  type: 0
+  type: 4
   isPoweredUnit: 0
