@@ -34,8 +34,9 @@ public class MapGenerator : MonoBehaviour
 
     void Start()
     {
-        LoadAndGenerate("Europe");
-        // LoadAndGenerate("Test");
+        // LoadAndGenerate("EUROPE");
+        LoadAndGenerate("TEST");
+        // LoadAndGenerate("LOL");
     }
 
     void LoadAndGenerate(string folderName)
@@ -102,6 +103,7 @@ public class MapGenerator : MonoBehaviour
                 Vector3 pos = new Vector3(p.x * tileSize, 0, unityZ);
                 
                 GameObject bObj = Instantiate(prefab, pos, Quaternion.identity, transform);
+                bObj.transform.localScale = new Vector3(3f, 3f, 3f);
                 bObj.name = $"{type}_{p.x}_{p.y}";
 
                 allTiles[p.x, p.y].SetBuilding(type, bObj);
@@ -122,7 +124,7 @@ public class MapGenerator : MonoBehaviour
                 if (tile.buildingType != TileData.BuildingType.None || tile.groundType == TileData.GroundType.Water)
                     continue;
 
-                if (Random.value < 0.4f)
+                if (Random.value < 0.3f)
                 {
                     GameObject treePrefab = null;
                     TileData.TreeType tType = TileData.TreeType.None;
@@ -138,6 +140,7 @@ public class MapGenerator : MonoBehaviour
                         
                         Quaternion rot = Quaternion.Euler(0, Random.Range(0, 360), 0);
                         Instantiate(treePrefab, pos, rot, transform);
+                        treePrefab.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
 
                         tile.SetTree(tType);
                     }

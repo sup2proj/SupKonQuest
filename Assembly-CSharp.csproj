@@ -60,12 +60,14 @@
     <Compile Include="Assets\Scripts\Data\LandUntisData\LandUnitsSO\UnitsData.cs" />
     <Compile Include="Assets\Scripts\Data\BoatUnitsData\Frigate.cs" />
     <Compile Include="Assets\Scripts\Instances\LandUnitsInstances\UnitsBufferInstance.cs" />
+    <Compile Include="Assets\Scripts\camera\RTSCamera.cs" />
     <Compile Include="Assets\Scripts\Instances\LandUnitsInstances\UnitsSoldierInstance.cs" />
     <Compile Include="Assets\Scripts\Manager\UnitsManager.cs" />
     <Compile Include="Assets\Scripts\Map\BuildingData.cs" />
     <Compile Include="Assets\Scripts\Map\MapGenerator.cs" />
-    <None Include="Assets\Resources\Maps\Test\MapData.json" />
-    <None Include="Assets\Resources\Maps\Europe\MapData.json" />
+    <None Include="Assets\Resources\Maps\LOL\MapData.json" />
+    <None Include="Assets\Resources\Maps\TEST\MapData.json" />
+    <None Include="Assets\Resources\Maps\EUROPE\MapData.json" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
