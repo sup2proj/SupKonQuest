@@ -7,6 +7,8 @@ using System.Collections.Generic;
 
 public class StructureInstance : MonoBehaviour
 {
+    [Header("Data")]
+    [SerializeField] private StructureData structureData;
     public UnitsManager unitsManager; //Permet d'appeler l'unitsManager
     public GameObject structureInterface;
 
@@ -36,6 +38,7 @@ public class StructureInstance : MonoBehaviour
     void Start()
     {
         structurePosition = transform.position; // Initialise la position au démarrage
+        Screen.SetResolution(1920, 1080, FullScreenMode.Windowed);
         UnSelected();
     }
 
@@ -70,11 +73,39 @@ public class StructureInstance : MonoBehaviour
     {
         if (structureInterface != null)
         {
+            Debug.Log("Selected structure: " + gameObject.name);
             structureInterface.SetActive(true);
             structureInterface.transform.SetAsLastSibling();
+            PositionInterface();
         }
         if (outline != null)
             outline.enabled = true;
+    }
+
+    void PositionInterface()
+    {
+        if (structureInterface == null)
+            return;
+
+        RectTransform rectTransform = structureInterface.GetComponent<RectTransform>();
+        if (rectTransform != null)
+        {
+            // Définir la taille
+            rectTransform.sizeDelta = new Vector2(1920, 1080);
+
+            // Ancrer en bas à gauche du Canvas
+            rectTransform.anchorMin = new Vector2(0, 0);
+            rectTransform.anchorMax = new Vector2(0, 0);
+            
+            // Le pivot en bas à gauche de l'interface elle-même
+            rectTransform.pivot = new Vector2(0, 0);
+
+            // Positionner le coin inférieur gauche exactement au coin inférieur gauche de l'écran
+            rectTransform.anchoredPosition = Vector2.zero;
+            
+            // S'assurer que la position locale est également à zéro
+            rectTransform.localPosition = new Vector3(rectTransform.localPosition.x, rectTransform.localPosition.y, 0);
+        }
     }
 
     public void UnSelected()
