@@ -5,6 +5,7 @@ public class UnitsHealerInstance : MonoBehaviour
 {
     [Header("Data")] 
     [SerializeField] private HealerData healerData;
+	public GameObject circleUnderFeet;
     public GameObject itemModel;
     public float currentHealth;
     public float maxHealth;
@@ -49,6 +50,22 @@ public class UnitsHealerInstance : MonoBehaviour
     {
         Initialize(healerData);
         itemModel.SetActive(false);
+		if (circleUnderFeet != null)
+        {
+            circleUnderFeet.SetActive(true);
+
+            // Ajuste la position
+            Vector3 localPos = circleUnderFeet.transform.localPosition;
+            localPos.y = 0f;
+            circleUnderFeet.transform.localPosition = localPos;
+
+            SpriteRenderer sr = circleUnderFeet.GetComponent<SpriteRenderer>();
+            // à modifier en fonction de la couleur attribué au joueur
+            if (sr != null)
+            {
+                sr.color = Color.white;
+            }
+        }
     }
 
     void Update()
@@ -84,6 +101,12 @@ public class UnitsHealerInstance : MonoBehaviour
     
     public void Die()
     {
+        // Détacher le cercle avant destruction pour qu'il ne disparaisse pas
+        if (circleUnderFeet != null)
+        {
+            circleUnderFeet.transform.SetParent(null);
+        }
+        
         // Jouer l'animation de mort
         animator.SetTrigger("Die");
         // Supprime l'objet après un délai pour permettre à l'animation de se jouer
