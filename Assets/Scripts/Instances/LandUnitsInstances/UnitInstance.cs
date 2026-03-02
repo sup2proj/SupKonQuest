@@ -1,0 +1,127 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class UnitInstance : MonoBehaviour
+{
+    [Header("Data")]
+    [SerializeField] private UnitData unitData;
+
+    [Header("Visuals")]
+    public GameObject objectModel;
+    public GameObject circleUnderFeet;
+    public Animator animator;
+
+    [Header("Runtime")]
+    public float currentHealth;
+
+    void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
+
+    void Start()
+    {
+        Initialize(unitData);
+
+        if (objectModel != null)
+            objectModel.SetActive(false);
+
+        InitSelectionCircle();
+    }
+
+    void Update()
+    {
+        HandleMovement();
+        HandleAttack();
+    }
+
+    public void Initialize(UnitData data)
+    {
+        unitData = data;
+        if (unitData == null)
+        {
+            Debug.LogError("UnitData is null on " + gameObject.name);
+            return;
+        }
+        currentHealth = unitData.maxHealth;
+    }
+
+    void InitSelectionCircle()
+    {
+        if (circleUnderFeet == null)
+            return;
+
+        circleUnderFeet.SetActive(true);
+
+        Vector3 localPos = circleUnderFeet.transform.localPosition;
+        localPos.y = 0f;
+        circleUnderFeet.transform.localPosition = localPos;
+
+        SpriteRenderer sr = circleUnderFeet.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.color = Color.white;
+        }
+    }
+
+    void HandleMovement()
+    {
+        if (unitData == null)
+            return;
+
+        bool isMoving = Keyboard.current.spaceKey.isPressed;
+        animator.SetBool("isMoving", isMoving);
+
+        if (isMoving)
+        {
+            transform.Translate(Vector3.forward * unitData.speed * Time.deltaTime);
+        }
+    }
+
+    void HandleAttack()
+    {
+        if (unitData == null || !unitData.canAttack)
+            return;
+        bool isAttacking = Keyboard.current.wKey.isPressed;
+
+        animator.SetBool("isAttacking", isAttacking);
+        if (objectModel == null) {
+            Debug.Log("Handling attack for " + gameObject.name);
+        }
+        if (objectModel != null) {
+            Debug.Log("Handling attack for " + gameObject.name);
+            objectModel.SetActive(isAttacking);
+        }
+    }
+
+    public void TakeDamage(float amount)
+    {
+        currentHealth -= amount;
+
+        if (currentHealth <= 0)
+            Die();
+    }
+
+    public void Heal(float amount)
+    {
+        if (unitData == null || !unitData.canHeal)
+            return;
+
+        currentHealth += amount;
+        currentHealth = Mathf.Min(currentHealth, unitData.maxHealth);
+    }
+
+    void Die()
+    {
+        if (circleUnderFeet != null)
+            circleUnderFeet.transform.SetParent(null);
+        Destroy(gameObject, 2f);
+    }
+
+    public void ApplyBuff()
+    {
+        if (unitData == null || !unitData.canBuff)
+            return;
+        Debug.Log("Buff applied to " + unitData.type);
+    }
+}

@@ -11,7 +11,7 @@ public class StructureInstance : MonoBehaviour
     public GameObject structureInterface;
 
     private Vector3 structurePosition; // Récupère la position de la structure dans la scène
-    private Queue<UnitsData> unitQueue = new Queue<UnitsData>(); // File d'attente pour les unités à créer
+    private Queue<UnitData> unitQueue = new Queue<UnitData>(); // File d'attente pour les unités à créer
     private bool isSpawning = false; // Indique si la structure est actuellement en train de créer des unités
     public bool neutralStructure;
     public StructureType structureType;
@@ -24,7 +24,6 @@ public class StructureInstance : MonoBehaviour
     [Header("Player")]
     public PlayerNumber player;
 
-    private bool isSelected = false;
     private Outline outline; // Quick Outline composant
 
     void Awake()
@@ -55,7 +54,7 @@ public class StructureInstance : MonoBehaviour
 
     public void AddToQueue(UnitsType type)
     {
-        UnitsData data = unitsManager.unitsData.Find(d => d.type == type);
+        UnitData data = unitsManager.unitData.Find(d => d.type == type);
         if (data != null)
         {
             unitQueue.Enqueue(data);
@@ -69,7 +68,6 @@ public class StructureInstance : MonoBehaviour
 
     void Selected()
     {
-        isSelected = true;
         if (structureInterface != null)
         {
             structureInterface.SetActive(true);
@@ -81,8 +79,6 @@ public class StructureInstance : MonoBehaviour
 
     public void UnSelected()
     {
-        isSelected = false;
-
         // Cache le menu UI
         if (structureInterface != null)
             structureInterface.SetActive(false);
@@ -100,9 +96,8 @@ public class StructureInstance : MonoBehaviour
         isSpawning = true;
         while (unitQueue.Count > 0)
         {
-            UnitsData data = unitQueue.Dequeue();
+            UnitData data = unitQueue.Dequeue();
             unitsManager.SpawnUnitByTypeAtPosition(data.type, position);
-
             yield return new WaitForSeconds(data.creationTime);
         }
         isSpawning = false;
