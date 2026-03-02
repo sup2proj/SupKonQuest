@@ -84,7 +84,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f056c1e4083d8435e80d9ffdad1a4832, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitsBufferInstance
-  buffData: {fileID: 11400000, guid: c96833603ad4e6e468b4eb140b4da998, type: 2}
+  supportData: {fileID: 11400000, guid: c96833603ad4e6e468b4eb140b4da998, type: 2}
   itemModel: {fileID: 7969559920920450612}
   currentHealth: 0
   maxHealth: 0

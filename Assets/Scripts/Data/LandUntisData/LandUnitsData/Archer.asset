@@ -12,13 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bf7c22c52f0d4817a46d310e744cff2, type: 3}
   m_Name: Archer
   m_EditorClassIdentifier: Assembly-CSharp::InfantryData
-  price: 0
-  maxHealth: 0
-  attack: 0
-  attackSpeed: 0
-  attackRange: 0
-  attackCooldown: 0
-  speed: 0
-  creationTime: 0
-  type: 
+  price: 70
+  maxHealth: 80
+  attack: 10
+  attackSpeed: 1.4
+  attackRange: 30
+  speed: 3.3
+  creationTime: 9
+  type: 1
   isPoweredUnit: 0

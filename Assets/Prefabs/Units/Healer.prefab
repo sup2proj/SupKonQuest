@@ -74,11 +74,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 68a305e0596a34e7091868b517e213f1, type: 3}
   m_PrefabInstance: {fileID: 7229138003420617425}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &7535198820806993792 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 68a305e0596a34e7091868b517e213f1, type: 3}
-  m_PrefabInstance: {fileID: 7229138003420617425}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8547709253229861071
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -144,7 +139,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 240a8a0381738482d9509371c7c98931, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5745511146692709822}
+      addedObject: {fileID: 8562459513340220605}
   m_SourcePrefab: {fileID: 100100000, guid: 240a8a0381738482d9509371c7c98931, type: 3}
 --- !u!4 &8148464431167749924 stripped
 Transform:
@@ -156,7 +151,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 240a8a0381738482d9509371c7c98931, type: 3}
   m_PrefabInstance: {fileID: 8547709253229861071}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5745511146692709822
+--- !u!114 &8562459513340220605
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -165,18 +160,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 8817759546670376350}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f056c1e4083d8435e80d9ffdad1a4832, type: 3}
+  m_Script: {fileID: 11500000, guid: 3aa63535fd6734efba8f6d3b616b3688, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UnitsBufferInstance
-  buffData: {fileID: 0}
-  itemModel: {fileID: 7535198820806993792}
+  m_EditorClassIdentifier: Assembly-CSharp::UnitsHealerInstance
+  healerData: {fileID: 11400000, guid: 1cde77aca47f64e37a6e150dfe00fade, type: 2}
+  itemModel: {fileID: 0}
   currentHealth: 0
   maxHealth: 0
   animator: {fileID: 0}
   price: 0
-  buffAttackSpeed: 0
-  buffSpeed: 0
-  buffDamage: 0
+  buffHealing: 0
+  buffHealingCooldown: 0
+  buffTime: 0
   buffRange: 0
   speed: 0
   creationTime: 0

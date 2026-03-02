@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bf7c22c52f0d4817a46d310e744cff2, type: 3}
   m_Name: AntiBlindage
   m_EditorClassIdentifier: Assembly-CSharp::UnitsData
-  price: 0
-  maxHealth: 0
-  attack: 0
-  attackSpeed: 0
-  attackRange: 0
-  speed: 0
-  creationTime: 0
-  type: 0
+  price: 85
+  maxHealth: 90
+  attack: 14
+  attackSpeed: 1
+  attackRange: 5
+  speed: 3
+  creationTime: 10
+  type: 4
   isPoweredUnit: 0

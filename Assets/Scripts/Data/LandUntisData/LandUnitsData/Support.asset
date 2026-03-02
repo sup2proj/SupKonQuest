@@ -12,3 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff93bc2e624164b039f7f7028355ba75, type: 3}
   m_Name: Support
   m_EditorClassIdentifier: Assembly-CSharp::Support
+  price: 80
+  maxHealth: 90
+  buffAttackSpeed: 1.2
+  buffSpeed: 1.5
+  buffDamage: 1.7
+  buffAttackSpeedCooldown: 4
+  buffTime: 8
+  buffSpeedCooldown: 7
+  buffDamageCooldown: 15
+  buffRange: 20
+  speed: 3.2
+  creationTime: 10
+  type: 6
+  isPoweredUnit: 0
