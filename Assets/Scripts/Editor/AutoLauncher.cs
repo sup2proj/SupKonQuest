@@ -18,6 +18,9 @@ public static class AutoLauncher
             {
                 GameObject bootstrapper = new GameObject("AUTO_MAP_GENERATOR");
                 bootstrapper.AddComponent<MapGenerator>();
+                
+                OverlayManager.initializePermanentOverlay();
+                
                 Debug.Log("AutoLauncher : MapGenerator injecté dynamiquement.");
             }
         }
