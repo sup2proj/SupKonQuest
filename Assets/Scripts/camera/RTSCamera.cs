@@ -8,18 +8,18 @@ public class RTSCamera : MonoBehaviour
 
     [Header("Sensibilité & Rotation")]
     [Range(0.1f, 2f)] 
-    public float mouseSensitivity = 0.6f;
+    public float mouseSensitivity = 0.8f;
     public float rotateSpeed = 30f;
     public float tiltSpeed = 30f;
 
     [Header("Limites d'Angle (Pitch)")]
     public float minPitch = 20f; // Vue rasante
-    public float maxPitch = 80f; // Vue de dessus
+    public float maxPitch = 40f; // Vue de dessus
 
     [Header("Limites de Zoom")]
     public float zoomSpeed = 1000f;
     public float minY = 5f;
-    public float maxY = 60f; // Limite pour ne pas voir trop de "vide" autour de la map
+    public float maxY = 20f; // Limite pour ne pas voir trop de "vide" autour de la map
 
     private Vector2 mapBounds = new Vector2(100, 100); // Valeur de secours
     private float currentPitch = 60f;

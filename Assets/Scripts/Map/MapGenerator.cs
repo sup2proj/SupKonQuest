@@ -102,16 +102,37 @@ public class MapGenerator : MonoBehaviour
                 float unityZ = (h - 1 - p.y) * tileSize;
                 Vector3 pos = new Vector3(p.x * tileSize, 0, unityZ);
                 
-                GameObject bObj = Instantiate(prefab, pos, Quaternion.identity, transform);
-                bObj.transform.localScale = new Vector3(3f, 3f, 3f);
-                bObj.name = $"{type}_{p.x}_{p.y}";
+                GameObject buildingObj = Instantiate(prefab, pos, Quaternion.identity, transform);
+                buildingObj.transform.localScale = new Vector3(3f, 3f, 3f);
+                buildingObj.name = $"{type}_{p.x}_{p.y}";
 
-                allTiles[p.x, p.y].SetBuilding(type, bObj);
+                allTiles[p.x, p.y].SetBuilding(type, buildingObj);
                 allTiles[p.x, p.y].SetOwnerID(p.owner);
+                BlockPlanting(p.x, p.y);
             }
         }
     }
 
+    void BlockPlanting(int x, int y)
+    {
+        // int[,] coordArray = { {0,0}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}, {0, 1} } ;
+        int voisinX = 0;
+        int voisinY = 0;
+        
+        for (int i = -3; i < 4; i++)
+        {
+            for (int j = -3; j < 4; j++)
+            {
+                voisinX = x + i;
+                voisinY = y + j;
+                if (voisinX >= 0 && voisinX < allTiles.GetLength(0) && voisinY >= 0 && voisinY < allTiles.GetLength(1))
+                {
+                    allTiles[voisinX, voisinY].isPlantable = false;
+                }
+            }
+        }
+    }
+    
     void AddTrees()
     {
         int h = mapLayout.height;
@@ -121,28 +142,28 @@ public class MapGenerator : MonoBehaviour
             {
                 TileData tile = allTiles[x, y];
 
-                if (tile.buildingType != TileData.BuildingType.None || tile.groundType == TileData.GroundType.Water)
-                    continue;
-
-                if (Random.value < 0.3f)
+                if (tile.isPlantable && tile.groundType != TileData.GroundType.Water)
                 {
-                    GameObject treePrefab = null;
-                    TileData.TreeType tType = TileData.TreeType.None;
-
-                    if (tile.groundType == TileData.GroundType.Grass) { treePrefab = treeGrass; tType = TileData.TreeType.Grass; }
-                    else if (tile.groundType == TileData.GroundType.Dirt) { treePrefab = treeDirt; tType = TileData.TreeType.Dirt; }
-                    else if (tile.groundType == TileData.GroundType.Snow) { treePrefab = treeSnow; tType = TileData.TreeType.Snow; }
-
-                    if (treePrefab != null)
+                    if (Random.value < 0.2f)
                     {
-                        float unityZ = (h - 1 - y) * tileSize;
-                        Vector3 pos = new Vector3(x * tileSize, 0, unityZ);
-                        
-                        Quaternion rot = Quaternion.Euler(0, Random.Range(0, 360), 0);
-                        Instantiate(treePrefab, pos, rot, transform);
-                        treePrefab.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+                        GameObject treeObj = null;
+                        TileData.TreeType tType = TileData.TreeType.None;
 
-                        tile.SetTree(tType);
+                        if (tile.groundType == TileData.GroundType.Grass) { treeObj = treeGrass; tType = TileData.TreeType.Grass; }
+                        else if (tile.groundType == TileData.GroundType.Dirt) { treeObj = treeDirt; tType = TileData.TreeType.Dirt; }
+                        else if (tile.groundType == TileData.GroundType.Snow) { treeObj = treeSnow; tType = TileData.TreeType.Snow; }
+
+                        if (treeObj != null)
+                        {
+                            float unityZ = (h - 1 - y) * tileSize;
+                            Vector3 pos = new Vector3(x * tileSize, 0, unityZ);
+                            
+                            Quaternion rot = Quaternion.Euler(0, Random.Range(0, 360), 0);
+                            Instantiate(treeObj, pos, rot, transform);
+                            treeObj.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+                            treeObj.name = $"Tree_{x}_{y}";
+                            tile.SetTree(tType);
+                        }
                     }
                 }
             }
