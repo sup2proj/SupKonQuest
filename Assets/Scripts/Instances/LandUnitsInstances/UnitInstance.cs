@@ -80,10 +80,6 @@ public class UnitInstance : MonoBehaviour
 
     void HandleAttack()
     {
-        // Vérifier si c'est une unité de combat
-        if (!(unitData is UnitCombatData))
-            return;
-
         bool isAttacking = Keyboard.current.gKey.isPressed;
 
         if (animator != null)
