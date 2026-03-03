@@ -80,8 +80,10 @@ public class UnitInstance : MonoBehaviour
 
     void HandleAttack()
     {
-        // if (unitData == null || !unitData.canAttack)
-        //     return;
+        // Vérifier si c'est une unité de combat
+        if (!(unitData is UnitCombatData))
+            return;
+
         bool isAttacking = Keyboard.current.gKey.isPressed;
 
         if (animator != null)
@@ -110,7 +112,11 @@ public class UnitInstance : MonoBehaviour
 
     public void Heal(float amount)
     {
-        if (unitData == null || !unitData.canHeal)
+        if (unitData == null)
+            return;
+
+        // Vérifier si c'est une unité soigneuse
+        if (!(unitData is UnitHealerData healerData))
             return;
 
         currentHealth += amount;
@@ -126,8 +132,13 @@ public class UnitInstance : MonoBehaviour
 
     public void ApplyBuff()
     {
-        if (unitData == null || !unitData.canBuff)
+        if (unitData == null)
             return;
+
+        // Vérifier si c'est une unité de support
+        if (!(unitData is UnitSupportData supportData))
+            return;
+
         Debug.Log("Buff applied to " + unitData.type);
     }
 }
