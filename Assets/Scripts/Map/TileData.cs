@@ -12,6 +12,7 @@ public class TileData
     public bool hasTree;
     public bool isWalkable;
     public bool isNavigable;
+    public bool isPlantable;
     public GameObject unitOnTop;
     public GameObject buildingOnTop;
     public int coordX;
@@ -30,6 +31,7 @@ public class TileData
         this.currentOwnerID = -1;
         this.isWalkable = (this.groundType != GroundType.Water);
         this.isNavigable = (this.groundType == GroundType.Water);
+        this.isPlantable = true;
     }
     public void SetTree(TreeType type)
     {
