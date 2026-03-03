@@ -9,15 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b173fc46574824eb2b3c352581204582, type: 3}
+  m_Script: {fileID: 11500000, guid: b353e6cb6b9b049d5ab94e0b5a678373, type: 3}
   m_Name: Healer
-  m_EditorClassIdentifier: Assembly-CSharp::Healer
+  m_EditorClassIdentifier: Assembly-CSharp::UnitHealerData
   price: 0
   maxHealth: 0
-  buffHealing: 0
-  buffHealingCooldown: 0
-  buffRange: 0
   speed: 0
   creationTime: 0
   type: 0
   isPoweredUnit: 0
+  healAmount: 0
+  healCooldown: 0
+  healDuration: 0
+  healRange: 0

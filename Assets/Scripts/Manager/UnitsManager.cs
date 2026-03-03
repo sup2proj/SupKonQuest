@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class UnitsManager : MonoBehaviour
 {
-    public List<UnitsData> unitsDatas;
+    public List<UnitData> unitData;
     public UnitsType unitsType;
     public GameObject unitPrefab;
     
@@ -18,21 +18,21 @@ public class UnitsManager : MonoBehaviour
     
 	public void SpawnUnitByIndexAtPosition(int index, Vector3 position)
     {
-        if (unitsDatas.Count == 0 || unitPrefab == null || index < 0 || index >= unitsDatas.Count)
+        if (unitData.Count == 0 || unitPrefab == null || index < 0 || index >= unitData.Count)
             return;
 
-        UnitsData data = unitsDatas[index];
+        UnitData data = unitData[index];
         GameObject unitGO = Instantiate(unitPrefab, position, Quaternion.identity);
-        UnitsSoldierInstance instance = unitGO.GetComponent<UnitsSoldierInstance>();
+        UnitInstance instance = unitGO.GetComponent<UnitInstance>();
         if (instance != null)
         {
-            instance.Init(data);
+            instance.Initialize(data);
         }
     }
     
     public void SpawnUnitByTypeAtPosition(UnitsType type, Vector3 position)
     {
-        int index = unitsDatas.FindIndex(data => data.type == type);
+        int index = unitData.FindIndex(data => data.type == type);
         if (index != -1)
         {
             SpawnUnitByIndexAtPosition(index, position);
