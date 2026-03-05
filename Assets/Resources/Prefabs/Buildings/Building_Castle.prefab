@@ -188,7 +188,7 @@ MonoBehaviour:
   structureData: {fileID: 0}
   unitsManager: {fileID: 0}
   neutralStructure: 0
-  structureType: 0
+  structureType: 1
   unitsProtectorTypes: 
   UnitsProtector: 0
   isAlive: 0

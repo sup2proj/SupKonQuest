@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6807213923685891317}
+  - component: {fileID: -654240376972270683}
   m_Layer: 0
   m_Name: Building_Special
   m_TagString: Untagged
@@ -32,6 +33,26 @@ Transform:
   - {fileID: 731654957586410100}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-654240376972270683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 314074348264333094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6dc3800f24f44f84ad9c6715e1d16f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StructureInstance
+  structureData: {fileID: 0}
+  unitsManager: {fileID: 0}
+  neutralStructure: 0
+  structureType: 0
+  unitsProtectorTypes: 
+  UnitsProtector: 0
+  isAlive: 0
+  player: 0
 --- !u!1001 &985695904087018911
 PrefabInstance:
   m_ObjectHideFlags: 0

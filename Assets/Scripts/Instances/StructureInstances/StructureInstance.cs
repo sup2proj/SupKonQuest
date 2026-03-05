@@ -8,6 +8,8 @@ using UnityEngine.EventSystems;
 
 public class StructureInstance : MonoBehaviour
 {
+    private static StructureInstance currentlySelected = null;
+    
     [Header("Data")]
     [SerializeField] private StructureData structureData;
     public UnitsManager unitsManager; //Permet d'appeler l'unitsManager
@@ -83,28 +85,37 @@ public class StructureInstance : MonoBehaviour
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;
 
-        // Vérifie uniquement si la structure est sélectionnée
         if (!outline.enabled) return;
-
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-
             if (Physics.Raycast(ray, out hit))
             {
-                // Si le clic n'est pas sur cette structure (ou ses enfants)
-                if (!hit.collider.transform.IsChildOf(transform))
+                // Vérifie si on a cliqué sur une autre structure
+                StructureInstance otherStructure = hit.collider.GetComponent<StructureInstance>();
+                // Si c'est une autre structure, on ne fait rien
+                // (l'autre structure va se sélectionner via son OnMouseDown)
+                if (otherStructure != null && otherStructure != this)
+                {
+                    // Désélectionne cette structure sans cacher les boutons
+                    // (la nouvelle structure va afficher ses propres boutons)
+                    UnSelected();
+                    return;
+                }
+                
+                // Si le clic n'est pas sur cette structure (ou ses enfants) et pas sur une autre structure
+                if (!hit.collider.transform.IsChildOf(transform) && otherStructure == null)
                 {
                     UnSelected();
-                    ActionInterface.Instance.HideStructureButtons();
+                    ActionInterface.Instance.HideAllButtons();
                 }
             }
             else
             {
                 // Clic dans le vide → désélection
                 UnSelected();
-                ActionInterface.Instance.HideStructureButtons();
+                ActionInterface.Instance.HideAllButtons();
                 
             }
         }
@@ -112,18 +123,35 @@ public class StructureInstance : MonoBehaviour
 
     public void Selected()
     {
-        Debug.Log($"Structure {name} sélectionnée.");
+        Debug.Log($"Structure {name} sélectionnée (Type: {structureType}).");
+        
+        // Si une autre structure était déjà sélectionnée, on la désélectionne
+        if (currentlySelected != null && currentlySelected != this)
+        {
+            currentlySelected.UnSelected();
+        }
+        
+        // Cette structure devient la structure sélectionnée
+        currentlySelected = this;
+        
         if (outline != null)
             outline.enabled = true;
         else
             Debug.LogWarning($"[StructureInstance] Composant Outline manquant sur {name}.");
         
-        ActionInterface.ShowStructureButtons();
+        ActionInterface.ShowStructureButtons(structureType);
     }
 
     public void UnSelected()
     {
         Debug.Log($"Structure {name} désélectionnée.");
+        
+        // Si c'est la structure actuellement sélectionnée, on efface la référence
+        if (currentlySelected == this)
+        {
+            currentlySelected = null;
+        }
+        
         // Restaure la couleur du bâtiment
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)

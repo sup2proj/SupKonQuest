@@ -11,34 +11,27 @@ public class ActionButton : MonoBehaviour
     private float colorResetTimer = 0f;
     private bool isColorTemporarilyChanged = false;
 
-    public void Setup(System.Action onClick)
+    public void Setup(StructureType structureType,System.Action onClick)
     {
-        Debug.Log($"[{name}] Setup() appelé");
-        
         if (button == null)
         {
             button = GetComponent<Button>();
         }
+		Debug.Log($"[ActionButton] Setup() appelé pour {name} avec StructureType: {structureType}");
 
-        if (button == null)
+		if (structureType == StructureType.NeutralStructure)
         {
-            Debug.LogError($"[{name}] ActionButton: aucun Button trouvé/assigné.", this);
-            return;
+            pressedColor = new Color(0.7f, 0.1f, 0.5f, 1f);
+			Debug.Log($"[ActionButton] Couleur de pression pour {structureType} définie sur {pressedColor}");
         }
 
-        Debug.Log($"[{name}] Button trouvé: {button != null}");
-        
         onClickAction = onClick;
         if (button.targetGraphic != null)
         {
             originalColor = button.targetGraphic.color;
-            Debug.Log($"[{name}] Couleur originale sauvegardée: {originalColor}");
         }
-
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(Execute);
-        
-        Debug.Log($"[{name}] Setup terminé - Listener ajouté");
     }
 
     void Update()
