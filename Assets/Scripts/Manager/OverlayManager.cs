@@ -14,14 +14,26 @@ public class OverlayManager : MonoBehaviour
 
     public static void initializePermanentOverlay()
     {
-        // GameObject permanentOverlay = Resources.Load<GameObject>("Sprites/UI/StructureInterface/Interface");
-        // if (permanentOverlay != null)
-        // {
-        //     Instantiate(permanentOverlay);
-        // }
-        // else
-        // {
-        //     Debug.LogError("Le prefab Interface n'a pas pu être chargé depuis Resources!");
-        // }
+        GameObject permanentOverlay = Resources.Load<GameObject>("Sprites/UI/StructureInterface/GameInterface");
+        initializeEventSystem();
+        if (permanentOverlay != null)
+        {
+            Instantiate(permanentOverlay);
+        }
+        else
+        {
+            Debug.LogError("Le prefab Interface n'a pas pu être chargé depuis Resources!");
+        }
+    }
+    
+    public static void initializeEventSystem()
+    {
+        if (UnityEngine.EventSystems.EventSystem.current == null)
+        {
+            GameObject eventSystem = new GameObject("EventSystem");
+            eventSystem.AddComponent<UnityEngine.EventSystems.EventSystem>();
+            eventSystem.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+        }
     }
 }
+

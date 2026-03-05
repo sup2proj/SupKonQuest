@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 // Ce script doit être rattaché à un GO directement dans la scène 
 // et il doit faire référence à l'unitsManager, pour pouvoir utiliser la fonction SpawnUnitByTypeAtPosition
@@ -10,8 +11,6 @@ public class StructureInstance : MonoBehaviour
     [Header("Data")]
     [SerializeField] private StructureData structureData;
     public UnitsManager unitsManager; //Permet d'appeler l'unitsManager
-    public GameObject structureInterface;
-
     private Vector3 structurePosition; // Récupère la position de la structure dans la scène
     private Queue<UnitData> unitQueue = new Queue<UnitData>(); // File d'attente pour les unités à créer
     private bool isSpawning = false; // Indique si la structure est actuellement en train de créer des unités
@@ -25,14 +24,23 @@ public class StructureInstance : MonoBehaviour
 
     [Header("Player")]
     public PlayerNumber player;
-
-    private Outline outline; // Quick Outline composant
+    private Outline outline;
+    private Collider structureCollider;
 
     void Awake()
     {
-        outline = GetComponent<Outline>(); // Récupère le composant Quick Outline
-        if (outline != null)
-            outline.enabled = false; // contour désactivé au départ
+        outline = GetComponent<Outline>();
+        structureCollider = GetComponent<Collider>();
+        
+        if (outline == null)
+        {
+            outline = gameObject.AddComponent<Outline>();
+        }
+        outline.enabled = false;
+        if (structureCollider == null)
+        {
+            structureCollider = gameObject.AddComponent<BoxCollider>();
+        }
     }
 
     void Start()
@@ -52,6 +60,8 @@ public class StructureInstance : MonoBehaviour
         {
             StartCoroutine(SpawnUnitsWithDelay(structurePosition));
         }
+
+        DetectClickOutside();
     }
 
     public void AddToQueue(UnitsType type)
@@ -68,32 +78,57 @@ public class StructureInstance : MonoBehaviour
         Selected();
     }
 
-    void Selected()
+    void DetectClickOutside()
     {
-        if (structureInterface != null)
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return;
+
+        // Vérifie uniquement si la structure est sélectionnée
+        if (!outline.enabled) return;
+
+        if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Selected structure: " + gameObject.name);
-            structureInterface.SetActive(true);
-            structureInterface.transform.SetAsLastSibling();
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                // Si le clic n'est pas sur cette structure (ou ses enfants)
+                if (!hit.collider.transform.IsChildOf(transform))
+                {
+                    UnSelected();
+                    ActionInterface.Instance.HideStructureButtons();
+                }
+            }
+            else
+            {
+                // Clic dans le vide → désélection
+                UnSelected();
+                ActionInterface.Instance.HideStructureButtons();
+                
+            }
         }
+    }
+
+    public void Selected()
+    {
+        Debug.Log($"Structure {name} sélectionnée.");
         if (outline != null)
             outline.enabled = true;
+        else
+            Debug.LogWarning($"[StructureInstance] Composant Outline manquant sur {name}.");
+        
+        ActionInterface.ShowStructureButtons();
     }
 
     public void UnSelected()
     {
-        // Cache le menu UI
-        if (structureInterface != null)
-            structureInterface.SetActive(false);
-
+        Debug.Log($"Structure {name} désélectionnée.");
         // Restaure la couleur du bâtiment
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)
             renderer.material.color = Color.white;
-
-        // Désactive le contour Quick Outline
-        if (outline != null)
-            outline.enabled = false;
+        outline.enabled = false;
     }
 
     private IEnumerator SpawnUnitsWithDelay(Vector3 position)

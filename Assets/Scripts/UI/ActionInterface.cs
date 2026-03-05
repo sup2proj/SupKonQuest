@@ -2,10 +2,20 @@ using UnityEngine;
 
 public class ActionInterface : MonoBehaviour
 {
-    public ActionButton[] buttons;
+    public static ActionInterface Instance;
 
+    public ActionButton[] buttons;
+    
+    void Awake()
+    {
+        Debug.Log("[ActionInterface] Awake() appelé");
+        Instance = this;
+        HideStructureButtons();
+    }
+    
     void Start()
     {
+        Debug.Log("[ActionInterface] Start() appelé");
         SetupButtons();
     }
 
@@ -24,7 +34,8 @@ public class ActionInterface : MonoBehaviour
             if (buttons[i] != null)
             {
                 int buttonNumber = i + 1;
-                buttons[i].Setup(null, 0, () => ButtonAction(buttonNumber));
+                Debug.Log($"[ActionInterface] Configuration du bouton {buttonNumber} ({buttons[i].name})");
+                buttons[i].Setup(() => ButtonAction(buttonNumber));
             }
             else
             {
@@ -35,6 +46,42 @@ public class ActionInterface : MonoBehaviour
 
     void ButtonAction(int buttonNumber)
     {
-        Debug.Log(buttonNumber.ToString());
+        Debug.Log($"[ActionInterface] ButtonAction appelé pour le bouton {buttonNumber}");
+    }
+    
+    public void HideStructureButtons()
+    {
+        Debug.Log("[ActionInterface] HideStructureButtons() appelé");
+        foreach (var button in buttons)
+        {
+            if (button != null)
+            {
+                button.gameObject.SetActive(false);
+            }
+        }
+    }
+    
+    public static void ShowStructureButtons()
+    {
+        if (Instance == null)
+        {
+            Debug.LogError("[ActionInterface] Instance est null! ShowStructureButtons ne peut pas fonctionner.");
+            return;
+        }
+        
+        if (Instance.buttons == null || Instance.buttons.Length == 0)
+        {
+            Debug.LogError("[ActionInterface] Aucun bouton n'est assigné dans l'instance!");
+            return;
+        }
+        
+        foreach (var button in Instance.buttons)
+        {
+            if (button != null)
+            {
+                button.gameObject.SetActive(true);
+                Debug.Log($"[ActionInterface] Bouton {button.name} activé");
+            }
+        }
     }
 }
