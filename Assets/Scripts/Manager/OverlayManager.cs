@@ -14,7 +14,7 @@ public class OverlayManager : MonoBehaviour
 
     public static void initializePermanentOverlay()
     {
-        GameObject permanentOverlay = Resources.Load<GameObject>("Sprites/UI/StructureInterface/GameInterface");
+        GameObject permanentOverlay = Resources.Load<GameObject>("Sprites/UI/GameInterface/GameInterface");
         initializeEventSystem();
         if (permanentOverlay != null)
         {

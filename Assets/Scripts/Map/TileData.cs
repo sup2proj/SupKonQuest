@@ -7,7 +7,7 @@ using UnityEngine;
 public class TileData
 {
     public GroundType groundType;
-    public bool isBuildingOnTop;
+    public bool isStructureOnTop;
     public bool isUnitOnTop;
     public bool isTreeOnTop;
     public bool isWalkable;
@@ -18,7 +18,7 @@ public class TileData
     public TileData(GroundType t,int x,int y)
     {
         groundType = t;
-        isBuildingOnTop = false;
+        isStructureOnTop = false;
         isUnitOnTop = false;
         isTreeOnTop = false;
         coordX = x;
@@ -32,15 +32,15 @@ public class TileData
         isTreeOnTop = true;
         UpdatePathfindingStatus();
     }
-    public void SetBuilding(int ownerID, int income)
+    public void SetStructure(int ownerID, int income)
     {
-        isBuildingOnTop = true;
+        isStructureOnTop = true;
         UpdatePathfindingStatus();
     }
     public void UpdatePathfindingStatus()
     {
-        isWalkable = groundType != GroundType.Water && !isTreeOnTop && !isBuildingOnTop && !isUnitOnTop;
-        isNavigable = groundType == GroundType.Water && !isTreeOnTop && !isBuildingOnTop && !isUnitOnTop;
+        isWalkable = groundType != GroundType.Water && !isTreeOnTop && !isStructureOnTop && !isUnitOnTop;
+        isNavigable = groundType == GroundType.Water && !isTreeOnTop && !isStructureOnTop && !isUnitOnTop;
     }
     public void SetUnitOnTop()
     {

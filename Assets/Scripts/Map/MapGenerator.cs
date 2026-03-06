@@ -30,7 +30,7 @@ public class MapGenerator : MonoBehaviour
     public GameObject treeGrass;
     public GameObject treeSnow;
     
-    [Header("Buildings")]
+    [Header("Structures")]
     public GameObject buildingCastle;
     public GameObject buildingHarbour;
     public GameObject buildingSpecial;
@@ -190,7 +190,7 @@ public class MapGenerator : MonoBehaviour
     {
         string environmentPath = "Prefabs/Environment/";
         string naturePath = "Prefabs/Nature/";
-        string buildingPath = "Prefabs/Buildings/";
+        string buildingPath = "Prefabs/Structures/";
         
         if (groundDirt == null) groundDirt = Resources.Load<GameObject>(environmentPath+"Env_Ground_Dirt");
         if (groundGrass == null) groundGrass = Resources.Load<GameObject>(environmentPath+"Env_Ground_Grass");
@@ -201,8 +201,8 @@ public class MapGenerator : MonoBehaviour
         if (treeGrass == null) treeGrass = Resources.Load<GameObject>(naturePath+"Nature_Tree_Grass");
         if (treeSnow == null) treeSnow = Resources.Load<GameObject>(naturePath+"Nature_Tree_Snow");
 
-        if (buildingCastle == null) buildingCastle = Resources.Load<GameObject>(buildingPath+"Building_Castle");
-        if (buildingHarbour == null) buildingHarbour = Resources.Load<GameObject>(buildingPath+"Building_Harbour");
-        if (buildingSpecial == null) buildingSpecial = Resources.Load<GameObject>(buildingPath+"Building_Special");
+        if (buildingCastle == null) buildingCastle = Resources.Load<GameObject>(buildingPath+"Structure");
+        if (buildingHarbour == null) buildingHarbour = Resources.Load<GameObject>(buildingPath+"Harbour");
+        if (buildingSpecial == null) buildingSpecial = Resources.Load<GameObject>(buildingPath+"NeutralStructure");
     }
 }
