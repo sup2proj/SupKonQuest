@@ -1,5 +1,9 @@
-﻿using UnityEngine;
+﻿using Enums.Environment;
+using Enums.Nature;
+using Enums.Structure;
+using UnityEngine;
 using System.Collections.Generic;
+using Building;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -7,6 +11,8 @@ public class MapGenerator : MonoBehaviour
     private readonly Color32 _colorDirt = new Color32(170, 160, 0, 255);
     private readonly Color32 _colorSnow = new Color32(255, 255, 255, 255);
     private readonly Color32 _colorWater = new Color32(0, 10, 170, 255);
+    public GroundType groundType;
+    public TreeType treeType;
     
     public TileData[,] allTiles;
 
@@ -26,7 +32,7 @@ public class MapGenerator : MonoBehaviour
     
     [Header("Buildings")]
     public GameObject buildingCastle;
-    public GameObject buildingArsenal;
+    public GameObject buildingHarbour;
     public GameObject buildingSpecial;
 
     [Header("Réglages")]
@@ -35,11 +41,11 @@ public class MapGenerator : MonoBehaviour
     void Start()
     {
         // LoadAndGenerate("EUROPE");
-        LoadAndGenerate("TEST");
+        // LoadAndGenerate("TEST");
         // LoadAndGenerate("LOL");
     }
 
-    void LoadAndGenerate(string folderName)
+    public void LoadAndGenerate(string folderName)
     {
         SetupResources();
         string path = "Maps/" + folderName + "/";
@@ -50,7 +56,7 @@ public class MapGenerator : MonoBehaviour
         {
             GenerateWorld();      
             PlaceBuildings(jsonData); 
-            AddTrees();     
+            AddNature();     
             Debug.Log($"Monde '{folderName}' généré avec succès !");
         }
         else
@@ -71,26 +77,25 @@ public class MapGenerator : MonoBehaviour
             {
                 Color32 color = mapLayout.GetPixel(x, y);
                 var gData = GetGroundDatas(color);
-                int arrayY = h - 1 - y;
-                allTiles[x, arrayY] = new TileData(gData.type, x, arrayY);
+                allTiles[x, y] = new TileData(gData.type, x, y);
 
                 Vector3 pos = new Vector3(x * tileSize, 0, y * tileSize);
                 GameObject floor = Instantiate(gData.prefab, pos, Quaternion.identity, transform);
                 floor.transform.localScale = new Vector3(0.1f, 1f, 0.1f);
-                floor.name = $"Tile_{x}_{arrayY}";
+                floor.name = $"Tile_{x}_{y}";
             }
         }
     }
 
     void PlaceBuildings(MapJsonData data)
     {
-        SpawnBuildingGroup(data.startPoints, buildingCastle, TileData.BuildingType.Castle);
-        SpawnBuildingGroup(data.castles, buildingCastle, TileData.BuildingType.Castle);
-        SpawnBuildingGroup(data.arsenals, buildingArsenal, TileData.BuildingType.Arsenal);
-        SpawnBuildingGroup(data.special, buildingSpecial, TileData.BuildingType.Special);
+        SpawnBuildingGroup(data.startPoints, buildingCastle, StructureType.Structure, 1);
+        SpawnBuildingGroup(data.castles, buildingCastle,  StructureType.Structure, 1);
+        SpawnBuildingGroup(data.harbours, buildingHarbour,  StructureType.Harbour, 1);
+        SpawnBuildingGroup(data.special, buildingSpecial,  StructureType.NeutralStructure, 1);
     }
 
-    void SpawnBuildingGroup(List<PointData> points, GameObject prefab, TileData.BuildingType type)
+    void SpawnBuildingGroup(List<PointData> points, GameObject prefab,  StructureType type, int income)
     {
         if (points == null || prefab == null) return;
         int h = mapLayout.height;
@@ -99,23 +104,22 @@ public class MapGenerator : MonoBehaviour
         {
             if (p.x >= 0 && p.x < allTiles.GetLength(0) && p.y >= 0 && p.y < allTiles.GetLength(1))
             {
-                float unityZ = (h - 1 - p.y) * tileSize;
-                Vector3 pos = new Vector3(p.x * tileSize, 0, unityZ);
+                int unityY = (h - 1 - p.y) ;
+                Vector3 pos = new Vector3(p.x * tileSize, 0, unityY* tileSize);
                 
                 GameObject buildingObj = Instantiate(prefab, pos, Quaternion.identity, transform);
                 buildingObj.transform.localScale = new Vector3(3f, 3f, 3f);
                 buildingObj.name = $"{type}_{p.x}_{p.y}";
+                BuildingController buildingController = buildingObj.AddComponent<BuildingController>();
+                buildingController.Init(p.x, p.y,-1,income);
 
-                allTiles[p.x, p.y].SetBuilding(type, buildingObj);
-                allTiles[p.x, p.y].SetOwnerID(p.owner);
-                BlockPlanting(p.x, p.y);
+                BlockNature(p.x, unityY);
             }
         }
     }
 
-    void BlockPlanting(int x, int y)
+    void BlockNature(int x, int y)
     {
-        // int[,] coordArray = { {0,0}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}, {0, 1} } ;
         int voisinX = 0;
         int voisinY = 0;
         
@@ -127,13 +131,13 @@ public class MapGenerator : MonoBehaviour
                 voisinY = y + j;
                 if (voisinX >= 0 && voisinX < allTiles.GetLength(0) && voisinY >= 0 && voisinY < allTiles.GetLength(1))
                 {
-                    allTiles[voisinX, voisinY].isPlantable = false;
+                    allTiles[voisinX, voisinY].CanPlaceNature = false;
                 }
             }
         }
     }
     
-    void AddTrees()
+    void AddNature()
     {
         int h = mapLayout.height;
         for (int x = 0; x < allTiles.GetLength(0); x++)
@@ -142,27 +146,26 @@ public class MapGenerator : MonoBehaviour
             {
                 TileData tile = allTiles[x, y];
 
-                if (tile.isPlantable && tile.groundType != TileData.GroundType.Water)
+                if (tile.CanPlaceNature && tile.groundType != GroundType.Water)
                 {
                     if (Random.value < 0.2f)
                     {
                         GameObject treeObj = null;
-                        TileData.TreeType tType = TileData.TreeType.None;
+                        TreeType tType = TreeType.None;
 
-                        if (tile.groundType == TileData.GroundType.Grass) { treeObj = treeGrass; tType = TileData.TreeType.Grass; }
-                        else if (tile.groundType == TileData.GroundType.Dirt) { treeObj = treeDirt; tType = TileData.TreeType.Dirt; }
-                        else if (tile.groundType == TileData.GroundType.Snow) { treeObj = treeSnow; tType = TileData.TreeType.Snow; }
+                        if (tile.groundType == GroundType.Grass) { treeObj = treeGrass; tType = TreeType.Grass; }
+                        else if (tile.groundType == GroundType.Dirt) { treeObj = treeDirt; tType = TreeType.Dirt; }
+                        else if (tile.groundType == GroundType.Snow) { treeObj = treeSnow; tType = TreeType.Snow; }
 
                         if (treeObj != null)
                         {
-                            float unityZ = (h - 1 - y) * tileSize;
-                            Vector3 pos = new Vector3(x * tileSize, 0, unityZ);
+                            Vector3 pos = new Vector3(x * tileSize, 0, y);
                             
                             Quaternion rot = Quaternion.Euler(0, Random.Range(0, 360), 0);
                             Instantiate(treeObj, pos, rot, transform);
                             treeObj.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
                             treeObj.name = $"Tree_{x}_{y}";
-                            tile.SetTree(tType);
+                            tile.SetTree();
                         }
                     }
                 }
@@ -175,12 +178,12 @@ public class MapGenerator : MonoBehaviour
         return c1.r == c2.r && c1.g == c2.g && c1.b == c2.b;
     }
 
-    (TileData.GroundType type, GameObject prefab) GetGroundDatas(Color32 c)
+    (GroundType type, GameObject prefab) GetGroundDatas(Color32 c)
     {
-        if (IsColor(c, _colorWater)) return (TileData.GroundType.Water, groundWater);
-        if (IsColor(c, _colorDirt)) return (TileData.GroundType.Dirt, groundDirt);
-        if (IsColor(c, _colorSnow)) return (TileData.GroundType.Snow, groundSnow);
-        return (TileData.GroundType.Grass, groundGrass);
+        if (IsColor(c, _colorWater)) return (GroundType.Water, groundWater);
+        if (IsColor(c, _colorDirt)) return (GroundType.Dirt, groundDirt);
+        if (IsColor(c, _colorSnow)) return (GroundType.Snow, groundSnow);
+        return (GroundType.Grass, groundGrass);
     }
     
     void SetupResources()
@@ -199,7 +202,7 @@ public class MapGenerator : MonoBehaviour
         if (treeSnow == null) treeSnow = Resources.Load<GameObject>(naturePath+"Nature_Tree_Snow");
 
         if (buildingCastle == null) buildingCastle = Resources.Load<GameObject>(buildingPath+"Building_Castle");
-        if (buildingArsenal == null) buildingArsenal = Resources.Load<GameObject>(buildingPath+"Building_Arsenal");
+        if (buildingHarbour == null) buildingHarbour = Resources.Load<GameObject>(buildingPath+"Building_Harbour");
         if (buildingSpecial == null) buildingSpecial = Resources.Load<GameObject>(buildingPath+"Building_Special");
     }
 }

@@ -1,62 +1,50 @@
-﻿using UnityEngine;
+﻿using Enums.Environment;
+using Enums.Nature;
+using Enums.Structure;
+using UnityEngine;
 
 [System.Serializable]
 public class TileData
 {
-    public enum GroundType { Grass, Dirt, Snow, Water }
-    public enum TreeType { None, Grass, Dirt, Snow }
-    public enum BuildingType { None, Castle, Special, Arsenal }
     public GroundType groundType;
-    public TreeType treeType;
-    public BuildingType buildingType;
-    public bool hasTree;
+    public bool isBuildingOnTop;
+    public bool isUnitOnTop;
+    public bool isTreeOnTop;
     public bool isWalkable;
     public bool isNavigable;
-    public bool isPlantable;
-    public GameObject unitOnTop;
-    public GameObject buildingOnTop;
+    public bool CanPlaceNature;
     public int coordX;
     public int coordY;
-    public int currentOwnerID;
     public TileData(GroundType t,int x,int y)
     {
-        this.groundType = t;
-        this.treeType = TreeType.None;
-        this.buildingType = BuildingType.None;
-        this.hasTree = false;
-        this.unitOnTop = null;
-        this.buildingOnTop = null;
-        this.coordX = x;
-        this.coordY = y;
-        this.currentOwnerID = -1;
-        this.isWalkable = (this.groundType != GroundType.Water);
-        this.isNavigable = (this.groundType == GroundType.Water);
-        this.isPlantable = true;
+        groundType = t;
+        isBuildingOnTop = false;
+        isUnitOnTop = false;
+        isTreeOnTop = false;
+        coordX = x;
+        coordY = y;
+        isWalkable = (groundType != GroundType.Water);
+        isNavigable = (groundType == GroundType.Water);
+        CanPlaceNature = true;
     }
-    public void SetTree(TreeType type)
+    public void SetTree()
     {
-        this.treeType = type;
-        this.hasTree = true;
+        isTreeOnTop = true;
         UpdatePathfindingStatus();
     }
-    public void SetBuilding(BuildingType type, GameObject buildingObj)
+    public void SetBuilding(int ownerID, int income)
     {
-        this.buildingType = type;
-        this.buildingOnTop = buildingObj;
+        isBuildingOnTop = true;
         UpdatePathfindingStatus();
     }
     public void UpdatePathfindingStatus()
     {
-        this.isWalkable = (this.groundType != GroundType.Water && !this.hasTree && this.buildingType == BuildingType.None && this.unitOnTop == null);
-        this.isNavigable = (this.groundType == GroundType.Water && this.unitOnTop == null);
+        isWalkable = groundType != GroundType.Water && !isTreeOnTop && !isBuildingOnTop && !isUnitOnTop;
+        isNavigable = groundType == GroundType.Water && !isTreeOnTop && !isBuildingOnTop && !isUnitOnTop;
     }
-    public void SetUnitOnTop(GameObject unit)
+    public void SetUnitOnTop()
     {
-        this.unitOnTop = unit;
+        isUnitOnTop = true;
         UpdatePathfindingStatus();
-    }
-    public void SetOwnerID(int ownerID)
-    {
-        this.currentOwnerID = ownerID;
     }
 }
