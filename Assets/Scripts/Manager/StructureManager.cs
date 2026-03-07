@@ -1,11 +1,17 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class UnitsManager : MonoBehaviour
+public class StructureManager : MonoBehaviour
 {
+    public StructureManager Instance;
     public List<UnitData> unitData;
     public UnitsType unitsType;
     public GameObject unitPrefab;
+    
+    void Awake()
+    {
+        Instance = this;
+    }
     
     void Update()
     {
@@ -30,9 +36,12 @@ public class UnitsManager : MonoBehaviour
         }
     }
     
-    public void SpawnUnitByTypeAtPosition(UnitsType type, Vector3 position)
+    public void SpawnUnitByTypeAtPosition(UnitsType type, float x, float z)
     {
+        string unitPath = "Prefabs/Units/";
         int index = unitData.FindIndex(data => data.type == type);
+        //logique de spawn à des coordonnées x et z 
+        
         if (index != -1)
         {
             SpawnUnitByIndexAtPosition(index, position);

@@ -41,8 +41,8 @@ public class cameraMouvement : MonoBehaviour
 
     void SetUpCamera(int mapWidth, int mapHeight)
     {
-        mapWidth = mapWidth;
-        mapHeight = mapHeight;
+        this.mapWidth = mapWidth;
+        this.mapHeight = mapHeight;
         
     }
     

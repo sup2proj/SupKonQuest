@@ -443,7 +443,7 @@ GameObject:
   - component: {fileID: 1431006425}
   - component: {fileID: 1431006424}
   m_Layer: 0
-  m_Name: UnitsManager
+  m_Name: StructureManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

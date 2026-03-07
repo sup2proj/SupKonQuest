@@ -17,6 +17,8 @@ public class ActionInterface : MonoBehaviour
     public ActionButton[] unitActionButtons;
     
     private StructureType currentStructureType;
+	private float x;
+	private float y;
     
     void Awake()
     {
@@ -29,6 +31,8 @@ public class ActionInterface : MonoBehaviour
     {
         Debug.Log("[ActionInterface] Start() appelé");
         SetupAllButtons();
+		this.x = StructureInstance.x;
+        this.y = StructureInstance.y;
     }
 
     void SetupAllButtons()
@@ -67,8 +71,95 @@ public class ActionInterface : MonoBehaviour
 
     void ButtonAction(int buttonNumber, string structureTypeName)
     {
-        Debug.Log($"[ActionInterface] ButtonAction appelé pour le bouton {buttonNumber} du type {structureTypeName}");
-        // Ici vous pouvez ajouter la logique spécifique selon le type
+        //Debug.Log($"[ActionInterface] ButtonAction appelé pour le bouton {buttonNumber} du type {structureTypeName}");
+		if (structureTypeName == "Structure") {
+			StructureButtonAction(buttonNumber);
+		}
+         else if (structureTypeName == "NeutralStructure") {
+			NeutralStructureButtonAction(buttonNumber);
+		}
+         else if (structureTypeName == "Harbour") {
+			HarbourButtonAction(buttonNumber);
+		}
+	}
+
+	public void StructureButtonAction(int buttonNumber) {
+		switch(buttonNumber)
+		{
+			case 1:
+                Debug.Log("Action 1 pour Structure exécutée");
+				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Infantry, x, y);
+                break;
+            case 2:
+                Debug.Log("Action 2 pour Structure exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 2
+                break;
+            case 3:
+                Debug.Log("Action 3 pour Structure exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 3
+                break;
+			case 4:
+                Debug.Log("Action 4 pour Structure exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 4
+                break;
+			case 5:
+                Debug.Log("Action 5 pour Structure exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 5
+                break;
+			case 6:
+                Debug.Log("Action 6 pour Structure exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 6
+                break;
+			case 7:
+                Debug.Log("Action 7 pour Structure exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 7
+                break;
+            default:
+                Debug.LogWarning($"Aucune action définie pour le bouton {buttonNumber} du type Structure");
+                break;
+        }
+    }
+
+	public void NeutralStructureButtonAction(int buttonNumber) {
+        switch(buttonNumber)
+        {
+            case 1:
+                Debug.Log("Action 1 pour NeutralStructure exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 1
+                break;
+            case 2:
+                Debug.Log("Action 2 pour NeutralStructure exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 2
+                break;
+            case 3:
+                Debug.Log("Action 3 pour NeutralStructure exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 3
+                break;
+            default:
+                Debug.LogWarning($"Aucune action définie pour le bouton {buttonNumber} du type NeutralStructure");
+                break;
+        }
+	}
+
+	public void HarbourButtonAction(int buttonNumber) {
+        switch(buttonNumber)
+        {
+            case 1:
+                Debug.Log("Action 1 pour Harbour exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 1
+                break;
+            case 2:
+                Debug.Log("Action 2 pour Harbour exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 2
+                break;
+            case 3:
+                Debug.Log("Action 3 pour Harbour exécutée");
+                // Implémentez ici l'action spécifique pour le bouton 3
+                break;
+            default:
+                Debug.LogWarning($"Aucune action définie pour le bouton {buttonNumber} du type Harbour");
+                break;
+        }
     }
     
     public void HideAllButtons()

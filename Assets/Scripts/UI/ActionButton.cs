@@ -17,12 +17,11 @@ public class ActionButton : MonoBehaviour
         {
             button = GetComponent<Button>();
         }
-		Debug.Log($"[ActionButton] Setup() appelé pour {name} avec StructureType: {structureType}");
+		Debug.Log($"[ActionButton] testttttttSetup() appelé pour {name} avec StructureType: {structureType}");
 
 		if (structureType == StructureType.NeutralStructure)
         {
             pressedColor = new Color(0.7f, 0.1f, 0.5f, 1f);
-			Debug.Log($"[ActionButton] Couleur de pression pour {structureType} définie sur {pressedColor}");
         }
 
         onClickAction = onClick;

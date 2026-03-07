@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 
 // Ce script doit être rattaché à un GO directement dans la scène 
-// et il doit faire référence à l'unitsManager, pour pouvoir utiliser la fonction SpawnUnitByTypeAtPosition
+// et il doit faire référence à l'structureManager, pour pouvoir utiliser la fonction SpawnUnitByTypeAtPosition
 
 public class StructureInstance : MonoBehaviour
 {
@@ -12,12 +12,14 @@ public class StructureInstance : MonoBehaviour
     
     [Header("Data")]
     [SerializeField] private StructureData structureData;
-    public UnitsManager unitsManager; //Permet d'appeler l'unitsManager
+    public StructureManager structureManager; //Permet d'appeler le structureManager
     private Vector3 structurePosition; // Récupère la position de la structure dans la scène
+    public static float x; // Coordonnée X de la structure
+    public static float y; // Coordonnée Y de la structure
     private Queue<UnitData> unitQueue = new Queue<UnitData>(); // File d'attente pour les unités à créer
     private bool isSpawning = false; // Indique si la structure est actuellement en train de créer des unités
     public bool neutralStructure;
-    public StructureType structureType;
+    public StructureType structureType;	
 
     [Header("Units")]
     public List<UnitsType> unitsProtectorTypes = new List<UnitsType>();
@@ -48,6 +50,8 @@ public class StructureInstance : MonoBehaviour
     void Start()
     {
         structurePosition = transform.position; // Initialise la position au démarrage
+        x = structurePosition.x; // Extrait la coordonnée X
+        y = structurePosition.z; // Extrait la coordonnée Z (Y dans le plan 3D Unity)
         UnSelected();
     }
 
@@ -68,7 +72,7 @@ public class StructureInstance : MonoBehaviour
 
     public void AddToQueue(UnitsType type)
     {
-        UnitData data = unitsManager.unitData.Find(d => d.type == type);
+        UnitData data = structureManager.unitData.Find(d => d.type == type);
         if (data != null)
         {
             unitQueue.Enqueue(data);
@@ -78,6 +82,7 @@ public class StructureInstance : MonoBehaviour
     public void OnMouseDown()
     {
         Selected();
+		Debug.Log($"Position de la structure: {structurePosition} | X: {x}, Y: {y}");
     }
 
     void DetectClickOutside()
@@ -165,7 +170,7 @@ public class StructureInstance : MonoBehaviour
         while (unitQueue.Count > 0)
         {
             UnitData data = unitQueue.Dequeue();
-            unitsManager.SpawnUnitByTypeAtPosition(data.type, position);
+            structureManager.SpawnUnitByTypeAtPosition(data.type, position);
             yield return new WaitForSeconds(data.creationTime);
         }
         isSpawning = false;
