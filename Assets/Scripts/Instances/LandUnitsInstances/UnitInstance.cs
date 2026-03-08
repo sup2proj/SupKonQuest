@@ -85,7 +85,6 @@ public class UnitInstance : MonoBehaviour
         if (animator != null)
         {
             animator.SetBool("isAttacking", isAttacking);
-            Debug.Log("Animation isAttacking définie à: " + isAttacking + " pour " + gameObject.name);
         }
         else
         {
@@ -136,5 +135,20 @@ public class UnitInstance : MonoBehaviour
             return;
 
         Debug.Log("Buff applied to " + unitData.type);
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        // Vérifier si l'objet en collision a un des tags autorisés
+        if (collision.gameObject.tag != "AntiBlindage" && collision.gameObject.tag != "Archer")
+            return;
+
+        Debug.Log("Collision détectée pour " + gameObject.name);
+        Vector3 pushDirection = transform.position - collision.contacts[0].point;
+        pushDirection.y = 0; // Garder le mouvement sur le plan horizontal
+        pushDirection.Normalize();
+    
+        // Déplacer l'objet dans la direction opposée
+        float pushDistance = 1f; // Distance de déplacement
+        transform.position += pushDirection * pushDistance;
     }
 }
