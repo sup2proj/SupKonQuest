@@ -12,10 +12,7 @@ public class StructureInstance : MonoBehaviour
     
     [Header("Data")]
     [SerializeField] private StructureData structureData;
-    public StructureManager structureManager; //Permet d'appeler le structureManager
     private Vector3 structurePosition; // Récupère la position de la structure dans la scène
-    public static float x; // Coordonnée X de la structure
-    public static float y; // Coordonnée Y de la structure
     private Queue<UnitData> unitQueue = new Queue<UnitData>(); // File d'attente pour les unités à créer
     private bool isSpawning = false; // Indique si la structure est actuellement en train de créer des unités
     public bool neutralStructure;
@@ -50,8 +47,6 @@ public class StructureInstance : MonoBehaviour
     void Start()
     {
         structurePosition = transform.position; // Initialise la position au démarrage
-        x = structurePosition.x; // Extrait la coordonnée X
-        y = structurePosition.z; // Extrait la coordonnée Z (Y dans le plan 3D Unity)
         UnSelected();
     }
 
@@ -72,7 +67,7 @@ public class StructureInstance : MonoBehaviour
 
     public void AddToQueue(UnitsType type)
     {
-        UnitData data = structureManager.unitData.Find(d => d.type == type);
+        UnitData data = StructureManager.Instance.unitData.Find(d => d.type == type);
         if (data != null)
         {
             unitQueue.Enqueue(data);
@@ -82,7 +77,6 @@ public class StructureInstance : MonoBehaviour
     public void OnMouseDown()
     {
         Selected();
-		Debug.Log($"Position de la structure: {structurePosition} | X: {x}, Y: {y}");
     }
 
     void DetectClickOutside()
@@ -144,6 +138,8 @@ public class StructureInstance : MonoBehaviour
         else
             Debug.LogWarning($"[StructureInstance] Composant Outline manquant sur {name}.");
         
+        // Transmettre les coordonnées de la structure à l'ActionInterface
+        ActionInterface.SetSelectedStructure(this, structurePosition);
         ActionInterface.ShowStructureButtons(structureType);
     }
 
@@ -170,7 +166,7 @@ public class StructureInstance : MonoBehaviour
         while (unitQueue.Count > 0)
         {
             UnitData data = unitQueue.Dequeue();
-            structureManager.SpawnUnitByTypeAtPosition(data.type, position);
+            StructureManager.Instance.SpawnUnitByTypeAtPosition(data.type, position.x, position.z);
             yield return new WaitForSeconds(data.creationTime);
         }
         isSpawning = false;

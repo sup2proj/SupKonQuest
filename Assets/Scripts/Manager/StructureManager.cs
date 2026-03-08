@@ -3,49 +3,36 @@ using System.Collections.Generic;
 
 public class StructureManager : MonoBehaviour
 {
-    public StructureManager Instance;
+    public static StructureManager Instance;
     public List<UnitData> unitData;
-    public UnitsType unitsType;
-    public GameObject unitPrefab;
+    [Header("Unit Prefabs")]
+    [SerializeField] private List<UnitPrefabMapping> unitPrefabMappings = new List<UnitPrefabMapping>();
+    private Dictionary<UnitsType, GameObject> unitPrefabDict = new Dictionary<UnitsType, GameObject>();
     
+    [System.Serializable]
+    public class UnitPrefabMapping
+    {
+        public UnitsType unitType;
+        public GameObject prefab;
+    }
     void Awake()
     {
         Instance = this;
-    }
-    
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
+        foreach (var mapping in unitPrefabMappings)
         {
-            SpawnUnitByIndexAtPosition(0, Vector3.zero);
-        }
-    }
-    
-    
-	public void SpawnUnitByIndexAtPosition(int index, Vector3 position)
-    {
-        if (unitData.Count == 0 || unitPrefab == null || index < 0 || index >= unitData.Count)
-            return;
-
-        UnitData data = unitData[index];
-        GameObject unitGO = Instantiate(unitPrefab, position, Quaternion.identity);
-        UnitInstance instance = unitGO.GetComponent<UnitInstance>();
-        if (instance != null)
-        {
-            instance.Initialize(data);
+            unitPrefabDict.Add(mapping.unitType, mapping.prefab);
         }
     }
     
     public void SpawnUnitByTypeAtPosition(UnitsType type, float x, float z)
     {
-        string unitPath = "Prefabs/Units/";
-        int index = unitData.FindIndex(data => data.type == type);
-        //logique de spawn à des coordonnées x et z 
+        UnitData data = unitData.Find(d => d.type == type);
+        GameObject prefab = unitPrefabDict[type];
+        Vector3 position = new Vector3(x, 0, z-3);
         
-        if (index != -1)
-        {
-            SpawnUnitByIndexAtPosition(index, position);
-        }
+        GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
+        UnitInstance instance = unitGO.GetComponent<UnitInstance>();
+        instance.Initialize(data);
     }
     
     

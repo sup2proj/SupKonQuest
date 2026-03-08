@@ -17,22 +17,19 @@ public class ActionInterface : MonoBehaviour
     public ActionButton[] unitActionButtons;
     
     private StructureType currentStructureType;
-	private float x;
-	private float y;
+	private static float x;
+	private static float z;
+	private static StructureInstance currentSelectedStructure;
     
     void Awake()
     {
-        Debug.Log("[ActionInterface] Awake() appelé");
         Instance = this;
         HideAllButtons();
     }
     
     void Start()
     {
-        Debug.Log("[ActionInterface] Start() appelé");
         SetupAllButtons();
-		this.x = StructureInstance.x;
-        this.y = StructureInstance.y;
     }
 
     void SetupAllButtons()
@@ -46,12 +43,8 @@ public class ActionInterface : MonoBehaviour
     {
         if (buttons == null || buttons.Length == 0)
         {
-            Debug.LogWarning($"Aucun bouton n'est assigné pour {typeName}!");
             return;
         }
-
-        Debug.Log($"Configuration de {buttons.Length} boutons pour {typeName}");
-
         StructureType typeEnum = StructureType.Structure;
         if (System.Enum.TryParse(typeName, out StructureType parsedType))
         {
@@ -71,7 +64,6 @@ public class ActionInterface : MonoBehaviour
 
     void ButtonAction(int buttonNumber, string structureTypeName)
     {
-        //Debug.Log($"[ActionInterface] ButtonAction appelé pour le bouton {buttonNumber} du type {structureTypeName}");
 		if (structureTypeName == "Structure") {
 			StructureButtonAction(buttonNumber);
 		}
@@ -84,35 +76,41 @@ public class ActionInterface : MonoBehaviour
 	}
 
 	public void StructureButtonAction(int buttonNumber) {
+		if (StructureManager.Instance == null)
+		{
+			Debug.LogError("[ActionInterface] StructureManager.Instance est null! Assurez-vous qu'un StructureManager existe dans la scène.");
+			return;
+		}
+		Debug.Log("[ActionInterface] StructureButtonAction() appelé pour le bouton " + buttonNumber);
 		switch(buttonNumber)
 		{
 			case 1:
-                Debug.Log("Action 1 pour Structure exécutée");
-				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Infantry, x, y);
+                Debug.Log("Action 1 (Antiblindage) pour Structure exécutée");
+				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.AntiBlindage, x, z);
                 break;
             case 2:
-                Debug.Log("Action 2 pour Structure exécutée");
-                // Implémentez ici l'action spécifique pour le bouton 2
+                Debug.Log("Action 2 (Archer) pour Structure exécutée");
+				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Archer, x, z);
                 break;
             case 3:
-                Debug.Log("Action 3 pour Structure exécutée");
-                // Implémentez ici l'action spécifique pour le bouton 3
+                Debug.Log("Action 3 (Healer) pour Structure exécutée");
+				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Healer, x, z);
                 break;
 			case 4:
-                Debug.Log("Action 4 pour Structure exécutée");
-                // Implémentez ici l'action spécifique pour le bouton 4
+                Debug.Log("Action 4 (Heavy) pour Structure exécutée");
+				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Heavy, x, z);
                 break;
 			case 5:
-                Debug.Log("Action 5 pour Structure exécutée");
-                // Implémentez ici l'action spécifique pour le bouton 5
+                Debug.Log("Action 5 (infantry) pour Structure exécutée");
+				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Infantry, x, z);
                 break;
 			case 6:
-                Debug.Log("Action 6 pour Structure exécutée");
-                // Implémentez ici l'action spécifique pour le bouton 6
+                Debug.Log("Action 6 (mortar) pour Structure exécutée");
+				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Mortar, x, z);
                 break;
 			case 7:
-                Debug.Log("Action 7 pour Structure exécutée");
-                // Implémentez ici l'action spécifique pour le bouton 7
+                Debug.Log("Action 7 (support) pour Structure exécutée");
+				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Support, x, z);
                 break;
             default:
                 Debug.LogWarning($"Aucune action définie pour le bouton {buttonNumber} du type Structure");
@@ -226,5 +224,13 @@ public class ActionInterface : MonoBehaviour
                 Instance.ShowButtonArray(Instance.neutralStructureButtons);
                 break;
         }
+    }
+
+    public static void SetSelectedStructure(StructureInstance structure, Vector3 position)
+    {
+        currentSelectedStructure = structure;
+        x = position.x;
+        z = position.z;
+        Debug.Log($"[ActionInterface] Structure sélectionnée aux coordonnées x={position.x}, z={position.z}");
     }
 }
