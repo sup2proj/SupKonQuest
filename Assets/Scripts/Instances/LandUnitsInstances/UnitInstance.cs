@@ -17,6 +17,12 @@ public class UnitInstance : MonoBehaviour
     void Awake()
     {
         animator = GetComponent<Animator>();
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.freezeRotation = true;
+        }
     }
 
     void Start()
@@ -74,7 +80,16 @@ public class UnitInstance : MonoBehaviour
 
         if (isMoving)
         {
-            transform.Translate(Vector3.forward * unitData.speed * Time.deltaTime);
+            Rigidbody rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                Vector3 move = transform.forward * unitData.speed * Time.deltaTime;
+                rb.MovePosition(rb.position + move);
+            }
+            else
+            {
+                transform.Translate(Vector3.forward * unitData.speed * Time.deltaTime);
+            }
         }
     }
 
@@ -136,19 +151,30 @@ public class UnitInstance : MonoBehaviour
 
         Debug.Log("Buff applied to " + unitData.type);
     }
+    
     private void OnCollisionEnter(Collision collision)
     {
-        // Vérifier si l'objet en collision a un des tags autorisés
-        if (collision.gameObject.tag != "AntiBlindage" && collision.gameObject.tag != "Archer")
+        // Ignorer les collisions avec le sol (tiles)
+        if (collision.gameObject.CompareTag("Ground"))
             return;
 
-        Debug.Log("Collision détectée pour " + gameObject.name);
+        // Vérifier si l'objet est une unité valide
+        if (!collision.gameObject.CompareTag("AntiBlindage") &&
+            !collision.gameObject.CompareTag("Archer"))
+            return;
+
+        Debug.Log("Collision détectée avec : " + collision.gameObject.name);
+
+        // Récupérer le Rigidbody
+        Rigidbody rb = GetComponent<Rigidbody>();
+
+        // Calculer la direction pour repousser l'unité
         Vector3 pushDirection = transform.position - collision.contacts[0].point;
-        pushDirection.y = 0; // Garder le mouvement sur le plan horizontal
+        pushDirection.y = 0f;
         pushDirection.Normalize();
-    
-        // Déplacer l'objet dans la direction opposée
-        float pushDistance = 1f; // Distance de déplacement
-        transform.position += pushDirection * pushDistance;
+
+        // Appliquer une force de recul
+        float pushForce = 5f;
+        rb.AddForce(pushDirection * pushForce, ForceMode.Impulse);
     }
 }
