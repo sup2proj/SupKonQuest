@@ -159,8 +159,7 @@ public class UnitInstance : MonoBehaviour
             return;
 
         // Vérifier si l'objet est une unité valide
-        if (!collision.gameObject.CompareTag("AntiBlindage") &&
-            !collision.gameObject.CompareTag("Archer"))
+        if (!collision.gameObject.CompareTag("Units"))
             return;
 
         Debug.Log("Collision détectée avec : " + collision.gameObject.name);

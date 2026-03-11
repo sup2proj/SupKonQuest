@@ -1570,7 +1570,7 @@ GameObject:
   - component: {fileID: 5121653130452320911}
   m_Layer: 0
   m_Name: Antiblindage
-  m_TagString: AntiBlindage
+  m_TagString: Units
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
