@@ -16,7 +16,7 @@ MonoBehaviour:
   maxHealth: 0
   speed: 0
   creationTime: 0
-  type: 0
+  type: 5
   isPoweredUnit: 0
   healAmount: 0
   healCooldown: 0

@@ -16,7 +16,7 @@ MonoBehaviour:
   maxHealth: 0
   speed: 0
   creationTime: 0
-  type: 0
+  type: 6
   isPoweredUnit: 0
   buffAttackSpeed: 0
   buffSpeed: 0
