@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 public class ActionInterface : MonoBehaviour
 {
@@ -16,6 +17,11 @@ public class ActionInterface : MonoBehaviour
 	[Header("Boutons pour déclancher les compétences des unités")]
     public ActionButton[] unitActionButtons;
     
+	[Header("Prices des unités (ordre identique aux unitDatas))")]
+ 	[SerializeField] private TextMeshProUGUI[] unitPriceTexts;
+ 	[SerializeField] private UnitData[] unitDatas;
+   
+
     private StructureType currentStructureType;
 	private static float x;
 	private static float z;
@@ -30,7 +36,26 @@ public class ActionInterface : MonoBehaviour
     void Start()
     {
         SetupAllButtons();
+		SetupUnitPrices();	
     }
+
+	private void SetupUnitPrices()
+		{
+			if (unitPriceTexts == null || unitDatas == null) return;
+
+			int count = Mathf.Min(unitPriceTexts.Length, unitDatas.Length);
+			for (int i =0; i < count; i++)
+			{
+				if (unitPriceTexts[i] == null) continue;
+
+ 				if (unitDatas[i] == null)
+ 			{
+ 			unitPriceTexts[i].text = "";
+ 			continue;
+ 			}
+ 			unitPriceTexts[i].text = unitDatas[i].price.ToString();
+ 		}
+ 	}
 
     void SetupAllButtons()
     {
@@ -167,6 +192,8 @@ public class ActionInterface : MonoBehaviour
         HideButtonArray(harbourButtons);
         HideButtonArray(neutralStructureButtons);
 		HideButtonArray(unitActionButtons);
+		HidePrices(unitPriceTexts);
+
     }
 
     void HideButtonArray(ActionButton[] buttons)
@@ -195,6 +222,32 @@ public class ActionInterface : MonoBehaviour
             }
         }
     }
+
+	void HidePrices(TextMeshProUGUI[] unitPriceTexts)
+    {
+        if (unitPriceTexts == null) return;
+        
+        foreach (var unitPriceText in unitPriceTexts)
+        {
+            if (unitPriceText != null)
+            {
+                unitPriceText.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    void ShowPrices(TextMeshProUGUI[] unitPriceTexts)
+    {
+        if (unitPriceTexts == null) return;
+        
+        foreach (var unitPriceText in unitPriceTexts)
+        {
+            if (unitPriceText != null)
+            {
+                unitPriceText.gameObject.SetActive(true);
+            }
+        }
+    }
     
     public static void ShowStructureButtons(StructureType structureType)
     {
@@ -212,6 +265,7 @@ public class ActionInterface : MonoBehaviour
             case StructureType.Structure:
                 Debug.Log("[ActionInterface] Affichage des boutons pour Structure");
                 Instance.ShowButtonArray(Instance.structureButtons);
+				Instance.ShowPrices(Instance.unitPriceTexts);
                 break;
             
             case StructureType.Harbour:
