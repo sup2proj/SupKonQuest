@@ -17,13 +17,25 @@ public static class AutoLauncher
         {
             if (Object.FindAnyObjectByType<MapGenerator>() == null)
             {
-                GameObject bootstrapper = new GameObject("AUTO_MAP_GENERATOR");
-                bootstrapper.AddComponent<MapGenerator>();
                 
                 OverlayManager.initializePermanentOverlay();
                 
-                GameObject gameObject = new GameObject("AUTO_MAP_GENERATOR");
-                MapGenerator mapGenerator = gameObject.AddComponent<MapGenerator>();
+                GameObject map = new GameObject("AUTO_MAP_GENERATOR"); 
+                
+                GameObject structureManagerPrefab = Resources.Load<GameObject>("Prefabs/Manager/StructureManager");
+
+                if (structureManagerPrefab != null)
+                {
+                    GameObject structureManagerInstance = Object.Instantiate(structureManagerPrefab);
+                    structureManagerInstance.name = "StructureManager";
+                }
+                else
+                {
+                    Debug.LogWarning("AutoLauncher : Prefab StructureManager introuvable !");
+                }
+
+                
+                MapGenerator mapGenerator = map.AddComponent<MapGenerator>();
                 mapGenerator.LoadAndGenerate("TEST");
                 Debug.Log("AutoLauncher : MapGenerator injecté dynamiquement.");
                 // Camera mainCamera = Camera.main;

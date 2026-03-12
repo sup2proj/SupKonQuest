@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cce3bbaace63248209ebc4210149f8b3, type: 3}
   m_Name: Infantry
   m_EditorClassIdentifier: Assembly-CSharp::UnitCombatData
-  price: 0
-  maxHealth: 0
-  speed: 0
-  creationTime: 0
+  price: 50
+  maxHealth: 120
+  speed: 3.5
+  creationTime: 8
   type: 0
   isPoweredUnit: 0
-  attack: 0
-  attackSpeed: 0
-  attackRange: 0
+  attack: 12
+  attackSpeed: 1
+  attackRange: 1.5

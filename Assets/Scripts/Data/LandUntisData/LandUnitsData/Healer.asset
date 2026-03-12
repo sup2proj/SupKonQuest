@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b353e6cb6b9b049d5ab94e0b5a678373, type: 3}
   m_Name: Healer
   m_EditorClassIdentifier: Assembly-CSharp::UnitHealerData
-  price: 0
-  maxHealth: 0
-  speed: 0
-  creationTime: 0
+  price: 90
+  maxHealth: 80
+  speed: 3.2
+  creationTime: 12
   type: 5
   isPoweredUnit: 0
-  healAmount: 0
-  healCooldown: 0
-  healDuration: 0
-  healRange: 0
+  healAmount: 15
+  healCooldown: 20
+  healDuration: 4
+  healRange: 6
