@@ -11,8 +11,18 @@ public class UnitInstance : MonoBehaviour
     public GameObject circleUnderFeet;
     public Animator animator;
 
+    [Header("UI")]
+    [SerializeField] public HealthBar healthBar;
+
     [Header("Runtime")]
     public float currentHealth;
+
+    [Header("HealthBar Over Head")]
+    [SerializeField] private Transform healthBarAnchor;
+    [SerializeField] private float healthBarLocalY = 2f;
+    [SerializeField] private Vector3 healthBarLocalOffset = Vector3.zero;
+    [SerializeField] private bool healthBarFaceCamera = true;
+
 
     void Awake()
     {
@@ -33,12 +43,29 @@ public class UnitInstance : MonoBehaviour
             objectModel.SetActive(false);
 
         InitSelectionCircle();
+        InitHealthBarOverHead();
     }
 
     void Update()
     {
         HandleMovement();
         HandleAttack();
+
+        // Maintenir le billboard sans avoir besoin d'un script séparé
+        if (healthBarFaceCamera && healthBar != null && healthBar.isActiveAndEnabled && Camera.main != null)
+        {
+            Vector3 forward = Camera.main.transform.forward;
+            healthBar.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+        }
+
+        if (Input.GetKeyDown("s"))
+        {
+            Heal(-10f);
+        }
+        if (Input.GetKeyDown("d"))
+        {
+            Heal(10f);
+        }
     }
 
     public void Initialize(UnitData data)
@@ -49,7 +76,14 @@ public class UnitInstance : MonoBehaviour
             Debug.LogError("UnitData is null on " + gameObject.name);
             return;
         }
+
         currentHealth = unitData.maxHealth;
+
+        if (healthBar != null)
+        {
+            healthBar.SetMaxHealth(unitData.maxHealth);
+            healthBar.SetHealth(currentHealth);
+        }
     }
 
     void InitSelectionCircle()
@@ -67,6 +101,46 @@ public class UnitInstance : MonoBehaviour
         if (sr != null)
         {
             sr.color = Color.white;
+        }
+    }
+
+    private void InitHealthBarOverHead()
+    {
+        if (healthBar == null)
+        {
+            Debug.LogWarning($"[UnitInstance] {name} : healthBar non assignée dans l'inspector.", this);
+            return;
+        }
+
+        // healthBar.gameObject.SetActive(true);
+
+        // IMPORTANT: dans le prefab HealthBar, le RectTransform racine est à scale (0,0,0)
+        // => donc invisible. On force un scale correct ici.
+        if (healthBar.transform.localScale == Vector3.zero)
+        {
+            Debug.LogWarning($"[UnitInstance] {name} : HealthBar scale=0 détecté, correction en scale=1 (sinon invisible).", this);
+            healthBar.transform.localScale = Vector3.one;
+        }
+
+        // On parent la healthbar sous un anchor (tête) ou sous l'unité, comme le circle.
+        Transform anchor = healthBarAnchor != null ? healthBarAnchor : transform;
+        if (healthBar.transform.parent != anchor)
+            healthBar.transform.SetParent(anchor, worldPositionStays: false);
+
+        // Position au-dessus de la tête
+        Vector3 localPos = healthBarLocalOffset;
+        localPos.y += healthBarLocalY;
+        healthBar.transform.localPosition = localPos;
+
+        // Reset rotation locale pour éviter des rotations héritées cheloues
+        healthBar.transform.localRotation = Quaternion.identity;
+
+        // Optionnel: la faire regarder la caméra (sans script dédié)
+        if (healthBarFaceCamera && Camera.main != null)
+        {
+            // On fait un premier snap tout de suite
+            Vector3 forward = Camera.main.transform.forward;
+            healthBar.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
         }
     }
 
@@ -105,7 +179,7 @@ public class UnitInstance : MonoBehaviour
         {
             Debug.LogError("Animator est null dans HandleAttack pour " + gameObject.name);
         }
-        
+
         if (objectModel != null)
         {
             objectModel.SetActive(isAttacking);
@@ -114,7 +188,14 @@ public class UnitInstance : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+        if (unitData == null)
+            return;
+
         currentHealth -= amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0f, unitData.maxHealth);
+
+        if (healthBar != null)
+            healthBar.SetHealth(currentHealth);
 
         if (currentHealth <= 0)
             Die();
@@ -125,18 +206,25 @@ public class UnitInstance : MonoBehaviour
         if (unitData == null)
             return;
 
-        // Vérifier si c'est une unité soigneuse
-        if (!(unitData is UnitHealerData healerData))
+        // Vérifier si c'est une unité soigneuse (logique actuelle conservée)
+        if (!(unitData is UnitHealerData))
             return;
 
         currentHealth += amount;
-        currentHealth = Mathf.Min(currentHealth, unitData.maxHealth);
+        currentHealth = Mathf.Clamp(currentHealth, 0f, unitData.maxHealth);
+
+        if (healthBar != null)
+            healthBar.SetHealth(currentHealth);
     }
 
     void Die()
     {
         if (circleUnderFeet != null)
             circleUnderFeet.transform.SetParent(null);
+
+        if (healthBar != null)
+            healthBar.transform.SetParent(null);
+
         Destroy(gameObject, 2f);
     }
 
@@ -146,12 +234,12 @@ public class UnitInstance : MonoBehaviour
             return;
 
         // Vérifier si c'est une unité de support
-        if (!(unitData is UnitSupportData supportData))
+        if (!(unitData is UnitSupportData))
             return;
 
         Debug.Log("Buff applied to " + unitData.type);
     }
-    
+
     private void OnCollisionEnter(Collision collision)
     {
         // Ignorer les collisions avec le sol (tiles)
@@ -176,4 +264,17 @@ public class UnitInstance : MonoBehaviour
         float pushForce = 5f;
         rb.AddForce(pushDirection * pushForce, ForceMode.Impulse);
     }
+
+    public void SetHealth(float healthChange)
+    {
+        if (unitData == null)
+            return;
+
+        currentHealth += healthChange;
+        currentHealth = Mathf.Clamp(currentHealth, 0f, unitData.maxHealth);
+
+        if (healthBar != null)
+            healthBar.SetHealth(currentHealth);
+    }
 }
+
