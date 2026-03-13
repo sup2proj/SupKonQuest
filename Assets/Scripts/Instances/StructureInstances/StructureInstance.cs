@@ -46,7 +46,7 @@ public class StructureInstance : MonoBehaviour
 
     void Start()
     {
-        structurePosition = transform.position; // Initialise la position au démarrage
+        structurePosition = transform.position;
         UnSelected();
     }
 

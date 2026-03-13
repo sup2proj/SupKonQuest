@@ -20,7 +20,10 @@ public class ActionInterface : MonoBehaviour
 	[Header("Prices des unités (ordre identique aux unitDatas))")]
  	[SerializeField] private TextMeshProUGUI[] unitPriceTexts;
  	[SerializeField] private UnitData[] unitDatas;
-   
+
+	[Header("Image des structures")]
+    public GameObject[] structureImage;
+
 
     private StructureType currentStructureType;
 	private static float x;
@@ -193,6 +196,7 @@ public class ActionInterface : MonoBehaviour
         HideButtonArray(neutralStructureButtons);
 		HideButtonArray(unitActionButtons);
 		HidePrices(unitPriceTexts);
+		HideImage(structureImage);
 
     }
 
@@ -218,7 +222,6 @@ public class ActionInterface : MonoBehaviour
             if (button != null)
             {
                 button.gameObject.SetActive(true);
-                Debug.Log($"[ActionInterface] Bouton {button.name} activé");
             }
         }
     }
@@ -248,37 +251,68 @@ public class ActionInterface : MonoBehaviour
             }
         }
     }
-    
-    public static void ShowStructureButtons(StructureType structureType)
+
+	void HideImage(GameObject[] structureImage)
+{
+    if (structureImage == null) return;
+
+    foreach (var img in structureImage)
     {
-        if (Instance == null)
+        if (img != null)
         {
-            Debug.LogError("[ActionInterface] Instance est null! ShowStructureButtons ne peut pas fonctionner.");
-            return;
-        }
-
-        Instance.currentStructureType = structureType;
-        Instance.HideAllButtons();
-
-        switch (structureType)
-        {
-            case StructureType.Structure:
-                Debug.Log("[ActionInterface] Affichage des boutons pour Structure");
-                Instance.ShowButtonArray(Instance.structureButtons);
-				Instance.ShowPrices(Instance.unitPriceTexts);
-                break;
-            
-            case StructureType.Harbour:
-                Debug.Log("[ActionInterface] Affichage des boutons pour Harbour");
-                Instance.ShowButtonArray(Instance.harbourButtons);
-                break;
-            
-            case StructureType.NeutralStructure:
-                Debug.Log("[ActionInterface] Affichage des boutons pour NeutralStructure");
-                Instance.ShowButtonArray(Instance.neutralStructureButtons);
-                break;
+            img.gameObject.SetActive(false);
         }
     }
+}
+
+    void ShowImage(GameObject[] structureImage, StructureType selectedType)
+{
+    if (structureImage == null) return;
+    HideImage(structureImage);
+    int index = (int)selectedType;
+    if (index >= 0 && index < structureImage.Length && structureImage[index] != null)
+    {
+        structureImage[index].gameObject.SetActive(true);
+    }
+    else
+    {
+        Debug.LogWarning($"[ActionInterface] Aucune image configurée pour {selectedType} (index {index}).");
+    }
+}
+
+    public static void ShowStructureButtons(StructureType structureType)
+{
+    if (Instance == null)
+    {
+        Debug.LogError("[ActionInterface] Instance est null! ShowStructureButtons ne peut pas fonctionner.");
+        return;
+    }
+
+    Instance.currentStructureType = structureType;
+    Instance.HideAllButtons();
+
+    switch (structureType)
+    {
+        case StructureType.Structure:
+            Debug.Log("[ActionInterface] Affichage des boutons pour Structure");
+            Instance.ShowButtonArray(Instance.structureButtons);
+            Instance.ShowPrices(Instance.unitPriceTexts);
+            Instance.ShowImage(Instance.structureImage, structureType);
+            break;
+
+        case StructureType.Harbour:
+            Debug.Log("[ActionInterface] Affichage des boutons pour Harbour");
+            Instance.ShowButtonArray(Instance.harbourButtons);
+            Instance.ShowImage(Instance.structureImage, structureType);
+            break;
+
+        case StructureType.NeutralStructure:
+            Debug.Log("[ActionInterface] Affichage des boutons pour NeutralStructure");
+            Instance.ShowButtonArray(Instance.neutralStructureButtons);
+            Instance.ShowImage(Instance.structureImage, structureType);
+            break;
+    }
+}
 
     public static void SetSelectedStructure(StructureInstance structure, Vector3 position)
     {

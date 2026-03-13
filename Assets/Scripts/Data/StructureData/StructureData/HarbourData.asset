@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d573fb65cb6f14a8099d52bdd18f07de, type: 3}
-  m_Name: StructureData
+  m_Name: HarbourData
   m_EditorClassIdentifier: Assembly-CSharp::StructureData
   neutralStructure: 0
   structureType: 0
