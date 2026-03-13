@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public class UnitInstance : MonoBehaviour
 {
     [Header("Data")]
-    [SerializeField] private UnitData unitData;
+    [SerializeField] public static UnitData unitData;
 
     [Header("Visuals")]
     public GameObject objectModel;
@@ -15,19 +15,11 @@ public class UnitInstance : MonoBehaviour
     [SerializeField] public HealthBar healthBar;
 
     [Header("Runtime")]
-    public float currentHealth;
-
-    [Header("HealthBar Over Head")]
-    [SerializeField] private Transform healthBarAnchor;
-    [SerializeField] private float healthBarLocalY = 2f;
-    [SerializeField] private Vector3 healthBarLocalOffset = Vector3.zero;
-    [SerializeField] private bool healthBarFaceCamera = true;
-
+    public static float currentHealth;
 
     void Awake()
     {
         animator = GetComponent<Animator>();
-
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
@@ -43,7 +35,7 @@ public class UnitInstance : MonoBehaviour
             objectModel.SetActive(false);
 
         InitSelectionCircle();
-        InitHealthBarOverHead();
+        InitHealthBar();
     }
 
     void Update()
@@ -51,20 +43,19 @@ public class UnitInstance : MonoBehaviour
         HandleMovement();
         HandleAttack();
 
-        // Maintenir le billboard sans avoir besoin d'un script séparé
-        if (healthBarFaceCamera && healthBar != null && healthBar.isActiveAndEnabled && Camera.main != null)
+        if (healthBar != null && healthBar.isActiveAndEnabled && Camera.main != null)
         {
             Vector3 forward = Camera.main.transform.forward;
             healthBar.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
         }
 
-        if (Input.GetKeyDown("s"))
+        
+        if (Input.GetKeyDown("b"))
         {
-            Heal(-10f);
-        }
-        if (Input.GetKeyDown("d"))
-        {
-            Heal(10f);
+            if (unitData == null)
+                return;
+            const float damageAmount = 10f;
+            TakeDamage(damageAmount);
         }
     }
 
@@ -104,42 +95,14 @@ public class UnitInstance : MonoBehaviour
         }
     }
 
-    private void InitHealthBarOverHead()
+    private void InitHealthBar()
     {
         if (healthBar == null)
         {
             Debug.LogWarning($"[UnitInstance] {name} : healthBar non assignée dans l'inspector.", this);
             return;
         }
-
-        // healthBar.gameObject.SetActive(true);
-
-        // IMPORTANT: dans le prefab HealthBar, le RectTransform racine est à scale (0,0,0)
-        // => donc invisible. On force un scale correct ici.
-        if (healthBar.transform.localScale == Vector3.zero)
-        {
-            Debug.LogWarning($"[UnitInstance] {name} : HealthBar scale=0 détecté, correction en scale=1 (sinon invisible).", this);
-            healthBar.transform.localScale = Vector3.one;
-        }
-
-        // On parent la healthbar sous un anchor (tête) ou sous l'unité, comme le circle.
-        Transform anchor = healthBarAnchor != null ? healthBarAnchor : transform;
-        if (healthBar.transform.parent != anchor)
-            healthBar.transform.SetParent(anchor, worldPositionStays: false);
-
-        // Position au-dessus de la tête
-        healthBar.transform.localPosition = 1.1f * Vector3.up + healthBarLocalOffset;
-
-        // Reset rotation locale pour éviter des rotations héritées cheloues
-        healthBar.transform.localRotation = Quaternion.identity;
-
-        // Optionnel: la faire regarder la caméra (sans script dédié)
-        if (healthBarFaceCamera && Camera.main != null)
-        {
-            // On fait un premier snap tout de suite
-            Vector3 forward = Camera.main.transform.forward;
-            healthBar.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
-        }
+        healthBar.transform.localPosition = (1.1f * Vector3.up);
     }
 
     void HandleMovement()
@@ -147,8 +110,12 @@ public class UnitInstance : MonoBehaviour
         if (unitData == null)
             return;
 
+        if (Keyboard.current == null)
+            return;
+
         bool isMoving = Keyboard.current.spaceKey.isPressed;
-        animator.SetBool("isMoving", isMoving);
+        if (animator != null)
+            animator.SetBool("isMoving", isMoving);
 
         if (isMoving)
         {
@@ -167,6 +134,9 @@ public class UnitInstance : MonoBehaviour
 
     void HandleAttack()
     {
+        if (Keyboard.current == null)
+            return;
+
         bool isAttacking = Keyboard.current.gKey.isPressed;
 
         if (animator != null)
@@ -177,7 +147,6 @@ public class UnitInstance : MonoBehaviour
         {
             Debug.LogError("Animator est null dans HandleAttack pour " + gameObject.name);
         }
-
         if (objectModel != null)
         {
             objectModel.SetActive(isAttacking);
@@ -195,8 +164,15 @@ public class UnitInstance : MonoBehaviour
         if (healthBar != null)
             healthBar.SetHealth(currentHealth);
 
-        if (currentHealth <= 0)
+        if (currentHealth <= 0f)
             Die();
+    }
+
+    void Die()
+    {
+        Destroy(circleUnderFeet, 0f);
+        Destroy(healthBar, 0f);
+        Destroy(gameObject, 0f);
     }
 
     public void Heal(float amount)
@@ -204,7 +180,6 @@ public class UnitInstance : MonoBehaviour
         if (unitData == null)
             return;
 
-        // Vérifier si c'est une unité soigneuse (logique actuelle conservée)
         if (!(unitData is UnitHealerData))
             return;
 
@@ -215,26 +190,13 @@ public class UnitInstance : MonoBehaviour
             healthBar.SetHealth(currentHealth);
     }
 
-    void Die()
-    {
-        if (circleUnderFeet != null)
-            circleUnderFeet.transform.SetParent(null);
-
-        if (healthBar != null)
-            healthBar.transform.SetParent(null);
-
-        Destroy(gameObject, 2f);
-    }
 
     public void ApplyBuff()
     {
         if (unitData == null)
             return;
-
-        // Vérifier si c'est une unité de support
         if (!(unitData is UnitSupportData))
             return;
-
         Debug.Log("Buff applied to " + unitData.type);
     }
 
@@ -252,6 +214,8 @@ public class UnitInstance : MonoBehaviour
 
         // Récupérer le Rigidbody
         Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb == null)
+            return;
 
         // Calculer la direction pour repousser l'unité
         Vector3 pushDirection = transform.position - collision.contacts[0].point;
@@ -275,4 +239,3 @@ public class UnitInstance : MonoBehaviour
             healthBar.SetHealth(currentHealth);
     }
 }
-
