@@ -128,9 +128,7 @@ public class UnitInstance : MonoBehaviour
             healthBar.transform.SetParent(anchor, worldPositionStays: false);
 
         // Position au-dessus de la tête
-        Vector3 localPos = healthBarLocalOffset;
-        localPos.y += healthBarLocalY;
-        healthBar.transform.localPosition = localPos;
+        healthBar.transform.localPosition = 1.1f * Vector3.up + healthBarLocalOffset;
 
         // Reset rotation locale pour éviter des rotations héritées cheloues
         healthBar.transform.localRotation = Quaternion.identity;
