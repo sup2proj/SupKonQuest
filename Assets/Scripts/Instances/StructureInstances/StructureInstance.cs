@@ -166,7 +166,8 @@ public class StructureInstance : MonoBehaviour
         while (unitQueue.Count > 0)
         {
             UnitData data = unitQueue.Dequeue();
-            StructureManager.Instance.SpawnUnitByTypeAtPosition(data.type, position.x, position.z);
+            bool isPoweredUnit = false;
+            StructureManager.Instance.SpawnUnitByTypeAtPosition(data.type, position.x, position.z, isPoweredUnit);
             yield return new WaitForSeconds(data.creationTime);
         }
         isSpawning = false;
