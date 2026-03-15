@@ -19,7 +19,7 @@ public class ActionInterface : MonoBehaviour
     
 	[Header("Prices des unités (ordre identique aux unitDatas))")]
  	[SerializeField] private TextMeshProUGUI[] unitPriceTexts;
- 	[SerializeField] private UnitData[] unitDatas;
+ 	[SerializeField] public UnitData[] unitDatas;
 
 	[Header("Image des structures")]
     public GameObject[] structureImage;
@@ -113,6 +113,8 @@ public class ActionInterface : MonoBehaviour
             if (InterfaceInstance.Instance != null)
             {
                 InterfaceInstance.Instance.addUnitToQueue(clickedImageGO);
+                InterfaceInstance.Instance.InitUnitsCreation(buttonNumber);
+
             }
             else
             {

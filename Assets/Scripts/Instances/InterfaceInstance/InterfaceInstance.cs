@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 
 public class InterfaceInstance : MonoBehaviour
@@ -12,6 +13,9 @@ public class InterfaceInstance : MonoBehaviour
     [Header("Queue item")]
     [SerializeField] private Vector3 queuedItemLocalScale = new Vector3(0.75f, 0.35f, 1f);
     [SerializeField] private Image[] queueSlots;
+    
+    [Header("Progression Bar")]
+    [SerializeField] public ProgressBar progressBar;
     
     [Header("Runtime")]
     public static float currentProgression;
@@ -33,8 +37,6 @@ public class InterfaceInstance : MonoBehaviour
             Debug.LogWarning("[InterfaceInstance] unitsQueue n'est pas assigné dans l'Inspector.");
             return;
         }
-        
-        InitprogressBar();
     }
 
     void Update()
@@ -60,6 +62,7 @@ public class InterfaceInstance : MonoBehaviour
             {
                 FillSlotImage(i, clickedUnit);
                 slotAvailabel = i + 1;
+                
                 return;
             }
         }
@@ -84,24 +87,31 @@ public class InterfaceInstance : MonoBehaviour
         target.sprite = source.sprite;
     }
     
-    private void InitprogressBar()
-    
+    public void InitUnitsCreation(int unitIndex)
     {
-        if (progressBar != null)
-        {
-            progressBar.SetProgressionBarEmpty();
-            progressBar.StartCreation(unitData.creationTime);
-            progressBar.SetProgressionBarEmpty();
-        }
-        
         if (progressBar == null)
         {
             Debug.LogWarning($"[UnitInstance] {name} : progressBar non assignée dans l'inspector.", this);
             return;
         }
+
+        progressBar.StartCreation(ActionInterface.Instance.unitDatas[unitIndex].creationTime);
+        StartCoroutine(WaitProgressBarFinished());
+
         progressBar.transform.localPosition = (1.1f * Vector3.up);
     }
-    
-    
-    
+
+    private IEnumerator WaitProgressBarFinished()
+    {
+        yield return null;
+
+        while (progressBar != null && !progressBar.IsFinished())
+            yield return null;
+
+        // if (progressBar != null)
+        //     //appelle du manager pour créer l'unité 
+    }
+
+
+
 }

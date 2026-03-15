@@ -57,11 +57,6 @@ public class StructureInstance : MonoBehaviour
             AddToQueue(UnitsType.Infantry);
         }
 
-        if (!isSpawning && unitQueue.Count > 0)
-        {
-            StartCoroutine(SpawnUnitsWithDelay(structurePosition));
-        }
-
         DetectClickOutside();
     }
 
@@ -151,13 +146,13 @@ public class StructureInstance : MonoBehaviour
     public void UnSelected()
     {
         Debug.Log($"Structure {name} désélectionnée.");
-        
+
         // Si c'est la structure actuellement sélectionnée, on efface la référence
         if (currentlySelected == this)
         {
             currentlySelected = null;
         }
-        
+
         // Restaure la couleur du bâtiment
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)
@@ -167,18 +162,5 @@ public class StructureInstance : MonoBehaviour
         {
             InterfaceInstance.Instance.HideUnitsQueue();
         }
-    }
-
-    private IEnumerator SpawnUnitsWithDelay(Vector3 position)
-    {
-        isSpawning = true;
-        while (unitQueue.Count > 0)
-        {
-            UnitData data = unitQueue.Dequeue();
-            bool isPoweredUnit = false;
-            StructureManager.Instance.SpawnUnitByTypeAtPosition(data.type, position.x, position.z, isPoweredUnit);
-            yield return new WaitForSeconds(data.creationTime);
-        }
-        isSpawning = false;
     }
 }

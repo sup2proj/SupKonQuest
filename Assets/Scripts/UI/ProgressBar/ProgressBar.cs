@@ -1,8 +1,8 @@
+using System.Collections;
 using UnityEngine;
 
 public class ProgressBar : MonoBehaviour
 {
-
     [Header("Config")]
     [SerializeField] private float width = 0f;
     [SerializeField] private float height = 100f;
@@ -10,34 +10,101 @@ public class ProgressBar : MonoBehaviour
     [Header("References")]
     [SerializeField] private RectTransform progressBar;
 
-    private float maxProgression = 1f;
-    private float currentProgression = 1f;
+    private Coroutine routine;
+
+    private float durationSeconds = 1f;
+    private float elapsedSeconds = 0f;
+
+
 
     private void Awake()
     {
-        Refresh();
+        WidthInitialized();
+        SetNormalized(0f);
     }
 
-    public void SetProgressionBarEmpty(float value)
+    public void StartCreation(float creationTimeSeconds)
     {
-        maxProgression = Mathf.Max(1f, value);
-        currentProgression = Mathf.Clamp(currentProgression, 0f, maxProgression);
-        Refresh();
+        StopCreation(resetToZero: true);
+
+        WidthInitialized();
+
+        if (creationTimeSeconds <= 0f)
+        {
+            durationSeconds = 0f;
+            elapsedSeconds = 0f;
+            return;
+        }
+
+        durationSeconds = creationTimeSeconds;
+        elapsedSeconds = 0f;
+        SetNormalized(0f);
+        routine = StartCoroutine(FillOverTime());
     }
 
-    public void SetHealth(float value)
+    public void StopCreation(bool resetToZero = false)
     {
-        currentProgression = Mathf.Clamp(value, 0f, maxProgression);
-        Refresh();
+        if (routine != null)
+        {
+            StopCoroutine(routine);
+            routine = null;
+        }
+
+        if (resetToZero)
+        {
+            elapsedSeconds = 0f;
+            SetNormalized(0f);
+        }
     }
 
-    private void Refresh()
+    public bool IsFinished()
+    {
+        // Fini quand on a atteint (ou dépassé) 100%.
+        if (durationSeconds <= 0f)
+            return true;
+
+        return elapsedSeconds >= durationSeconds;
+    }
+
+    private IEnumerator FillOverTime()
+    {
+        while (elapsedSeconds < durationSeconds)
+        {
+            elapsedSeconds += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedSeconds / durationSeconds);
+            SetNormalized(t);
+            yield return null;
+        }
+
+        // À 100%, on revient automatiquement à 0%.
+        SetNormalized(1f);
+        StopCreation(resetToZero: true);
+    }
+
+    private void SetNormalized(float t)
+    {
+        if (progressBar == null)
+            return;
+        t = Mathf.Clamp01(t);
+        float newWidth = t * width;
+        progressBar.sizeDelta = new Vector2(newWidth, height);
+    }
+
+    private void WidthInitialized()
     {
         if (progressBar == null)
             return;
 
-        float ratio = maxProgression <= 0f ? 0f : (currentProgression / maxProgression);
-        float newWidth = ratio * width;
-        progressBar.sizeDelta = new Vector2(newWidth, height);
+        if (width > 0f)
+            return;
+        RectTransform parent = progressBar.parent as RectTransform;
+        if (parent != null)
+        {
+            width = parent.rect.width;
+        }
+        if (width <= 0f)
+        {
+            width = progressBar.rect.width;
+        }
     }
 }
