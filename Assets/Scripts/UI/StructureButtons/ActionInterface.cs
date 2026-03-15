@@ -113,8 +113,10 @@ public class ActionInterface : MonoBehaviour
             if (InterfaceInstance.Instance != null)
             {
                 InterfaceInstance.Instance.addUnitToQueue(clickedImageGO);
-                InterfaceInstance.Instance.InitUnitsCreation(buttonNumber);
-
+				
+                int unitIndex = buttonNumber - 1;
+                UnitsType type = unitDatas[unitIndex].type;
+                InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false);
             }
             else
             {
@@ -136,40 +138,6 @@ public class ActionInterface : MonoBehaviour
 			return;
 		}
 		Debug.Log("[ActionInterface] StructureButtonAction() appelé pour le bouton " + buttonNumber);
-		switch(buttonNumber)
-		{
-			case 1:
-                Debug.Log("Action 1 (Antiblindage) pour Structure exécutée");
-				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.AntiBlindage, x, z, false);
-                break;
-            case 2:
-                Debug.Log("Action 2 (Archer) pour Structure exécutée");
-				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Archer, x, z, false);
-                break;
-            case 3:
-                Debug.Log("Action 3 (Healer) pour Structure exécutée");
-				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Healer, x, z, false);
-                break;
-			case 4:
-                Debug.Log("Action 4 (Heavy) pour Structure exécutée");
-				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Heavy, x, z, false);
-                break;
-			case 5:
-                Debug.Log("Action 5 (infantry) pour Structure exécutée");
-				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Infantry, x, z, false);
-                break;
-			case 6:
-                Debug.Log("Action 6 (mortar) pour Structure exécutée");
-				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Mortar, x, z, false);
-                break;
-			case 7:
-                Debug.Log("Action 7 (support) pour Structure exécutée");
-				StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Support, x, z, false);
-                break;
-            default:
-                Debug.LogWarning($"Aucune action définie pour le bouton {buttonNumber} du type Structure");
-                break;
-        }
     }
 
     public void NeutralStructureButtonAction(int buttonNumber)
