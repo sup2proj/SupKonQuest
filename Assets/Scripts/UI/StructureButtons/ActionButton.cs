@@ -46,7 +46,6 @@ public class ActionButton : MonoBehaviour
 
     void Execute()
     {
-        Debug.Log($"[{name}] Execute() appelé");
         if (button != null && button.targetGraphic != null)
         {
             button.targetGraphic.color = pressedColor;

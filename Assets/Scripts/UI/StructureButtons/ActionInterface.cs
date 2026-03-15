@@ -101,9 +101,33 @@ public class ActionInterface : MonoBehaviour
          else if (structureTypeName == "Harbour") {
 			HarbourButtonAction(buttonNumber);
 		}
-	}
+         SendUnitsIcon(buttonNumber);
+    }
+	
+	private void SendUnitsIcon(int buttonNumber)
+    {
+        // Ajout à la queue UI: on transmet "l'image" du bouton cliqué (en pratique, on clone son GameObject)
+        GameObject clickedImageGO = GetClickedUnitsIcon(buttonNumber);
+        if (clickedImageGO != null)
+        {
+            if (InterfaceInstance.Instance != null)
+            {
+                InterfaceInstance.Instance.addUnitToQueue(clickedImageGO);
+            }
+            else
+            {
+                Debug.LogWarning("[ActionInterface] InterfaceInstance.Instance est null, impossible d'ajouter à la queue.");
+            }
+        }
+    }
 
-	public void StructureButtonAction(int buttonNumber) {
+    private GameObject GetClickedUnitsIcon(int buttonNumber)
+    {
+        int index = buttonNumber - 1;
+        return structureButtons[index].gameObject;
+    }
+
+    public void StructureButtonAction(int buttonNumber) {
 		if (StructureManager.Instance == null)
 		{
 			Debug.LogError("[ActionInterface] StructureManager.Instance est null! Assurez-vous qu'un StructureManager existe dans la scène.");

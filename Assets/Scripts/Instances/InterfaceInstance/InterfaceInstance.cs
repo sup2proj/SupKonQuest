@@ -1,0 +1,107 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+
+public class InterfaceInstance : MonoBehaviour
+{
+    public static InterfaceInstance Instance { get; private set; }
+
+    [Header("UI")]
+    [SerializeField] public GameObject unitsQueue;
+
+    [Header("Queue item")]
+    [SerializeField] private Vector3 queuedItemLocalScale = new Vector3(0.75f, 0.35f, 1f);
+    [SerializeField] private Image[] queueSlots;
+    
+    [Header("Runtime")]
+    public static float currentProgression;
+    
+    private int slotAvailabel = -1;
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    void Start()
+    {
+        if (unitsQueue != null)
+        {
+            unitsQueue.SetActive(false);
+        }
+        if (unitsQueue == null)
+        {
+            Debug.LogWarning("[InterfaceInstance] unitsQueue n'est pas assigné dans l'Inspector.");
+            return;
+        }
+        
+        InitprogressBar();
+    }
+
+    void Update()
+    {
+
+    }
+
+    public void ShowUnitsQueue()
+    {
+            unitsQueue.SetActive(true);
+    }
+
+    public void HideUnitsQueue()
+    {
+        unitsQueue.SetActive(false);
+    }
+
+    public void addUnitToQueue(GameObject clickedUnit)
+    {
+        for (int i = 0; i < queueSlots.Length; i++)
+        {
+            if (queueSlots[i].sprite == null)
+            {
+                FillSlotImage(i, clickedUnit);
+                slotAvailabel = i + 1;
+                return;
+            }
+        }
+    }
+
+    public void FillSlotImage(int slotIndex, GameObject clickedUnit)
+    {
+        if (queueSlots == null || slotIndex < 0 || slotIndex >= queueSlots.Length)
+            return;
+    
+        if (clickedUnit == null)
+            return;
+    
+        var target = queueSlots[slotIndex];
+        if (target == null)
+            return;
+    
+        var source = clickedUnit.GetComponentInChildren<Image>(true);
+        if (source == null)
+            return;
+    
+        target.sprite = source.sprite;
+    }
+    
+    private void InitprogressBar()
+    
+    {
+        if (progressBar != null)
+        {
+            progressBar.SetProgressionBarEmpty();
+            progressBar.StartCreation(unitData.creationTime);
+            progressBar.SetProgressionBarEmpty();
+        }
+        
+        if (progressBar == null)
+        {
+            Debug.LogWarning($"[UnitInstance] {name} : progressBar non assignée dans l'inspector.", this);
+            return;
+        }
+        progressBar.transform.localPosition = (1.1f * Vector3.up);
+    }
+    
+    
+    
+}

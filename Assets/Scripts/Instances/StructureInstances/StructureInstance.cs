@@ -123,24 +123,29 @@ public class StructureInstance : MonoBehaviour
     public void Selected()
     {
         Debug.Log($"Structure {name} sélectionnée (Type: {structureType}).");
-        
+
         // Si une autre structure était déjà sélectionnée, on la désélectionne
         if (currentlySelected != null && currentlySelected != this)
         {
             currentlySelected.UnSelected();
         }
-        
+
         // Cette structure devient la structure sélectionnée
         currentlySelected = this;
-        
+
         if (outline != null)
             outline.enabled = true;
         else
             Debug.LogWarning($"[StructureInstance] Composant Outline manquant sur {name}.");
-        
+
         // Transmettre les coordonnées de la structure à l'ActionInterface
         ActionInterface.SetSelectedStructure(this, structurePosition);
         ActionInterface.ShowStructureButtons(structureType);
+
+        if (InterfaceInstance.Instance != null)
+        {
+            InterfaceInstance.Instance.ShowUnitsQueue();
+        }
     }
 
     public void UnSelected()
@@ -158,6 +163,10 @@ public class StructureInstance : MonoBehaviour
         if (renderer != null)
             renderer.material.color = Color.white;
         outline.enabled = false;
+        if (InterfaceInstance.Instance != null)
+        {
+            InterfaceInstance.Instance.HideUnitsQueue();
+        }
     }
 
     private IEnumerator SpawnUnitsWithDelay(Vector3 position)
