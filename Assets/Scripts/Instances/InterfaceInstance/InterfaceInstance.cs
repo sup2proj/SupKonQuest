@@ -18,7 +18,16 @@ public class InterfaceInstance : MonoBehaviour
 
     [Header("Protector item")] 
     [SerializeField] private Image[] unitsProtectorSlots;
-    
+
+    private static readonly Dictionary<int, UnitsType> ProtectorSlotToType = new Dictionary<int, UnitsType>
+    {
+        { 0, UnitsType.Infantry },
+        { 1, UnitsType.Mortar },
+        { 2, UnitsType.Heavy },
+        { 3, UnitsType.Archer },
+        { 4, UnitsType.AntiBlindage },
+    };
+
     [Header("Progression Bar")]
     [SerializeField] public ProgressBar progressBar;
     
@@ -58,6 +67,8 @@ public class InterfaceInstance : MonoBehaviour
             Debug.LogWarning("[InterfaceInstance] unitsQueue ou unitsprotector n'est pas assigné dans l'Inspector.");
             return;
         }
+
+        WireProtectorSlotClicks();
     }
 
     void Update()
@@ -75,9 +86,10 @@ public class InterfaceInstance : MonoBehaviour
         RefreshQueueSlotsVisibility();
     }
 
-    public void HideUnitsQueue()
+    public void HideStructureInterface()
     {
         unitsQueue.SetActive(false);
+        unitsProtector.SetActive(false);
         SetAllQueueSlotsActive(false);
     }
 
@@ -154,7 +166,7 @@ public class InterfaceInstance : MonoBehaviour
             if (progressBar == null)
                 break;
 
-            StructureManager.Instance.SpawnUnitByTypeAtPosition(req.type, req.x, req.z, false);
+            StructureManager.Instance.SpawnUnitByTypeAtPosition(req.type, req.x, req.z, false, false);
 
             ShiftQueueLeft();
         }
@@ -226,12 +238,33 @@ public class InterfaceInstance : MonoBehaviour
             if (img == null) continue;
             img.gameObject.SetActive(false);
         }
-        // showUnitsNextToStructure(UnitsType.Infantry);
     }
 
+    private void WireProtectorSlotClicks()
+    {
+        for (int i = 0; i < unitsProtectorSlots.Length; i++)
+        {
+            var img = unitsProtectorSlots[i];
+            if (img == null) continue;
+
+            var btn = img.GetComponent<Button>();
+            int capturedIndex = i;
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() => SpawnStructProtectorOnInterface(capturedIndex));
+        }
+    }
+
+    private void SpawnStructProtectorOnInterface(int slotIndex)
+    {
+        ProtectorSlotToType.TryGetValue(slotIndex, out var type);
+        var selected = StructureInstance.CurrentlySelected;
+        Vector3 pos = selected.StructurePosition;
+        StructureManager.Instance.SpawnUnitByTypeAtPosition(type, pos.x + 1f, pos.z + 1f, false, true);
+    }
 
     public void showUnitsNextToStructure(UnitsType type) 
     {
+        WireProtectorSlotClicks();
         if (type == UnitsType.Infantry)
         {
             unitsProtectorSlots[0].gameObject.SetActive(true);
@@ -250,7 +283,6 @@ public class InterfaceInstance : MonoBehaviour
         } else if (type == UnitsType.Heavy)
         {
             unitsProtectorSlots[2].gameObject.SetActive(true);
-            
         }
     }
 }

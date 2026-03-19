@@ -154,31 +154,31 @@ public class ActionInterface : MonoBehaviour
         {
             case 1:
                 Debug.Log("Action 1 (Antiblindage) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.AntiBlindage, x, z, true);
+                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.AntiBlindage, x, z, true, false);
                 break;
             case 2:
                 Debug.Log("Action 2 (Archer) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Archer, x, z,true );
+                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Archer, x, z,true, false );
                 break;
             case 3:
                 Debug.Log("Action 3 (Healer) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Healer, x, z, true);
+                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Healer, x, z, true, false);
                 break;
             case 4:
                 Debug.Log("Action 4 (Heavy) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Heavy, x, z, true);
+                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Heavy, x, z, true, false);
                 break;
             case 5:
                 Debug.Log("Action 5 (infantry) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Infantry, x, z, true);
+                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Infantry, x, z, true, false);
                 break;
             case 6:
                 Debug.Log("Action 6 (mortar) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Mortar, x, z, true);
+                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Mortar, x, z, true, false);
                 break;
             case 7:
                 Debug.Log("Action 7 (support) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Support, x, z, true);
+                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Support, x, z, true, false);
                 break;
             default:
                 Debug.LogWarning($"Aucune action définie pour le bouton {buttonNumber} du type Structure");

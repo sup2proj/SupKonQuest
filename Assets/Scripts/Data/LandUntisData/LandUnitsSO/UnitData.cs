@@ -18,4 +18,5 @@ public class UnitData : ScriptableObject
     [Header("Meta")]
     public UnitsType type;
     public bool isPoweredUnit;
+    public bool isProtector;
 }

@@ -29,7 +29,7 @@ public class StructureManager : MonoBehaviour
         }
     }
 
-    public void SpawnUnitByTypeAtPosition(UnitsType type, float x, float z, bool isPoweredUnit)
+    public void SpawnUnitByTypeAtPosition(UnitsType type, float x, float z, bool isPoweredUnit, bool isProtector)
     {
         UnitData data = unitData.Find(d => d.type == type);
         if (data == null)
@@ -45,6 +45,10 @@ public class StructureManager : MonoBehaviour
         }
 
         Vector3 position = new Vector3(x, 0, z - 3);
+
+        // Instanciation GO d'abord (nécessaire pour teinter/couleur)
+        GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
+
         UnitData runtimeData = data;
         if (isPoweredUnit)
         {
@@ -63,14 +67,16 @@ public class StructureManager : MonoBehaviour
                     combatData.attackSpeed *= m;
                 }
             }
+
+            ApplyColorTint(unitGO, new Color(1f, 0.35f, 0.35f, 1f));
         }
-        GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
-        
-        if (isPoweredUnit)
+
+        if (isProtector)
         {
-            ApplyPoweredRedTint(unitGO);
+            runtimeData.isProtector = true;
+            ApplyColorTint(unitGO, new Color(0.35f, 1f, 0.35f, 1f));
         }
-        
+
         UnitInstance instance = unitGO.GetComponent<UnitInstance>();
         if (instance == null)
         {
@@ -81,9 +87,8 @@ public class StructureManager : MonoBehaviour
         instance.Initialize(runtimeData);
     }
     
-    private void ApplyPoweredRedTint(GameObject unitGO)
+    private void ApplyColorTint(GameObject unitGO, Color tint)
     {
-        Color tint = new Color(1f, 0.35f, 0.35f, 1f);
         var excludedNames = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)
         {
             "Circle","HealthBar"

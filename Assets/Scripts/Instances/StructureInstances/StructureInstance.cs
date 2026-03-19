@@ -3,18 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 
-// Ce script doit être rattaché à un GO directement dans la scène 
-// et il doit faire référence à l'structureManager, pour pouvoir utiliser la fonction SpawnUnitByTypeAtPosition
-
 public class StructureInstance : MonoBehaviour
 {
     private static StructureInstance currentlySelected = null;
-    
+
+    public static StructureInstance CurrentlySelected => currentlySelected;
+    public Vector3 StructurePosition => structurePosition;
+
     [Header("Data")]
     [SerializeField] private StructureData structureData;
-    private Vector3 structurePosition; // Récupère la position de la structure dans la scène
-    private Queue<UnitData> unitQueue = new Queue<UnitData>(); // File d'attente pour les unités à créer
-    private bool isSpawning = false; // Indique si la structure est actuellement en train de créer des unités
+    private Vector3 structurePosition;
+
+    private Queue<UnitData> unitQueue = new Queue<UnitData>();
     public bool neutralStructure;
     public StructureType structureType;	
 
@@ -176,7 +176,7 @@ public class StructureInstance : MonoBehaviour
         outline.enabled = false;
         if (InterfaceInstance.Instance != null)
         {
-            InterfaceInstance.Instance.HideUnitsQueue();
+            InterfaceInstance.Instance.HideStructureInterface();
         }
     }
 
