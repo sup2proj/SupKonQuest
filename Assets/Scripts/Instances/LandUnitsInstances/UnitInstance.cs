@@ -4,7 +4,15 @@ using UnityEngine.InputSystem;
 public class UnitInstance : MonoBehaviour
 {
     [Header("Data")]
-    [SerializeField] public static UnitData unitData;
+    [SerializeField] public UnitData unitData;
+
+    public UnitsType UnitType
+    {
+        get
+        {
+            return unitData.type;
+        }
+    }
 
     [Header("Visuals")]
     public GameObject objectModel;
@@ -25,6 +33,13 @@ public class UnitInstance : MonoBehaviour
         {
             rb.freezeRotation = true;
         }
+
+        UnitsRegistry.Register(this);
+    }
+
+    private void OnDestroy()
+    {
+        UnitsRegistry.Unregister(this);
     }
 
     void Start()

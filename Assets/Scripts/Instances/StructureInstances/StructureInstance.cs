@@ -28,6 +28,9 @@ public class StructureInstance : MonoBehaviour
     private Outline outline;
     private Collider structureCollider;
 
+    [Header("Detection")]
+    [SerializeField] private float unitsFarRadius = 5f;
+
     void Awake()
     {
         outline = GetComponent<Outline>();
@@ -139,7 +142,20 @@ public class StructureInstance : MonoBehaviour
 
         if (InterfaceInstance.Instance != null)
         {
-            InterfaceInstance.Instance.ShowUnitsQueue();
+			InterfaceInstance.Instance.showInterfaceForStructure();
+
+            // Scan des unités à proximité et affichage des icônes "protectors"
+            var nearbyUnits = GetUnitsWithinConfiguredRadius();
+            var uniqueTypes = new HashSet<UnitsType>();
+            foreach (var unit in nearbyUnits)
+            {
+                if (unit == null) continue;
+                if (unit.unitData == null) continue;
+                uniqueTypes.Add(unit.unitData.type);
+            }
+
+            foreach (var t in uniqueTypes)
+                InterfaceInstance.Instance.showUnitsNextToStructure(t);
         }
     }
 
@@ -162,5 +178,33 @@ public class StructureInstance : MonoBehaviour
         {
             InterfaceInstance.Instance.HideUnitsQueue();
         }
+    }
+
+    public List<UnitInstance> GetUnitsWithinRadius(float radius)
+    {
+        var result = new List<UnitInstance>();
+        if (radius < 0f) return result;
+
+        float r2 = radius * radius;
+        Vector3 center = transform.position;
+
+        foreach (var unit in UnitsRegistry.GetSnapshot())
+        {
+            if (unit == null) continue;
+            Debug.Log($"Checking unit {unit.name} at position {unit.transform.position} against structure {name} at position {center} with radius {radius}.");
+            Vector3 d = unit.transform.position - center;
+            if (d.sqrMagnitude <= r2)
+            {
+                result.Add(unit);
+                Debug.Log($"Unit {unit.name} is within radius {radius} of structure {name}.");
+            }
+        }
+
+        return result;
+    }
+
+    public List<UnitInstance> GetUnitsWithinConfiguredRadius()
+    {
+        return GetUnitsWithinRadius(unitsFarRadius);
     }
 }

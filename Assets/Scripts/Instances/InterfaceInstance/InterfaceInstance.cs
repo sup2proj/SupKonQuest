@@ -10,10 +10,14 @@ public class InterfaceInstance : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] public GameObject unitsQueue;
+    [SerializeField] public GameObject unitsProtector;
 
     [Header("Queue item")]
     [SerializeField] private Vector3 queuedItemLocalScale = new Vector3(0.75f, 0.35f, 1f);
     [SerializeField] private Image[] queueSlots;
+
+    [Header("Protector item")] 
+    [SerializeField] private Image[] unitsProtectorSlots;
     
     [Header("Progression Bar")]
     [SerializeField] public ProgressBar progressBar;
@@ -43,13 +47,15 @@ public class InterfaceInstance : MonoBehaviour
 
     void Start()
     {
-        if (unitsQueue != null)
+        if (unitsQueue != null && unitsProtector != null)
         {
             unitsQueue.SetActive(false);
+            unitsProtector.SetActive(false);
         }
-        if (unitsQueue == null)
+        
+        if (unitsQueue == null && unitsProtector == null)
         {
-            Debug.LogWarning("[InterfaceInstance] unitsQueue n'est pas assigné dans l'Inspector.");
+            Debug.LogWarning("[InterfaceInstance] unitsQueue ou unitsprotector n'est pas assigné dans l'Inspector.");
             return;
         }
     }
@@ -59,9 +65,13 @@ public class InterfaceInstance : MonoBehaviour
 
     }
 
-    public void ShowUnitsQueue()
+    public void showInterfaceForStructure()
     {
         unitsQueue.SetActive(true);
+        unitsProtector.SetActive(true);
+        hideUnitsProtectorSlots();
+        // ClearFirstQueueSlot();
+        
         RefreshQueueSlotsVisibility();
     }
 
@@ -146,7 +156,6 @@ public class InterfaceInstance : MonoBehaviour
 
             StructureManager.Instance.SpawnUnitByTypeAtPosition(req.type, req.x, req.z, false);
 
-            ClearFirstQueueSlot();
             ShiftQueueLeft();
         }
 
@@ -209,7 +218,39 @@ public class InterfaceInstance : MonoBehaviour
             img.gameObject.SetActive(hasSprite);
         }
     }
+    
+    private void hideUnitsProtectorSlots()
+    {
+        foreach (var img in unitsProtectorSlots)
+        {
+            if (img == null) continue;
+            img.gameObject.SetActive(false);
+        }
+        // showUnitsNextToStructure(UnitsType.Infantry);
+    }
 
 
+    public void showUnitsNextToStructure(UnitsType type) 
+    {
+        if (type == UnitsType.Infantry)
+        {
+            unitsProtectorSlots[0].gameObject.SetActive(true);
+        } else if (type == UnitsType.Archer)
+        {
+            unitsProtectorSlots[3].gameObject.SetActive(true);
+            
+        } else if (type == UnitsType.Mortar)
+        {
+            unitsProtectorSlots[1].gameObject.SetActive(true);
+            
+        } else if (type == UnitsType.AntiBlindage)
+        {
+            unitsProtectorSlots[4].gameObject.SetActive(true);
 
+        } else if (type == UnitsType.Heavy)
+        {
+            unitsProtectorSlots[2].gameObject.SetActive(true);
+            
+        }
+    }
 }
