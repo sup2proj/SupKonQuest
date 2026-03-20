@@ -30,7 +30,7 @@ public class StructureInstance : MonoBehaviour
 
     [Header("Detection")]
     [SerializeField] private float unitsFarRadius = 5f;
-
+    
     void Awake()
     {
         outline = GetComponent<Outline>();
@@ -206,5 +206,13 @@ public class StructureInstance : MonoBehaviour
     public List<UnitInstance> GetUnitsWithinConfiguredRadius()
     {
         return GetUnitsWithinRadius(unitsFarRadius);
+    }
+    
+    public static MapJsonData LoadDataFromPath(string path) {
+        TextAsset targetFile = Resources.Load<TextAsset>(path);
+        if (targetFile != null) {
+            return JsonUtility.FromJson<MapJsonData>(targetFile.text);
+        }
+        return null;
     }
 }

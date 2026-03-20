@@ -3,7 +3,6 @@ using Enums.Nature;
 using Enums.Structure;
 using UnityEngine;
 using System.Collections.Generic;
-using Building;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -31,9 +30,9 @@ public class MapGenerator : MonoBehaviour
     public GameObject treeSnow;
     
     [Header("Structures")]
-    public GameObject buildingCastle;
-    public GameObject buildingHarbour;
-    public GameObject buildingSpecial;
+    public GameObject StructureCastle;
+    public GameObject StructureHarbour;
+    public GameObject StructureSpecial;
 
     [Header("Réglages")]
     public float tileSize = 1f;
@@ -50,12 +49,12 @@ public class MapGenerator : MonoBehaviour
         SetupResources();
         string path = "Maps/" + folderName + "/";
         mapLayout = Resources.Load<Texture2D>(path + "MapLayout");
-        MapJsonData jsonData = BuildingData.LoadDataFromPath(path + "MapData");
+        MapJsonData jsonData = StructureInstance.LoadDataFromPath(path + "MapData");
 
         if (mapLayout != null && jsonData != null)
         {
             GenerateWorld();      
-            PlaceBuildings(jsonData); 
+            PlaceStructures(jsonData); 
             AddNature();     
             Debug.Log($"Monde '{folderName}' généré avec succès !");
         }
@@ -89,15 +88,15 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    void PlaceBuildings(MapJsonData data)
+    void PlaceStructures(MapJsonData data)
     {
-        SpawnBuildingGroup(data.startPoints, buildingCastle, StructureType.Structure, 1);
-        SpawnBuildingGroup(data.castles, buildingCastle,  StructureType.Structure, 1);
-        SpawnBuildingGroup(data.harbours, buildingHarbour,  StructureType.Harbour, 1);
-        SpawnBuildingGroup(data.special, buildingSpecial,  StructureType.NeutralStructure, 1);
+        SpawnStructureGroup(data.startPoints, StructureCastle, StructureType.Structure, 1);
+        SpawnStructureGroup(data.castles, StructureCastle,  StructureType.Structure, 1);
+        SpawnStructureGroup(data.harbours, StructureHarbour,  StructureType.Harbour, 1);
+        SpawnStructureGroup(data.special, StructureSpecial,  StructureType.NeutralStructure, 1);
     }
 
-    void SpawnBuildingGroup(List<PointData> points, GameObject prefab,  StructureType type, int income)
+    void SpawnStructureGroup(List<PointData> points, GameObject prefab,  StructureType type, int income)
     {
         if (points == null || prefab == null) return;
         int h = mapLayout.height;
@@ -109,11 +108,11 @@ public class MapGenerator : MonoBehaviour
                 int unityY = (h - 1 - p.y) ;
                 Vector3 pos = new Vector3(p.x * tileSize, 0, unityY* tileSize);
                 
-                GameObject buildingObj = Instantiate(prefab, pos, Quaternion.identity, transform);
-                buildingObj.transform.localScale = new Vector3(3f, 3f, 3f);
-                buildingObj.name = $"{type}_{p.x}_{p.y}";
-                BuildingController buildingController = buildingObj.AddComponent<BuildingController>();
-                buildingController.Init(p.x, p.y,-1,income);
+                GameObject StructureObj = Instantiate(prefab, pos, Quaternion.identity, transform);
+                StructureObj.transform.localScale = new Vector3(3f, 3f, 3f);
+                StructureObj.name = $"{type}_{p.x}_{p.y}";
+                // StructureController StructureController = StructureObj.AddComponent<StructureController>();
+                // StructureController.Init(p.x, p.y,-1,income);
 
                 BlockNature(p.x, unityY);
             }
@@ -192,7 +191,7 @@ public class MapGenerator : MonoBehaviour
     {
         string environmentPath = "Prefabs/Environment/";
         string naturePath = "Prefabs/Nature/";
-        string buildingPath = "Prefabs/Structures/";
+        string StructurePath = "Prefabs/Structures/";
         
         if (groundDirt == null) groundDirt = Resources.Load<GameObject>(environmentPath+"Env_Ground_Dirt");
         if (groundGrass == null) groundGrass = Resources.Load<GameObject>(environmentPath+"Env_Ground_Grass");
@@ -203,8 +202,8 @@ public class MapGenerator : MonoBehaviour
         if (treeGrass == null) treeGrass = Resources.Load<GameObject>(naturePath+"Nature_Tree_Grass");
         if (treeSnow == null) treeSnow = Resources.Load<GameObject>(naturePath+"Nature_Tree_Snow");
 
-        if (buildingCastle == null) buildingCastle = Resources.Load<GameObject>(buildingPath+"Structure");
-        if (buildingHarbour == null) buildingHarbour = Resources.Load<GameObject>(buildingPath+"Harbour");
-        if (buildingSpecial == null) buildingSpecial = Resources.Load<GameObject>(buildingPath+"NeutralStructure");
+        if (StructureCastle == null) StructureCastle = Resources.Load<GameObject>(StructurePath+"Structure");
+        if (StructureHarbour == null) StructureHarbour = Resources.Load<GameObject>(StructurePath+"Harbour");
+        if (StructureSpecial == null) StructureSpecial = Resources.Load<GameObject>(StructurePath+"NeutralStructure");
     }
 }
