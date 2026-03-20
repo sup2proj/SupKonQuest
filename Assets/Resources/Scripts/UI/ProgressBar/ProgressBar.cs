@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class ProgressBar : MonoBehaviour
@@ -10,10 +9,10 @@ public class ProgressBar : MonoBehaviour
     [Header("References")]
     [SerializeField] private RectTransform progressBar;
 
-    private Coroutine routine;
-
     private float durationSeconds = 1f;
     private float elapsedSeconds = 0f;
+    private float creationStartTime = 0f;
+    private bool isRunning = false;
 
 
 
@@ -21,6 +20,19 @@ public class ProgressBar : MonoBehaviour
     {
         WidthInitialized();
         SetNormalized(0f);
+    }
+
+    private void OnEnable()
+    {
+        RefreshVisualFromClock();
+    }
+
+    private void Update()
+    {
+        if (!isRunning)
+            return;
+
+        RefreshVisualFromClock();
     }
 
     public void StartCreation(float creationTimeSeconds)
@@ -33,22 +45,21 @@ public class ProgressBar : MonoBehaviour
         {
             durationSeconds = 0f;
             elapsedSeconds = 0f;
+            creationStartTime = Time.time;
+            isRunning = false;
             return;
         }
 
         durationSeconds = creationTimeSeconds;
         elapsedSeconds = 0f;
+        creationStartTime = Time.time;
+        isRunning = true;
         SetNormalized(0f);
-        routine = StartCoroutine(FillOverTime());
     }
 
     public void StopCreation(bool resetToZero = false)
     {
-        if (routine != null)
-        {
-            StopCoroutine(routine);
-            routine = null;
-        }
+        isRunning = false;
 
         if (resetToZero)
         {
@@ -59,26 +70,27 @@ public class ProgressBar : MonoBehaviour
 
     public bool IsFinished()
     {
-        // Fini quand on a atteint (ou dépassé) 100%.
         if (durationSeconds <= 0f)
             return true;
 
-        return elapsedSeconds >= durationSeconds;
+        if (!isRunning)
+            return elapsedSeconds >= durationSeconds;
+
+        return (Time.time - creationStartTime) >= durationSeconds;
     }
 
-    private IEnumerator FillOverTime()
+    private void RefreshVisualFromClock()
     {
-        while (elapsedSeconds < durationSeconds)
+        if (durationSeconds <= 0f)
         {
-            elapsedSeconds += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedSeconds / durationSeconds);
-            SetNormalized(t);
-            yield return null;
+            elapsedSeconds = 0f;
+            SetNormalized(0f);
+            return;
         }
 
-        // À 100%, on revient automatiquement à 0%.
-        SetNormalized(1f);
-        StopCreation(resetToZero: true);
+        elapsedSeconds = Mathf.Clamp(Time.time - creationStartTime, 0f, durationSeconds);
+        float t = elapsedSeconds / durationSeconds;
+        SetNormalized(t);
     }
 
     private void SetNormalized(float t)

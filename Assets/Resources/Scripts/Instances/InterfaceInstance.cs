@@ -147,26 +147,36 @@ public class InterfaceInstance : MonoBehaviour
 
         while (creationQueue.Count > 0)
         {
-            if (progressBar == null)
-            {
-                Debug.LogWarning($"[InterfaceInstance] {name} : progressBar non assignée dans l'inspector.", this);
-                creationQueue.Clear();
-                break;
-            }
-
             UnitCreationRequest req = creationQueue.Dequeue();
 
-            progressBar.StartCreation(ActionInterface.Instance.unitDatas[req.unitIndex].creationTime);
-            progressBar.transform.localPosition = (1.1f * Vector3.up);
+            var actionInterface = ActionInterface.Instance;
+            if (actionInterface == null || actionInterface.unitDatas == null || req.unitIndex < 0 || req.unitIndex >= actionInterface.unitDatas.Length)
+            {
+                Debug.LogWarning($"[InterfaceInstance] Impossible de lancer la creation: unitDatas invalide (index={req.unitIndex}).", this);
+                ShiftQueueLeft();
+                continue;
+            }
 
-            yield return null;
-            while (progressBar != null && !progressBar.IsFinished())
+            float creationTime = actionInterface.unitDatas[req.unitIndex].creationTime;
+
+            // La barre est purement visuelle: la production suit son propre timer.
+            if (progressBar != null)
+            {
+                progressBar.StartCreation(creationTime);
+                progressBar.transform.localPosition = (1.1f * Vector3.up);
+            }
+
+            float elapsed = 0f;
+            while (elapsed < creationTime)
+            {
+                elapsed += Time.deltaTime;
                 yield return null;
+            }
 
-            if (progressBar == null)
-                break;
+            if (progressBar != null)
+                progressBar.StopCreation(resetToZero: true);
 
-            StructureManager.Instance.SpawnUnitByTypeAtPosition(req.type, req.x, req.z, false, false);
+            StructureManager.Instance.SpawnUnitByTypeAtPosition(req.type, req.x, req.z, req.isPoweredUnit, false);
 
             ShiftQueueLeft();
         }
