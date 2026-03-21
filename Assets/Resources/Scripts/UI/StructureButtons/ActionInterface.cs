@@ -93,21 +93,23 @@ public class ActionInterface : MonoBehaviour
     void ButtonAction(int buttonNumber, string structureTypeName)
     {
 		if (structureTypeName == "Structure") {
-			StructureButtonAction(buttonNumber);
+			// StructureButtonAction(buttonNumber);
+            SendUnitsIcon(buttonNumber, false);
+            
 		}
          else if (structureTypeName == "NeutralStructure") {
-			NeutralStructureButtonAction(buttonNumber);
+			// NeutralStructureButtonAction(buttonNumber);
+            SendUnitsIcon(buttonNumber, true);
 		}
          else if (structureTypeName == "Harbour") {
 			HarbourButtonAction(buttonNumber);
 		}
-         SendUnitsIcon(buttonNumber);
     }
 	
-	private void SendUnitsIcon(int buttonNumber)
+	private void SendUnitsIcon(int buttonNumber, bool isPowered)
     {
         // Ajout à la queue UI: on transmet "l'image" du bouton cliqué (en pratique, on clone son GameObject)
-        GameObject clickedImageGO = GetClickedUnitsIcon(buttonNumber);
+        GameObject clickedImageGO = GetClickedUnitsIcon(buttonNumber, isPowered);
         if (clickedImageGO != null)
         {
             if (InterfaceInstance.Instance != null)
@@ -116,7 +118,14 @@ public class ActionInterface : MonoBehaviour
 				
                 int unitIndex = buttonNumber - 1;
                 UnitsType type = unitDatas[unitIndex].type;
-                InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false);
+                if (isPowered)
+                {
+                    InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, true);
+                }
+                else
+                {
+                    InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false);
+                }
             }
             else
             {
@@ -125,10 +134,17 @@ public class ActionInterface : MonoBehaviour
         }
     }
 
-    private GameObject GetClickedUnitsIcon(int buttonNumber)
+    private GameObject GetClickedUnitsIcon(int buttonNumber, bool isPowered)
     {
         int index = buttonNumber - 1;
-        return structureButtons[index].gameObject;
+        if (isPowered)
+        {
+            return neutralStructureButtons[index].gameObject;
+        }
+        else
+        {
+            return structureButtons[index].gameObject;
+        }
     }
 
     public void StructureButtonAction(int buttonNumber) {
