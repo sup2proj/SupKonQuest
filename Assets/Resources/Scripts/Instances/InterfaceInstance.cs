@@ -272,27 +272,61 @@ public class InterfaceInstance : MonoBehaviour
         StructureManager.Instance.SpawnUnitByTypeAtPosition(type, pos.x + 1f, pos.z + 1f, false, true);
     }
 
-    public void showUnitsNextToStructure(UnitsType type) 
+    public void showUnitsNextToStructure(UnitsType type, bool isPoweredUnit) 
     {
         WireProtectorSlotClicks();
         if (type == UnitsType.Infantry)
         {
-            unitsProtectorSlots[0].gameObject.SetActive(true);
-        } else if (type == UnitsType.Archer)
-        {
-            unitsProtectorSlots[3].gameObject.SetActive(true);
-            
-        } else if (type == UnitsType.Mortar)
-        {
-            unitsProtectorSlots[1].gameObject.SetActive(true);
-            
-        } else if (type == UnitsType.AntiBlindage)
-        {
-            unitsProtectorSlots[4].gameObject.SetActive(true);
+            if (isPoweredUnit) {
+                unitsProtectorSlots[5].gameObject.SetActive(true);
+            }
+            else
+            {
+                unitsProtectorSlots[0].gameObject.SetActive(true);
+            }
+        } else if (type == UnitsType.Archer) {
+            if (isPoweredUnit)
+            {
+                unitsProtectorSlots[8].gameObject.SetActive(true);
+            }
+            else
+            {
+                unitsProtectorSlots[3].gameObject.SetActive(true);
 
-        } else if (type == UnitsType.Heavy)
-        {
-            unitsProtectorSlots[2].gameObject.SetActive(true);
+            }
+            
+        } else if (type == UnitsType.Mortar) {
+            if (isPoweredUnit)
+            {
+                unitsProtectorSlots[6].gameObject.SetActive(true);
+            }
+            else
+            {
+                unitsProtectorSlots[3].gameObject.SetActive(true);
+
+            }
+            
+        } else if (type == UnitsType.AntiBlindage) {
+            if (isPoweredUnit)
+            {
+                unitsProtectorSlots[9].gameObject.SetActive(true);
+            }
+            else
+            {
+                unitsProtectorSlots[4].gameObject.SetActive(true);
+
+            }
+
+        } else if (type == UnitsType.Heavy) {
+            if (isPoweredUnit)
+            {
+                unitsProtectorSlots[7].gameObject.SetActive(true);
+            }
+            else
+            {
+                unitsProtectorSlots[2].gameObject.SetActive(true);
+
+            }
         }
     }
 }

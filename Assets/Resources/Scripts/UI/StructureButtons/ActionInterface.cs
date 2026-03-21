@@ -42,23 +42,27 @@ public class ActionInterface : MonoBehaviour
 		SetupUnitPrices();	
     }
 
-	private void SetupUnitPrices()
+	public void SetupUnitPrices()
+	{
+		if (unitPriceTexts == null || unitDatas == null) return;
+
+		int count = Mathf.Min(unitPriceTexts.Length, unitDatas.Length);
+		for (int i = 0; i < count; i++)
 		{
-			if (unitPriceTexts == null || unitDatas == null) return;
+			if (unitPriceTexts[i] == null) continue;
 
-			int count = Mathf.Min(unitPriceTexts.Length, unitDatas.Length);
-			for (int i =0; i < count; i++)
+			if (unitDatas[i] == null)
 			{
-				if (unitPriceTexts[i] == null) continue;
+				unitPriceTexts[i].text = "";
+				continue;
+			}
 
- 				if (unitDatas[i] == null)
- 			{
- 			unitPriceTexts[i].text = "";
- 			continue;
- 			}
- 			unitPriceTexts[i].text = unitDatas[i].price.ToString();
- 		}
- 	}
+
+			float multiplier = (currentStructureType == StructureType.NeutralStructure) ? 1.20f : 1f;
+			float finalPrice = unitDatas[i].price * multiplier;
+			unitPriceTexts[i].text = finalPrice.ToString();
+		}
+	}
 
     void SetupAllButtons()
     {
@@ -93,12 +97,10 @@ public class ActionInterface : MonoBehaviour
     void ButtonAction(int buttonNumber, string structureTypeName)
     {
 		if (structureTypeName == "Structure") {
-			// StructureButtonAction(buttonNumber);
             SendUnitsIcon(buttonNumber, false);
             
 		}
          else if (structureTypeName == "NeutralStructure") {
-			// NeutralStructureButtonAction(buttonNumber);
             SendUnitsIcon(buttonNumber, true);
 		}
          else if (structureTypeName == "Harbour") {
@@ -154,52 +156,6 @@ public class ActionInterface : MonoBehaviour
 			return;
 		}
 		Debug.Log("[ActionInterface] StructureButtonAction() appelé pour le bouton " + buttonNumber);
-    }
-
-    public void NeutralStructureButtonAction(int buttonNumber)
-    {
-        if (StructureManager.Instance == null)
-        {
-            Debug.LogError(
-                "[ActionInterface] StructureManager.Instance est null! Assurez-vous qu'un StructureManager existe dans la scène.");
-            return;
-        }
-
-        Debug.Log("[ActionInterface] StructureButtonAction() appelé pour le bouton " + buttonNumber);
-        switch (buttonNumber)
-        {
-            case 1:
-                Debug.Log("Action 1 (Antiblindage) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.AntiBlindage, x, z, true, false);
-                break;
-            case 2:
-                Debug.Log("Action 2 (Archer) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Archer, x, z,true, false );
-                break;
-            case 3:
-                Debug.Log("Action 3 (Healer) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Healer, x, z, true, false);
-                break;
-            case 4:
-                Debug.Log("Action 4 (Heavy) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Heavy, x, z, true, false);
-                break;
-            case 5:
-                Debug.Log("Action 5 (infantry) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Infantry, x, z, true, false);
-                break;
-            case 6:
-                Debug.Log("Action 6 (mortar) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Mortar, x, z, true, false);
-                break;
-            case 7:
-                Debug.Log("Action 7 (support) pour Structure exécutée");
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(UnitsType.Support, x, z, true, false);
-                break;
-            default:
-                Debug.LogWarning($"Aucune action définie pour le bouton {buttonNumber} du type Structure");
-                break;
-        }
     }
 
     public void HarbourButtonAction(int buttonNumber) {
@@ -317,41 +273,40 @@ public class ActionInterface : MonoBehaviour
 }
 
     public static void ShowStructureButtons(StructureType structureType)
-{
-    if (Instance == null)
-    {
-        Debug.LogError("[ActionInterface] Instance est null! ShowStructureButtons ne peut pas fonctionner.");
-        return;
-    }
+	{
+		if (Instance == null)
+		{
+			Debug.LogError("[ActionInterface] Instance est null! ShowStructureButtons ne peut pas fonctionner.");
+			return;
+		}
 
-    Instance.currentStructureType = structureType;
-    Instance.HideAllButtons();
+		Instance.currentStructureType = structureType;
+		Instance.HideAllButtons();
+		Instance.SetupUnitPrices();
 
-    switch (structureType)
-    {
-        case StructureType.Structure:
-            Debug.Log("[ActionInterface] Affichage des boutons pour Structure");
-            Instance.ShowButtonArray(Instance.structureButtons);
-            Instance.ShowImage(Instance.structureImage, structureType);
-            Instance.ShowPrices(Instance.unitPriceTexts);
-            
-            break;
+		switch (structureType)
+		{
+			case StructureType.Structure:
+				Debug.Log("[ActionInterface] Affichage des boutons pour Structure");
+				Instance.ShowButtonArray(Instance.structureButtons);
+				Instance.ShowImage(Instance.structureImage, structureType);
+				Instance.ShowPrices(Instance.unitPriceTexts);
+				break;
 
-        case StructureType.Harbour:
-            Debug.Log("[ActionInterface] Affichage des boutons pour Harbour");
-            Instance.ShowButtonArray(Instance.harbourButtons);
-            Instance.ShowImage(Instance.structureImage, structureType);
-            break;
+			case StructureType.Harbour:
+				Debug.Log("[ActionInterface] Affichage des boutons pour Harbour");
+				Instance.ShowButtonArray(Instance.harbourButtons);
+				Instance.ShowImage(Instance.structureImage, structureType);
+				break;
 
-        case StructureType.NeutralStructure:
-            Debug.Log("[ActionInterface] Affichage des boutons pour NeutralStructure");
-            Instance.ShowButtonArray(Instance.neutralStructureButtons);
-            Instance.ShowImage(Instance.structureImage, structureType);
-            Instance.ShowPrices(Instance.unitPriceTexts);
-            
-            break;
-    }
-}
+			case StructureType.NeutralStructure:
+				Debug.Log("[ActionInterface] Affichage des boutons pour NeutralStructure");
+				Instance.ShowButtonArray(Instance.neutralStructureButtons);
+				Instance.ShowImage(Instance.structureImage, structureType);
+				Instance.ShowPrices(Instance.unitPriceTexts);
+				break;
+		}
+	}
 
     public static void SetSelectedStructure(StructureInstance structure, Vector3 position)
     {

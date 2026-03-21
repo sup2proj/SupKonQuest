@@ -155,7 +155,14 @@ public class StructureInstance : MonoBehaviour
             }
 
             foreach (var t in uniqueTypes)
-                InterfaceInstance.Instance.showUnitsNextToStructure(t);
+                if (structureType == StructureType.NeutralStructure)
+                {
+                    InterfaceInstance.Instance.showUnitsNextToStructure(t, true);
+                }
+                else
+                {
+                    InterfaceInstance.Instance.showUnitsNextToStructure(t, false);
+                }
         }
     }
 
