@@ -49,8 +49,6 @@ public class cameraMouvement : MonoBehaviour
     void CameraMove()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();
-        int compteurNord = 0;
-        int compteurSud = 0;
         int compteurEst = 0;
         int compteurOuest = 0;
 
@@ -65,8 +63,6 @@ public class cameraMouvement : MonoBehaviour
         }
 
         if (mousePos.y > screenBoundsHeight - boundary || Input.GetKey(isAZERTY ? KeyCode.Z : KeyCode.W) || Input.GetKey(KeyCode.UpArrow)){
-            
-            compteurNord++;
             if (compteurOuest >0 || compteurEst > 0)
                 position.y +=speed * Time.deltaTime / 2;
             else
@@ -77,8 +73,6 @@ public class cameraMouvement : MonoBehaviour
         }
             
         if (mousePos.y < boundary || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)){
-            
-            compteurSud++;
             if (compteurOuest > 0 || compteurEst > 0)
                 position.y -=speed * Time.deltaTime / 2;
                 
