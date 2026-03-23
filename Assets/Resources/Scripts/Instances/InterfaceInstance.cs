@@ -19,6 +19,9 @@ public class InterfaceInstance : MonoBehaviour
     [Header("Protector item")] 
     [SerializeField] private Image[] unitsProtectorSlots;
     
+	[Header("Player Statistics")]
+	[SerializeField] private StatisticsInterface statisticsInterface;
+
     [Header("TEMPORAIRE JOUEUR LIST")] 
     [SerializeField] private List<Image> playersList;
     [SerializeField] private int activePlayerIndex = -1;
@@ -94,6 +97,7 @@ public class InterfaceInstance : MonoBehaviour
 
         WirePlayersListClicks();
         WireProtectorSlotClicks();
+        RefreshPlayerStatisticsUI();
     }
 
     void Update()
@@ -166,6 +170,7 @@ public class InterfaceInstance : MonoBehaviour
         if (!session.SpendGold(cost))
         {
             Debug.Log($"[InterfaceInstance] Pas assez d'or pour demander la création: joueur={playerId}, gold={session.Gold}, coût={cost}.", this);
+            RefreshPlayerStatisticsUI();
             return false;
         }
 
@@ -184,7 +189,14 @@ public class InterfaceInstance : MonoBehaviour
         if (!isSpawning)
             StartCoroutine(ProcessCreationQueue());
 
+        RefreshPlayerStatisticsUI();
         return true;
+    }
+
+    private void RefreshPlayerStatisticsUI()
+    {
+        if (statisticsInterface != null)
+            statisticsInterface.Refresh();
     }
 
 	//TEMPORAIRE ---------------------
@@ -227,6 +239,8 @@ public class InterfaceInstance : MonoBehaviour
         }
 
         Debug.Log($"[InterfaceInstance] Switch joueur: uiIndex={uiIndex} => playerId={playerId}, gold={gold}.", this);
+
+        RefreshPlayerStatisticsUI();
     }
 
     private int GetSelectedPlayerId()
