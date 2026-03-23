@@ -100,9 +100,11 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\HealthBar\HealthBar.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitData.cs" />
+    <Compile Include="Assets\Resources\Scripts\PlayerMovement\SelectableObject.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Structure\StructureSO\StructureData.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
+    <Compile Include="Assets\Resources\Scripts\PlayerMovement\chevalierAnimation.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
     <Compile Include="Assets\Resources\Scripts\Camera\cameraMouvement.cs" />
@@ -110,6 +112,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
+    <Compile Include="Assets\Resources\Scripts\PlayerMovement\SelectionManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\ProgressBar\ProgressBar.cs" />
   </ItemGroup>
