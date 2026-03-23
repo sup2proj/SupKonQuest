@@ -110,23 +110,31 @@ public class ActionInterface : MonoBehaviour
 	
 	private void SendUnitsIcon(int buttonNumber, bool isPowered)
     {
-        // Ajout à la queue UI: on transmet "l'image" du bouton cliqué (en pratique, on clone son GameObject)
         GameObject clickedImageGO = GetClickedUnitsIcon(buttonNumber, isPowered);
         if (clickedImageGO != null)
         {
             if (InterfaceInstance.Instance != null)
             {
-                InterfaceInstance.Instance.addUnitToQueue(clickedImageGO);
-				
                 int unitIndex = buttonNumber - 1;
                 UnitsType type = unitDatas[unitIndex].type;
+
+                bool accepted;
                 if (isPowered)
                 {
-                    InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, true);
+                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, true);
                 }
                 else
                 {
-                    InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false);
+                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false);
+                }
+
+                if (accepted)
+                {
+                    InterfaceInstance.Instance.addUnitToQueue(clickedImageGO);
+                }
+                else
+                {
+                    Debug.Log($"[ActionInterface] Création refusée (pas assez d'or ?) -> icône non ajoutée à la queue. unitIndex={unitIndex}, type={type}");
                 }
             }
             else
