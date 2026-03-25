@@ -8,6 +8,7 @@ using UnityEngine;
 /// </summary>
 public class StatisticsInterface : MonoBehaviour
 {
+    public static StatisticsInterface Instance;
     [Header("UI")]
     [SerializeField] private TextMeshProUGUI goldText;
     [SerializeField] private TextMeshProUGUI unitCountText;
@@ -18,6 +19,7 @@ public class StatisticsInterface : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
         if (playerManager == null)
             playerManager = FindFirstObjectByType<PlayerManager>();
     }

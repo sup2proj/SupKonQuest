@@ -188,7 +188,23 @@ public class UnitInstance : MonoBehaviour
         Destroy(circleUnderFeet, 0f);
         Destroy(healthBar, 0f);
         Destroy(gameObject, 0f);
+
+        int playerId = getPlayerId();
+        var pm = PlayerManager.Instance;
+        var session = pm != null ? pm.GetSession(playerId) : null;
+        if (session != null)
+        {
+            session.removeUnit(1);
+            if (StatisticsInterface.Instance != null)
+                StatisticsInterface.Instance.Refresh();
+        }
     }
+
+    private int getPlayerId()
+    {
+        return PlayerManager.Instance.GetActivePlayerId();
+    }
+    
 
     public void Heal(float amount)
     {

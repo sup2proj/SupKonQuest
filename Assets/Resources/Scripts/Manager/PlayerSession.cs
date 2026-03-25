@@ -34,9 +34,14 @@ public class PlayerSession : MonoBehaviour
         if (amount > 0) gold += amount;
     }
 
-    public void AddUnit(int amount = 1)
+    public void AddUnit(int amount)
     {
         unitCount += amount;
+    }
+
+	public void removeUnit(int amount)
+    {
+        unitCount -= amount;
     }
 
     public void AddStructure(int amount = 1)

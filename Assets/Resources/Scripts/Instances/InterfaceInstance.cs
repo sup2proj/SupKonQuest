@@ -228,39 +228,40 @@ public class InterfaceInstance : MonoBehaviour
 
         activePlayerIndex = playerId - 1;
 
-        int gold = -1;
         if (playerManager == null)
             playerManager = FindFirstObjectByType<PlayerManager>();
 
+        if (playerManager != null)
+            playerManager.SetActivePlayer(playerId);
+
+        int gold = -1;
         if (playerManager != null)
         {
             var session = playerManager.GetSession(playerId);
             gold = session != null ? session.Gold : -1;
         }
 
-        Debug.Log($"[InterfaceInstance] Switch joueur: uiIndex={uiIndex} => playerId={playerId}, gold={gold}.", this);
+        Debug.Log($"[InterfaceInstance] Switch joueur (UI): uiIndex={uiIndex} => playerId={playerId}, gold={gold}.", this);
 
         RefreshPlayerStatisticsUI();
     }
 
     private int GetSelectedPlayerId()
     {
-        // IMPORTANT: pour simuler 'je suis ce joueur', on prend le joueur actif UI.
-        // (Sinon la structure sélectionnée forcerait l'id et tu ne pourrais pas agir "en tant que" un autre joueur.)
-        if (activePlayerIndex >= 0)
+        if (playerManager == null)
+            playerManager = FindFirstObjectByType<PlayerManager>();
+
+        // Source de vérité: PlayerManager
+        if (playerManager != null)
         {
-            int id = activePlayerIndex + 1;
-            int gold = -1;
-            if (playerManager != null)
-            {
-                var session = playerManager.GetSession(id);
-                gold = session != null ? session.Gold : -1;
-            }
-            Debug.Log($"[InterfaceInstance] Joueur actif UI utilisé: id={id}, gold={gold}.", this);
+            int id = playerManager.GetActivePlayerId();
+            var session = playerManager.GetSession(id);
+            int gold = session != null ? session.Gold : -1;
+            Debug.Log($"[InterfaceInstance] Joueur actif (PlayerManager) utilisé: id={id}, gold={gold}.", this);
             return id;
         }
 
-        // Fallback: si aucun joueur n'a été sélectionné, on peut retomber sur la structure.
+        // Fallback: si pas de PlayerManager, on peut retomber sur la structure.
         var selected = StructureInstance.CurrentlySelected;
         if (selected != null)
         {
@@ -268,7 +269,7 @@ public class InterfaceInstance : MonoBehaviour
             return id;
         }
 
-        Debug.Log("[InterfaceInstance] Aucun joueur sélectionné, fallback sur Player 1.", this);
+        Debug.Log("[InterfaceInstance] Aucun PlayerManager, fallback sur Player 1.", this);
         return 1;
     }
     // TEMPORAIRE -----------------------------------------------------------------------------
@@ -299,6 +300,23 @@ public class InterfaceInstance : MonoBehaviour
 
             if (progressBar != null)
                 progressBar.StopCreation(resetToZero: true);
+
+            if (StructureManager.Instance == null)
+            {
+                Debug.LogError($"[InterfaceInstance] StructureManager.Instance est null -> spawn annulé. playerId={req.playerId}, type={req.type}", this);
+            }
+            else
+            {
+                bool spawned = StructureManager.Instance.SpawnUnitByTypeAtPosition(
+                    req.playerId,
+                    req.type,
+                    req.x,
+                    req.z,
+                    req.isPoweredUnit,
+                    isProtector: false
+                );
+            }
+
             ShiftQueueLeft();
         }
 

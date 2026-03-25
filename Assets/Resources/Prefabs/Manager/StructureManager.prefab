@@ -52,6 +52,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4137a3a2a64d7ad4ab86c7d545b25e85, type: 2}
   - {fileID: 11400000, guid: 1cde77aca47f64e37a6e150dfe00fade, type: 2}
   - {fileID: 11400000, guid: c96833603ad4e6e468b4eb140b4da998, type: 2}
+  playerManager: {fileID: 0}
   unitPrefabMappings:
   - unitType: 0
     prefab: {fileID: 6712554670935715101, guid: d0cce79c972c99446af11cc16eb1df8d, type: 3}
@@ -67,3 +68,4 @@ MonoBehaviour:
     prefab: {fileID: 8817759546670376350, guid: 511d0b36b5df64fb68d7927a71e6c5db, type: 3}
   - unitType: 6
     prefab: {fileID: 2521214180397707472, guid: dd130a260b191c34594dd0132648cae2, type: 3}
+  poweredStatsMultiplier: 1.2

@@ -46,8 +46,6 @@ public class StructureManager : MonoBehaviour
             Debug.LogError($"[StructureManager] Prefab introuvable pour type={type} (vérifie unitPrefabMappings)");
             return false;
         }
-
-        // Calcule les stats runtime AVANT le spawn.
         UnitData runtimeData = data;
         if (isPoweredUnit)
         {
@@ -94,9 +92,14 @@ public class StructureManager : MonoBehaviour
         instance.Initialize(runtimeData);
         if (playerManager != null)
         {
+            Debug.Log("[StructureManager] Ajout de 1 unité à la session du joueur " + playerId);
             var session = playerManager.GetSession(playerId);
             if (session != null)
+            {
                 session.AddUnit(1);
+                StatisticsInterface.Instance.Refresh();
+                Debug.Log("[StructureManager] Session du joueur " + playerId + " mise à jour: UnitCount=" + session.UnitCount);
+            }
         }
 
         return true;

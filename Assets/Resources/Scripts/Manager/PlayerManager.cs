@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class PlayerManager : MonoBehaviour
 {
+    public static PlayerManager Instance;
+
     [SerializeField] private PlayerSession sessionPrefab;
     [SerializeField] private Transform sessionsRoot;
 
@@ -12,10 +14,14 @@ public class PlayerManager : MonoBehaviour
     [SerializeField, Min(0)] private int autoCreatePlayerCount = 2;
     [SerializeField, Min(0)] private int autoStartGold = 500;
 
+    [Header("Active player (runtime)")]
+    [SerializeField, Min(1)] private int activePlayerId = 1;
+    public int ActivePlayerId => activePlayerId;
+
     private void Awake()
     {
-        // Auto-création simple pour éviter des sessions null en jeu.
-        // Tu peux désactiver en mettant autoCreatePlayerCount = 0.
+        Instance = this;
+
         for (int i = 1; i <= autoCreatePlayerCount; i++)
         {
             if (!sessionsById.ContainsKey(i))
@@ -39,9 +45,25 @@ public class PlayerManager : MonoBehaviour
         return newSession;
     }
 
+    public void SetActivePlayer(int playerId)
+    {
+        if (!sessionsById.ContainsKey(playerId))
+        {
+            Debug.LogWarning($"[PlayerManager] SetActivePlayer: aucune session pour playerId={playerId} (création auto).", this);
+            CreateSessionForPlayer(playerId, autoStartGold, startUnitCount: 0, startStructureCount: 0);
+        }
+        activePlayerId = playerId;
+        var s = GetSession(activePlayerId);
+    }
+
     public PlayerSession GetSession(int id)
     {
         sessionsById.TryGetValue(id, out PlayerSession session);
         return session;
+    }
+
+    public int GetActivePlayerId()
+    {
+        return activePlayerId;
     }
 }
