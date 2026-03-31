@@ -17,6 +17,9 @@ public class PlayerManager : MonoBehaviour
     [Header("Active player (runtime)")]
     [SerializeField, Min(1)] private int activePlayerId = 1;
     public int ActivePlayerId => activePlayerId;
+    
+    private float timer = 0f;
+
 
     private void Awake()
     {
@@ -26,6 +29,17 @@ public class PlayerManager : MonoBehaviour
         {
             if (!sessionsById.ContainsKey(i))
                 CreateSessionForPlayer(i, autoStartGold, startUnitCount: 0, startStructureCount: 0);
+        }
+    }
+
+    private void Update()
+    {
+        int playerId = GetActivePlayerId();
+        timer += Time.deltaTime;
+        if (timer >= 1f)
+        {
+            timer = 0f;
+            GetGoldForPlayer(playerId);
         }
     }
 
@@ -66,4 +80,26 @@ public class PlayerManager : MonoBehaviour
     {
         return activePlayerId;
     }
+
+    public void GetGoldForPlayer(int playerId)
+    {
+        float goldAmount = 10;
+        int structureAmount = 0;
+        if (structureAmount > 0)
+        {
+            float multiplicator = structureAmount / 10f;
+            goldAmount += structureAmount * multiplicator;
+        }
+        var pm = PlayerManager.Instance;
+        var session = pm != null ? pm.GetSession(playerId) : null;
+        if (session)
+        {
+            session.AddGold((int)goldAmount);
+            if (StatisticsInterface.Instance != null)
+            {
+                StatisticsInterface.Instance.Refresh();
+            }
+        }
+    }
+
 }

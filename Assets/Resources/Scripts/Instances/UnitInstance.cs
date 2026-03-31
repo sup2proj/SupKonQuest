@@ -6,14 +6,6 @@ public class UnitInstance : MonoBehaviour
     [Header("Data")]
     [SerializeField] public UnitData unitData;
 
-    public UnitsType UnitType
-    {
-        get
-        {
-            return unitData.type;
-        }
-    }
-
     [Header("Visuals")]
     public GameObject objectModel;
     public GameObject circleUnderFeet;
