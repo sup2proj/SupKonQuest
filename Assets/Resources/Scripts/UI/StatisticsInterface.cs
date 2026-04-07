@@ -1,11 +1,6 @@
 using TMPro;
 using UnityEngine;
 
-/// <summary>
-/// Présente les statistiques du joueur actuellement sélectionné dans l'UI.
-/// Source du joueur actif: InterfaceInstance.ActivePlayerNumber.
-/// Source des données: PlayerManager -> PlayerSession.
-/// </summary>
 public class StatisticsInterface : MonoBehaviour
 {
     public static StatisticsInterface Instance;

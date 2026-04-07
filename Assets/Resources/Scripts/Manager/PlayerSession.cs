@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class PlayerSession : MonoBehaviour
 {
-    [SerializeField] private int id;
-    [SerializeField] private int gold;
-    [SerializeField] private int unitCount;
-    [SerializeField] private int structureCount;
+    [SerializeField] public int id;
+    [SerializeField] public int gold;
+    [SerializeField] public int unitCount;
+    [SerializeField] public int structureCount;
 
     public int Id => id;
     public int Gold => gold;
@@ -47,5 +47,10 @@ public class PlayerSession : MonoBehaviour
     public void AddStructure(int amount = 1)
     {
         structureCount += amount;
+    }
+
+    public void removeStructure(int amount)
+    {
+        structureCount -= amount;
     }
 }
