@@ -37,6 +37,10 @@ public class MapGenerator : MonoBehaviour
     [Header("Réglages")]
     public float tileSize = 1f;
 
+    private Transform groundFolder;
+    private Transform structuresFolder;
+    private Transform natureFolder;
+
     void Start()
     {
         // LoadAndGenerate("EUROPE");
@@ -47,6 +51,9 @@ public class MapGenerator : MonoBehaviour
     public void LoadAndGenerate(string folderName)
     {
         SetupResources();
+        groundFolder = GetOrCreateFolder("Ground");
+        structuresFolder = GetOrCreateFolder("Structures");
+        natureFolder = GetOrCreateFolder("Nature");
         string path = "Maps/" + folderName + "/";
         mapLayout = Resources.Load<Texture2D>(path + "MapLayout");
         MapJsonData jsonData = StructureInstance.LoadDataFromPath(path + "MapData");
@@ -64,6 +71,17 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    private Transform GetOrCreateFolder(string name)
+    {
+        Transform existing = transform.Find(name);
+        if (existing != null)
+            return existing;
+
+        GameObject folder = new GameObject(name);
+        folder.transform.SetParent(transform, false);
+        return folder.transform;
+    }
+
     void GenerateWorld()
     {
         int w = mapLayout.width;
@@ -79,7 +97,7 @@ public class MapGenerator : MonoBehaviour
                 allTiles[x, y] = new TileData(gData.type, x, y);
 
                 Vector3 pos = new Vector3(x * tileSize, 0, y * tileSize);
-                GameObject floor = Instantiate(gData.prefab, pos, Quaternion.identity, transform);
+                GameObject floor = Instantiate(gData.prefab, pos, Quaternion.identity, groundFolder);
                 floor.transform.localScale = new Vector3(0.1f, 1f, 0.1f);
                 floor.name = $"Tile_{x}_{y}";
                 floor.tag = "Ground";
@@ -108,13 +126,22 @@ public class MapGenerator : MonoBehaviour
                 int unityY = (h - 1 - p.y) ;
                 Vector3 pos = new Vector3(p.x * tileSize, 0, unityY* tileSize);
                 
-                GameObject StructureObj = Instantiate(prefab, pos, Quaternion.identity, transform);
-                StructureObj.transform.localScale = new Vector3(3f, 3f, 3f);
-                StructureObj.name = $"{type}_{p.x}_{p.y}";
-                // StructureController StructureController = StructureObj.AddComponent<StructureController>();
-                // StructureController.Init(p.x, p.y,-1,income);
+                GameObject structureObj = Instantiate(prefab, pos, Quaternion.identity, structuresFolder);
+                structureObj.transform.localScale = new Vector3(3f, 3f, 3f);
+                structureObj.name = $"{type}_{p.x}_{p.y}";
 
-                BlockNature(p.x, unityY);
+                var si = structureObj.GetComponent<StructureInstance>();
+                if (si != null)
+                {
+                    si.InitializePlayerId(p.owner);
+                    si.structureType = type;
+                    si.neutralStructure = (type == StructureType.NeutralStructure);
+                    BlockNature(p.x, unityY);
+                }
+                else
+                {
+                    Debug.LogError($"Prefab {prefab.name} sans StructureInstance");
+                }
             }
         }
     }
@@ -163,9 +190,9 @@ public class MapGenerator : MonoBehaviour
                             Vector3 pos = new Vector3(x * tileSize, 0, y);
                             
                             Quaternion rot = Quaternion.Euler(0, Random.Range(0, 360), 0);
-                            Instantiate(treeObj, pos, rot, transform);
-                            treeObj.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-                            treeObj.name = $"Tree_{x}_{y}";
+                            GameObject tree = Instantiate(treeObj, pos, rot, natureFolder);
+                            tree.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+                            tree.name = $"Tree_{x}_{y}";
                             tile.SetTree();
                         }
                     }

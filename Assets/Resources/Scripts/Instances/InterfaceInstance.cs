@@ -265,7 +265,7 @@ public class InterfaceInstance : MonoBehaviour
         var selected = StructureInstance.CurrentlySelected;
         if (selected != null)
         {
-            int id = ((int)selected.player) + 1;
+            int id = selected.playerId + 1;
             return id;
         }
 

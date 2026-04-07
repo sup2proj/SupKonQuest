@@ -6,12 +6,12 @@ using UnityEngine.EventSystems;
 public class StructureInstance : MonoBehaviour
 {
     private static StructureInstance currentlySelected = null;
+    public static StructureInstance Instance;
 
     public static StructureInstance CurrentlySelected => currentlySelected;
     public Vector3 StructurePosition => structurePosition;
 
     [Header("Data")]
-    [SerializeField] private StructureData structureData;
     private Vector3 structurePosition;
 
     private Queue<UnitData> unitQueue = new Queue<UnitData>();
@@ -23,8 +23,9 @@ public class StructureInstance : MonoBehaviour
     public int UnitsProtector;
     public bool isAlive;
 
-    [Header("Player")]
-    public PlayerNumber player;
+    [Header("Statisctics")]
+    public int playerId;
+    public int health = 1000;
     private Outline outline;
     private Collider structureCollider;
 
@@ -33,6 +34,7 @@ public class StructureInstance : MonoBehaviour
     
     void Awake()
     {
+        Instance = this;
         outline = GetComponent<Outline>();
         structureCollider = GetComponent<Collider>();
         
@@ -46,7 +48,12 @@ public class StructureInstance : MonoBehaviour
             structureCollider = gameObject.AddComponent<BoxCollider>();
         }
     }
-
+    
+    public void InitializePlayerId(int owner)
+    {
+        playerId = owner;
+    }
+    
     void Start()
     {
         structurePosition = transform.position;
@@ -74,7 +81,9 @@ public class StructureInstance : MonoBehaviour
 
     public void OnMouseDown()
     {
-        Selected();
+        int currentPlayerId = PlayerManager.Instance.GetActivePlayerId();
+        if (playerId == currentPlayerId)
+            Selected();
     }
 
     void DetectClickOutside()
