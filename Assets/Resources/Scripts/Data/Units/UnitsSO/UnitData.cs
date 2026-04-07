@@ -19,4 +19,5 @@ public class UnitData : ScriptableObject
     public UnitsType type;
     public bool isPoweredUnit;
     public bool isProtector;
+    public int playerId;
 }

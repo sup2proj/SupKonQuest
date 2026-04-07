@@ -37,19 +37,17 @@ public class StructureManager : MonoBehaviour
         UnitData data = unitData.Find(d => d.type == type);
         if (data == null)
         {
-            Debug.LogError($"[StructureManager] UnitData introuvable pour type={type}");
             return false;
         }
 
         if (!unitPrefabDict.TryGetValue(type, out GameObject prefab) || prefab == null)
         {
-            Debug.LogError($"[StructureManager] Prefab introuvable pour type={type} (vérifie unitPrefabMappings)");
             return false;
         }
-        UnitData runtimeData = data;
+        UnitData runtimeData = Instantiate(data);
+        runtimeData.playerId = playerId;
         if (isPoweredUnit)
         {
-            runtimeData = Instantiate(data);
             runtimeData.isPoweredUnit = true;
             float m = poweredStatsMultiplier;
             runtimeData.maxHealth *= m;
@@ -68,8 +66,6 @@ public class StructureManager : MonoBehaviour
 
         if (isProtector)
         {
-            if (!isPoweredUnit)
-                runtimeData = Instantiate(data);
             runtimeData.isProtector = true;
         }
         Vector3 position = new Vector3(x, 0, z - 3);
@@ -84,7 +80,6 @@ public class StructureManager : MonoBehaviour
         UnitInstance instance = unitGO.GetComponent<UnitInstance>();
         if (instance == null)
         {
-            Debug.LogError($"[StructureManager] Le prefab pour {type} n'a pas de composant UnitInstance.");
             Destroy(unitGO);
             return false;
         }
@@ -92,16 +87,13 @@ public class StructureManager : MonoBehaviour
         instance.Initialize(runtimeData);
         if (playerManager != null)
         {
-            Debug.Log("[StructureManager] Ajout de 1 unité à la session du joueur " + playerId);
             var session = playerManager.GetSession(playerId);
             if (session != null)
             {
                 session.AddUnit(1);
                 StatisticsInterface.Instance.Refresh();
-                Debug.Log("[StructureManager] Session du joueur " + playerId + " mise à jour: UnitCount=" + session.UnitCount);
             }
         }
-
         return true;
     }
     

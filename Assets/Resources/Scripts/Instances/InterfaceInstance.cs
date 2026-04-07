@@ -69,6 +69,7 @@ public class InterfaceInstance : MonoBehaviour
         public bool isPoweredUnit;
         public int playerId;
         public int paidCost;
+        public int buildingPlayerId;
     }
     
     private readonly Queue<UnitCreationRequest> creationQueue = new Queue<UnitCreationRequest>();
@@ -175,6 +176,14 @@ public class InterfaceInstance : MonoBehaviour
         }
 
         Debug.Log($"[InterfaceInstance] Création demandée et payée: joueur={playerId}, coût={cost}, goldRestant={session.Gold}, type={type}, powered={isPoweredUnit}.", this);
+        
+        int buildingPlayerId = playerId;
+        var selectedStructure = StructureInstance.CurrentlySelected;
+        if (selectedStructure != null)
+        {
+            buildingPlayerId = selectedStructure.playerId;
+        }
+        
         creationQueue.Enqueue(new UnitCreationRequest
         {
             unitIndex = unitIndex,
@@ -184,6 +193,7 @@ public class InterfaceInstance : MonoBehaviour
             isPoweredUnit = isPoweredUnit,
             playerId = playerId,
             paidCost = cost,
+            buildingPlayerId = buildingPlayerId,
         });
 
         if (!isSpawning)
@@ -303,12 +313,12 @@ public class InterfaceInstance : MonoBehaviour
 
             if (StructureManager.Instance == null)
             {
-                Debug.LogError($"[InterfaceInstance] StructureManager.Instance est null -> spawn annulé. playerId={req.playerId}, type={req.type}", this);
+                Debug.LogError($"[InterfaceInstance] StructureManager.Instance est null -> spawn annulé. playerId={req.buildingPlayerId}, type={req.type}", this);
             }
             else
             {
                 bool spawned = StructureManager.Instance.SpawnUnitByTypeAtPosition(
-                    req.playerId,
+                    req.buildingPlayerId,
                     req.type,
                     req.x,
                     req.z,
@@ -408,8 +418,8 @@ public class InterfaceInstance : MonoBehaviour
         ProtectorSlotToType.TryGetValue(slotIndex, out var type);
         var selected = StructureInstance.CurrentlySelected;
         Vector3 pos = selected.StructurePosition;
-        int playerId = GetSelectedPlayerId();
-        StructureManager.Instance.SpawnUnitByTypeAtPosition(playerId, type, pos.x + 1f, pos.z + 1f, false, true);
+        int buildingPlayerId = selected != null ? selected.playerId : GetSelectedPlayerId();
+        StructureManager.Instance.SpawnUnitByTypeAtPosition(buildingPlayerId, type, pos.x + 1f, pos.z + 1f, false, true);
     }
 
     public void showUnitsNextToStructure(UnitsType type, bool isPoweredUnit) 
