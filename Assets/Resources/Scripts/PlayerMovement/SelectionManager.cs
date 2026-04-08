@@ -67,7 +67,6 @@ public class SelectionManager : MonoBehaviour
         Debug.Log("test select unit");
         foreach (SelectableObject so in AllSelectableObjects)
         {
-            Debug.Log("test foreach");
             Vector3 screenPos = Camera.main.WorldToScreenPoint(so.transform.position);
             float boxLeft = SelectionBox.anchoredPosition.x - (SelectionBox.sizeDelta.x / 2);
             float boxRight = SelectionBox.anchoredPosition.x + (SelectionBox.sizeDelta.x / 2);

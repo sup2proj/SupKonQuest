@@ -39,15 +39,14 @@ public class chevalierAnimation : MonoBehaviour
         HandleMovement();
         
 
-        /**if(isMovingToTarget)
+        if(isMovingToTarget)
         {
-            animator.SetBool("Courir", true);
+            animator.SetBool("isMoving", true);
         }
         else
         {
-            animator.SetBool("Courir", false);
+            animator.SetBool("isMoving", false);
         }
-        **/
         
     }
 
@@ -62,6 +61,7 @@ public class chevalierAnimation : MonoBehaviour
             // Créer un raycast pour trouver où on a cliqué
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
+                Debug.Log("COLLISION WOUHOU: " + hit.point);
                 targetPosition = hit.point;
                 targetPosition.y = 0; // afin que le perso reste au sol
                 isMovingToTarget = true;

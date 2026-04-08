@@ -10,25 +10,16 @@ public class SelectableObject : MonoBehaviour
 
     public void SelectMe()
     {
-        Debug.Log("Selected : " + gameObject.name);
+        Debug.Log("Selected selectme: " + gameObject.name);
         SelectionMarker.SetActive(true);
         IsSelected = true;
     }
     
     public void DeselectMe()
     {
+        Debug.Log("Selected deselectme: " + gameObject.name);
         SelectionMarker.SetActive(false);
         IsSelected = false;
-    }
-
-    public void SetColorRed()
-    {
-        MyMeshRenderer.material = RedMat;
-    }
-
-    public void SetColorGreen()
-    {
-        MyMeshRenderer.material = GreenMat;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -36,14 +27,14 @@ public class SelectableObject : MonoBehaviour
     {
         //SelectionMarker.SetActive(false);
 
-        Debug.Log("GameObject: " + gameObject.name + ", SelectionMarker: " + SelectionMarker);
+        //Debug.Log("GameObject: " + gameObject.name + ", SelectionMarker: " + SelectionMarker);
         if (SelectionMarker != null)
         {
             SelectionMarker.SetActive(false);
         }
         else
         {
-            Debug.LogError("SelectionMarker NON assigné sur sdddddddddddddddddddd " + gameObject.name);
+            Debug.LogError("SelectionMarker NON assigné" + gameObject.name);
         }
     }
 
