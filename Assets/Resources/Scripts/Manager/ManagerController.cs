@@ -1,15 +1,21 @@
 using UnityEngine;
 
-public class OverlayManager : MonoBehaviour
+public class ManagerController : MonoBehaviour
 {
     void Start()
     {
-        initializePermanentOverlay();
+        
     }
 
     void Update()
     {
         
+    }
+
+    public static void initializePermanentGameObject()
+    {
+        initializePermanentOverlay();
+        intializePermanentManager();
     }
 
     public static void initializePermanentOverlay()
@@ -23,6 +29,20 @@ public class OverlayManager : MonoBehaviour
         else
         {
             Debug.LogError("Le prefab Interface n'a pas pu être chargé depuis Resources!");
+        }
+    }
+    
+    public static void intializePermanentManager()
+    {
+        GameObject managers = Resources.Load<GameObject>("Prefabs/Managers");
+        initializeEventSystem();
+        if (managers != null)
+        {
+            Instantiate(managers);
+        }
+        else
+        {
+            Debug.LogError("Le prefab des managers n'a pas pu être chargé depuis Resources!");
         }
     }
     

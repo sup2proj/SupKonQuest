@@ -18,7 +18,7 @@ public static class AutoLauncher
             if (Object.FindAnyObjectByType<MapGenerator>() == null)
             {
                 
-                OverlayManager.initializePermanentOverlay();
+                ManagerController.initializePermanentGameObject();
                 
                 GameObject map = new GameObject("AUTO_MAP_GENERATOR"); 
                 MapGenerator mapGenerator = map.AddComponent<MapGenerator>();
