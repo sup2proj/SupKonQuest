@@ -21,20 +21,6 @@ public static class AutoLauncher
                 OverlayManager.initializePermanentOverlay();
                 
                 GameObject map = new GameObject("AUTO_MAP_GENERATOR"); 
-                
-                GameObject structureManagerPrefab = Resources.Load<GameObject>("Prefabs/Manager/StructureManager");
-
-                if (structureManagerPrefab != null)
-                {
-                    GameObject structureManagerInstance = Object.Instantiate(structureManagerPrefab);
-                    structureManagerInstance.name = "StructureManager";
-                }
-                else
-                {
-                    Debug.LogWarning("AutoLauncher : Prefab StructureManager introuvable !");
-                }
-
-                
                 MapGenerator mapGenerator = map.AddComponent<MapGenerator>();
                 mapGenerator.LoadAndGenerate("TEST");
                 Debug.Log("AutoLauncher : MapGenerator injecté dynamiquement.");

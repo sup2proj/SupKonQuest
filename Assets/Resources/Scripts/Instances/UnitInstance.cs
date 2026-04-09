@@ -6,14 +6,6 @@ public class UnitInstance : MonoBehaviour
     [Header("Data")]
     [SerializeField] public UnitData unitData;
 
-    public UnitsType UnitType
-    {
-        get
-        {
-            return unitData.type;
-        }
-    }
-
     [Header("Visuals")]
     public GameObject objectModel;
     public GameObject circleUnderFeet;
@@ -23,7 +15,8 @@ public class UnitInstance : MonoBehaviour
     [SerializeField] public HealthBar healthBar;
 
     [Header("Runtime")]
-    public static float currentHealth;
+    public float currentHealth;
+    public int playerId;
 
     void Awake()
     {
@@ -83,6 +76,7 @@ public class UnitInstance : MonoBehaviour
             return;
         }
 
+        playerId = unitData.playerId;
         currentHealth = unitData.maxHealth;
 
         if (healthBar != null)
@@ -106,7 +100,23 @@ public class UnitInstance : MonoBehaviour
         SpriteRenderer sr = circleUnderFeet.GetComponent<SpriteRenderer>();
         if (sr != null)
         {
-            sr.color = Color.white;
+            sr.color = GetSelectionColorForPlayer(playerId);
+        }
+    }
+
+    private Color GetSelectionColorForPlayer(int id)
+    {
+        switch (id)
+        {
+            case 1: return Color.white;
+            case 2: return Color.red;
+            case 3: return Color.blue;
+            case 4: return Color.green;
+            case 5: return Color.yellow;
+            case 6: return Color.cyan;
+            case 7: return new Color(1f, 0.5f, 0f, 1f); // orange
+            case 8: return new Color(0.6f, 0f, 1f, 1f); // violet
+            default: return Color.gray;
         }
     }
 
@@ -188,7 +198,17 @@ public class UnitInstance : MonoBehaviour
         Destroy(circleUnderFeet, 0f);
         Destroy(healthBar, 0f);
         Destroy(gameObject, 0f);
+
+        var pm = PlayerManager.Instance;
+        var session = pm != null ? pm.GetSession(playerId) : null;
+        if (session != null)
+        {
+            session.removeUnit(1);
+            if (StatisticsInterface.Instance != null)
+                StatisticsInterface.Instance.Refresh();
+        }
     }
+
 
     public void Heal(float amount)
     {

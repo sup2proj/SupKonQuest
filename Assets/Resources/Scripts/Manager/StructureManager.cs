@@ -6,6 +6,9 @@ public class StructureManager : MonoBehaviour
     public static StructureManager Instance;
     public List<UnitData> unitData;
 
+    [Header("Sessions / Economy")]
+    [SerializeField] private PlayerManager playerManager;
+
     [Header("Unit Prefabs")]
     [SerializeField] private List<UnitPrefabMapping> unitPrefabMappings = new List<UnitPrefabMapping>();
     private Dictionary<UnitsType, GameObject> unitPrefabDict = new Dictionary<UnitsType, GameObject>();
@@ -29,30 +32,22 @@ public class StructureManager : MonoBehaviour
         }
     }
 
-    public void SpawnUnitByTypeAtPosition(UnitsType type, float x, float z, bool isPoweredUnit, bool isProtector)
+    public bool SpawnUnitByTypeAtPosition(int playerId, UnitsType type, float x, float z, bool isPoweredUnit, bool isProtector)
     {
         UnitData data = unitData.Find(d => d.type == type);
         if (data == null)
         {
-            Debug.LogError($"[StructureManager] UnitData introuvable pour type={type}");
-            return;
+            return false;
         }
 
         if (!unitPrefabDict.TryGetValue(type, out GameObject prefab) || prefab == null)
         {
-            Debug.LogError($"[StructureManager] Prefab introuvable pour type={type} (vérifie unitPrefabMappings)");
-            return;
+            return false;
         }
-
-        Vector3 position = new Vector3(x, 0, z - 3);
-
-        // Instanciation GO d'abord (nécessaire pour teinter/couleur)
-        GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
-
-        UnitData runtimeData = data;
+        UnitData runtimeData = Instantiate(data);
+        runtimeData.playerId = playerId;
         if (isPoweredUnit)
         {
-            runtimeData = Instantiate(data);
             runtimeData.isPoweredUnit = true;
             float m = poweredStatsMultiplier;
             runtimeData.maxHealth *= m;
@@ -67,24 +62,39 @@ public class StructureManager : MonoBehaviour
                     combatData.attackSpeed *= m;
                 }
             }
-
-            ApplyColorTint(unitGO, new Color(1f, 0.35f, 0.35f, 1f));
         }
 
         if (isProtector)
         {
             runtimeData.isProtector = true;
-            ApplyColorTint(unitGO, new Color(0.35f, 1f, 0.35f, 1f));
         }
+        Vector3 position = new Vector3(x, 0, z - 3);
+        GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
+
+        if (isPoweredUnit)
+            ApplyColorTint(unitGO, new Color(1f, 0.35f, 0.35f, 1f));
+
+        if (isProtector)
+            ApplyColorTint(unitGO, new Color(0.35f, 1f, 0.35f, 1f));
 
         UnitInstance instance = unitGO.GetComponent<UnitInstance>();
         if (instance == null)
         {
-            Debug.LogError($"[StructureManager] Le prefab pour {type} n'a pas de composant UnitInstance.");
             Destroy(unitGO);
-            return;
+            return false;
         }
+
         instance.Initialize(runtimeData);
+        if (playerManager != null)
+        {
+            var session = playerManager.GetSession(playerId);
+            if (session != null)
+            {
+                session.AddUnit(1);
+                StatisticsInterface.Instance.Refresh();
+            }
+        }
+        return true;
     }
     
     private void ApplyColorTint(GameObject unitGO, Color tint)
