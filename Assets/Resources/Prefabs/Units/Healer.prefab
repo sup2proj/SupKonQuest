@@ -1900,6 +1900,7 @@ GameObject:
   - component: {fileID: 7322826043863664852}
   - component: {fileID: 7531569455182867090}
   - component: {fileID: 639291211468168060}
+  - component: {fileID: 5055404702832634639}
   m_Layer: 0
   m_Name: Healer
   m_TagString: Units
@@ -1961,10 +1962,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitInstance
+  unitData: {fileID: 11400000, guid: 1cde77aca47f64e37a6e150dfe00fade, type: 2}
   objectModel: {fileID: 7535198820806993792}
   circleUnderFeet: {fileID: 5234142702115695861}
   animator: {fileID: 0}
   healthBar: {fileID: 2731449005562521216}
+  currentHealth: 0
+  playerId: 0
 --- !u!65 &7531569455182867090
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2013,3 +2017,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 84
   m_CollisionDetection: 0
+--- !u!114 &5055404702832634639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8817759546670376350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a172c3567a083c46a520a541297c332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BuffSpell
+  scanRadius: 5
+  unitsLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  debugScanKey: 112
+  showCircleWhenPressingKey: 1
+  circleSegments: 64
+  circleWidth: 0.05
+  circleColor: {r: 0.55, g: 1, b: 0.55, a: 1}
+  circleOutlineAlpha: 0.45
+  circleDurationSeconds: 1
+  circleHeightOffset: 0.05
+  showFilledDisc: 1
+  fillAlpha: 0.06

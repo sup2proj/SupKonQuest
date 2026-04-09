@@ -500,10 +500,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitsSoldierInstance
+  unitData: {fileID: 11400000, guid: 156b9e8658b0c49afb787de6726abdce, type: 2}
   objectModel: {fileID: 6972348287640944665}
   circleUnderFeet: {fileID: 5568360386382107041}
   animator: {fileID: 0}
   healthBar: {fileID: 2731449005562521216}
+  currentHealth: 0
+  playerId: 0
 --- !u!54 &888112340319924615
 Rigidbody:
   m_ObjectHideFlags: 0

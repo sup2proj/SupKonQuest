@@ -1691,10 +1691,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitsSoldierInstance
+  unitData: {fileID: 11400000, guid: 886f33ae739a84c94bbc7ae7538d7169, type: 2}
   objectModel: {fileID: 2597432588625706430}
   circleUnderFeet: {fileID: 2615190501803727386}
   animator: {fileID: 0}
   healthBar: {fileID: 2731449005562521216}
+  currentHealth: 0
+  playerId: 0
 --- !u!65 &7911920561147608704
 BoxCollider:
   m_ObjectHideFlags: 0

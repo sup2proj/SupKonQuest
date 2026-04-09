@@ -2844,10 +2844,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitInstance
+  unitData: {fileID: 11400000, guid: 07e81fd0ba5b94888b7c67a91496798f, type: 2}
   objectModel: {fileID: 6244019195384724075}
   circleUnderFeet: {fileID: 2206464339169037478}
   animator: {fileID: 0}
   healthBar: {fileID: 2731449005562521216}
+  currentHealth: 0
+  playerId: 0
 --- !u!65 &2408798326600379559
 BoxCollider:
   m_ObjectHideFlags: 0
