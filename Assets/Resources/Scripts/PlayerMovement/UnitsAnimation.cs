@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 
-public class chevalierAnimation : MonoBehaviour
+public class UnitsAnimation : MonoBehaviour
 {
     public Animator animator;
     public float moveSpeed = 1f;

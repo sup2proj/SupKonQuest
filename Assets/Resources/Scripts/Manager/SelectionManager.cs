@@ -4,25 +4,27 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 public class SelectionManager : MonoBehaviour
 {
+    public static SelectionManager Instance { get; private set; }
+
     public RectTransform SelectionBox;
     public List<SelectableObject> AllSelectableObjects;
     public List<SelectableObject> CurrentlySelectedObjects;
-    bool isMouseDown, isDragging;
+    [SerializeField, Min(0.05f)] private float selectableRefreshInterval = 0.25f;
+
+    bool isMouseDown, isDragging = false;
+    float selectableRefreshTimer;
 
     Vector3 mouseStartPos;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        isDragging = false;
-        isMouseDown = false;
-        AllSelectableObjects = new List<SelectableObject>(FindObjectsOfType<SelectableObject>());
 
-        Debug.Log("Nombre d'unités trouvées : " + AllSelectableObjects.Count);
+    void Awake()
+    {
+        Instance = this;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        AnalyzeSelectableObjectsContinuously();
+
         if(Mouse.current.leftButton.wasPressedThisFrame)
         {
             isMouseDown = true;
@@ -62,11 +64,44 @@ public class SelectionManager : MonoBehaviour
         }
     }
 
+    public void RegisterSelectable(SelectableObject selectable)
+    {
+        if (selectable == null)
+            return;
+
+        if (!AllSelectableObjects.Contains(selectable))
+            AllSelectableObjects.Add(selectable);
+    }
+    
+    private void AnalyzeSelectableObjectsContinuously()
+    {
+        selectableRefreshTimer += Time.deltaTime;
+        if (selectableRefreshTimer < selectableRefreshInterval)
+            return;
+
+        selectableRefreshTimer = 0f;
+        ForceRefreshSelectableObjects();
+    }
+
+    private void ForceRefreshSelectableObjects()
+    {
+        var found = FindObjectsOfType<SelectableObject>();
+
+        AllSelectableObjects.Clear();
+        AllSelectableObjects.AddRange(found);
+    }
+
     void selectUnits()
     {
-        Debug.Log("test select unit");
-        foreach (SelectableObject so in AllSelectableObjects)
+        for (int i = AllSelectableObjects.Count - 1; i >= 0; i--)
         {
+            SelectableObject so = AllSelectableObjects[i];
+            if (so == null)
+            {
+                AllSelectableObjects.RemoveAt(i);
+                continue;
+            }
+
             Vector3 screenPos = Camera.main.WorldToScreenPoint(so.transform.position);
             float boxLeft = SelectionBox.anchoredPosition.x - (SelectionBox.sizeDelta.x / 2);
             float boxRight = SelectionBox.anchoredPosition.x + (SelectionBox.sizeDelta.x / 2);
