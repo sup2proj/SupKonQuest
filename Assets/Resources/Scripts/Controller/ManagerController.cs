@@ -2,16 +2,6 @@ using UnityEngine;
 
 public class ManagerController : MonoBehaviour
 {
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
-    }
-
     public static void initializePermanentGameObject()
     {
         initializePermanentOverlay();

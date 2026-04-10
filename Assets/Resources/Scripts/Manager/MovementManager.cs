@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 
-public class DeplacementManager : MonoBehaviour
+public class MovementManager : MonoBehaviour
 {
     public Animator animator;
     public float moveSpeed = 1f;

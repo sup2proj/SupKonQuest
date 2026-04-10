@@ -1631,6 +1631,8 @@ GameObject:
   - component: {fileID: 584295807139649269}
   - component: {fileID: 7911920561147608704}
   - component: {fileID: -1801458887589098818}
+  - component: {fileID: 8132909324860242768}
+  - component: {fileID: -7223385642623911744}
   m_Layer: 0
   m_Name: Infantry
   m_TagString: Units
@@ -1746,6 +1748,37 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 84
   m_CollisionDetection: 0
+--- !u!114 &8132909324860242768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6712554670935715101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64cb831562a6bdf41a4a4ca58a11e281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
+  animator: {fileID: 0}
+  moveSpeed: 1
+  SelectionMarker: {fileID: 2615190501803727386}
+--- !u!114 &-7223385642623911744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6712554670935715101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f458f2bfb879834291da7ef83364c8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectableObject
+  SelectionMarker: {fileID: 2615190501803727386}
+  MyMeshRenderer: {fileID: 0}
+  RedMat: {fileID: 0}
+  GreenMat: {fileID: 0}
 --- !u!1 &6837486392623418950
 GameObject:
   m_ObjectHideFlags: 0
