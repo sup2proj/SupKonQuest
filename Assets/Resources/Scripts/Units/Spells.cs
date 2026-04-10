@@ -249,7 +249,10 @@ public class Spells : MonoBehaviour
         if (casterUnit != null && casterUnit.unitData is UnitHealerData hd && hd.healRange > 0f)
             scanRadius = hd.healRange;
 
-        int currentPlayerId = PlayerManager.Instance != null ? PlayerManager.Instance.ActivePlayerId : -1;
+        if (casterUnit == null)
+            return;
+
+        int casterPlayerId = casterUnit.playerId;
         int totalUnitsFound = 0;
         int friendlyUnitsFound = 0;
 
@@ -263,7 +266,7 @@ public class Spells : MonoBehaviour
             if (!unit.CompareTag("Units"))
                 continue;
             totalUnitsFound++;
-            if (unit.playerId != currentPlayerId)
+            if (unit.playerId != casterPlayerId)
                 continue;
             if (casterUnit != null && unit == casterUnit)
                 continue;
@@ -271,16 +274,16 @@ public class Spells : MonoBehaviour
             Debug.Log($"[BuffSpell] Unité alliée trouvée: {unit.name} (playerId={unit.playerId})", unit);
             if (casterUnit.unitData is UnitHealerData targetHealerData && spell == 1)
             {
-                Buffs.ApplyRegen(this, regenByTarget, unit, targetHealerData, regenTickInterval);
+                Buffs.ApplyRegen(this, regenByTarget, unit, targetHealerData, regenTickInterval, casterPlayerId);
                 
             } else if (casterUnit.unitData is UnitSupportData supportData && spell != 1)
             {
                 float buffMultiplicator = GetBuffMultiplicatorFromSpell(supportData, spell);
                 Buffs.BuffStatistics(this, AttackSpeedBuffByTarget, unit, supportData,
-                    buffMultiplicator, spell);
+                    buffMultiplicator, spell, casterPlayerId);
             }
         }
-        Debug.Log($"[BuffSpell] Scan radius={scanRadius} => unités détectées={totalUnitsFound}, alliées (playerId={currentPlayerId})={friendlyUnitsFound}", this);
+        Debug.Log($"[BuffSpell] Scan radius={scanRadius} => unités détectées={totalUnitsFound}, alliées (playerId={casterPlayerId})={friendlyUnitsFound}", this);
     }
 
 

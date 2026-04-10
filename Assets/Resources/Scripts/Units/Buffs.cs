@@ -9,15 +9,19 @@ public static class Buffs
         Dictionary<UnitInstance, Coroutine> regenByTarget,
         UnitInstance target,
         UnitHealerData healerData,
-        float regenTickInterval)
+        float regenTickInterval,
+        int sourcePlayerId)
     {
+        if (target == null || target.playerId != sourcePlayerId)
+            return;
+
         if (regenByTarget.TryGetValue(target, out Coroutine running) && running != null)
         {
             owner.StopCoroutine(running);
             regenByTarget.Remove(target);
         }
 
-        Coroutine c = owner.StartCoroutine(RegenCoroutine(target, healerData.healAmount, healerData.healDuration, regenTickInterval, regenByTarget));
+        Coroutine c = owner.StartCoroutine(RegenCoroutine(target, healerData.healAmount, healerData.healDuration, regenTickInterval, sourcePlayerId, regenByTarget));
         regenByTarget[target] = c;
     }
 
@@ -26,6 +30,7 @@ public static class Buffs
         float totalHealAmount,
         float duration,
         float regenTickInterval,
+        int sourcePlayerId,
         Dictionary<UnitInstance, Coroutine> regenByTarget)
     {
         float tick = Mathf.Max(0.01f, regenTickInterval);
@@ -34,8 +39,8 @@ public static class Buffs
 
         while (elapsed < duration)
         {
-            if (target == null)
-                yield break;
+            if (target == null || target.playerId != sourcePlayerId)
+                break;
 
             float dt = Mathf.Min(tick, duration - elapsed);
             float healThisTick = healPerSecond * dt;
@@ -54,9 +59,13 @@ public static class Buffs
         UnitInstance target,
         UnitSupportData supportData,
         float buffMultiplicator,
-        int spell)
+        int spell,
+        int sourcePlayerId)
     {
         if (owner == null || buffByTarget == null || target == null || target.unitData == null || supportData == null)
+            return;
+
+        if (target.playerId != sourcePlayerId)
             return;
 
         if (buffMultiplicator <= 0f)
@@ -78,7 +87,7 @@ public static class Buffs
             buffByTarget.Remove(target);
         }
 
-        Coroutine c = owner.StartCoroutine(BuffCoroutine(target, supportData.buffDuration, buffMultiplicator, spell, buffByTarget));
+        Coroutine c = owner.StartCoroutine(BuffCoroutine(target, supportData.buffDuration, buffMultiplicator, spell, sourcePlayerId, buffByTarget));
         buffByTarget[target] = c;
     }
 
@@ -87,9 +96,10 @@ public static class Buffs
         float duration,
         float buffMultiplicator,
         int spell,
+        int sourcePlayerId,
         Dictionary<UnitInstance, Coroutine> buffByTarget)
     {
-        if (target == null || target.unitData == null)
+        if (target == null || target.unitData == null || target.playerId != sourcePlayerId)
             yield break;
         
         float originalValue = 0f;
