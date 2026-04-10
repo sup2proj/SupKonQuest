@@ -101,6 +101,7 @@ public class InterfaceInstance : MonoBehaviour
         if (playerManager == null)
             playerManager = FindFirstObjectByType<PlayerManager>();
         hideBuffIcons();
+        WireBuffSlotClicks();
         WirePlayersListClicks();
         WireProtectorSlotClicks();
         RefreshPlayerStatisticsUI();
@@ -417,6 +418,31 @@ public class InterfaceInstance : MonoBehaviour
         }
     }
 
+    private void WireBuffSlotClicks()
+    {
+        if (buffSlots == null || buffSlots.Length == 0)
+            return;
+
+        for (int i = 0; i < buffSlots.Length; i++)
+        {
+            var img = buffSlots[i];
+            if (img == null) continue;
+
+            var btn = img.GetComponent<Button>();
+            int capturedIndex = i;
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() => OnBuffSlotClicked(capturedIndex));
+        }
+    }
+
+    private void OnBuffSlotClicked(int index)
+    {
+        if (buffSlots == null || index < 0 || index >= buffSlots.Length || buffSlots[index] == null)
+            return;
+        Spells.Instance.ButtonListener(index);
+        Debug.Log($"[InterfaceInstance] Bouton buff appuyé: index={index}, nom={buffSlots[index].gameObject.name}", buffSlots[index]);
+    }
+
     private void SpawnStructProtectorOnInterface(int slotIndex)
     {
         ProtectorSlotToType.TryGetValue(slotIndex, out var type);
@@ -511,28 +537,5 @@ public class InterfaceInstance : MonoBehaviour
             return;
 
         buffSlots[healerIndex].gameObject.SetActive(true);
-    }
-
-    public void ActiveBuff()
-    {
-        if (buffSlots == null || buffSlots.Length == 0)
-            return;
-
-        var clickedObject = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
-
-        for (int i = 0; i < buffSlots.Length; i++)
-        {
-            var slot = buffSlots[i];
-            if (slot == null)
-                continue;
-
-            if (slot.gameObject == clickedObject || clickedObject.transform.IsChildOf(slot.transform))
-            {
-                Debug.Log($"[InterfaceInstance] Bouton buff appuyé: index={i}, nom={slot.gameObject.name}", slot);
-                return;
-            }
-        }
-
-        Debug.Log($"[InterfaceInstance] Bouton buff non reconnu: {clickedObject.name}", clickedObject);
     }
 }

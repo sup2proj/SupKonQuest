@@ -3,12 +3,9 @@ using UnityEngine;
 
 public class Spells : MonoBehaviour
 {
+    public static Spells Instance { get; private set; }
+
     [SerializeField] private float regenTickInterval = 0.25f;
-    
-    private KeyCode debugScanKey = KeyCode.P;
-    private KeyCode debugScanKey2 = KeyCode.M;
-    private KeyCode debugScanKey3 = KeyCode.L;
-    private KeyCode debugScanKey4 = KeyCode.K;
     
     private int circleSegments = 128; 
     private float circleWidth = 0.05f;
@@ -31,6 +28,7 @@ public class Spells : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
         casterUnit = GetComponent<UnitInstance>();
         if (casterUnit.unitData is UnitHealerData healerData && healerData.healRange > 0f)
         {
@@ -40,15 +38,6 @@ public class Spells : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(debugScanKey) && casterUnit.unitData is UnitHealerData)
-            TriggerSpell(Color.red, 1);
-        if (Input.GetKeyDown(debugScanKey2) && casterUnit.unitData is UnitSupportData)
-            TriggerSpell(Color.green, 2);
-        if (Input.GetKeyDown(debugScanKey3) && casterUnit.unitData is UnitSupportData)
-            TriggerSpell(Color.yellow, 3);
-        if (Input.GetKeyDown(debugScanKey4) && casterUnit.unitData is UnitSupportData)
-            TriggerSpell(Color.blue, 4);
-
         if (circleHideAtTime >= 0f && Time.time >= circleHideAtTime)
         {
             if (rangeCircle != null)
@@ -63,6 +52,21 @@ public class Spells : MonoBehaviour
             UpdateRangeCirclePositions();
         if (rangeFillRenderer != null && rangeFillRenderer.enabled)
             UpdateRangeFillTransform(currentCircleColor);
+    }
+
+    public void ButtonListener(int choice)
+    {
+        if (casterUnit == null || casterUnit.unitData == null)
+            return;
+        Debug.Log("[BuffSpell] ButtonListener called with choice=" + choice, this);
+        if (choice == 3 && casterUnit.unitData is UnitHealerData)
+            TriggerSpell(Color.red, 1);
+        if (choice == 0 && casterUnit.unitData is UnitSupportData)
+            TriggerSpell(Color.green, 2);
+        if (choice == 1 && casterUnit.unitData is UnitSupportData)
+            TriggerSpell(Color.yellow, 3);
+        if (choice == 2 && casterUnit.unitData is UnitSupportData)
+            TriggerSpell(Color.blue, 4);
     }
 
     private void TriggerSpell(Color spellColor, int spell)
@@ -285,7 +289,6 @@ public class Spells : MonoBehaviour
         }
         Debug.Log($"[BuffSpell] Scan radius={scanRadius} => unités détectées={totalUnitsFound}, alliées (playerId={casterPlayerId})={friendlyUnitsFound}", this);
     }
-
 
     private float GetHealingDuration()
     {
