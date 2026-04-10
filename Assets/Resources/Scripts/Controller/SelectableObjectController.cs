@@ -54,7 +54,6 @@ public class SelectableObject : MonoBehaviour
     {
         Debug.Log("Deselected: " + gameObject.name);
         IsSelected = false;
-        if (buffIcons) InterfaceInstance.Instance.hideBuffIcons();
         if (markerSprite != null)
             markerSprite.color = originalColor;
     }

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 
 public class InterfaceInstance : MonoBehaviour
@@ -107,7 +108,6 @@ public class InterfaceInstance : MonoBehaviour
 
     void Update()
     {
-
     }
 
     public void showInterfaceForStructure()
@@ -511,6 +511,28 @@ public class InterfaceInstance : MonoBehaviour
             return;
 
         buffSlots[healerIndex].gameObject.SetActive(true);
-        
+    }
+
+    public void ActiveBuff()
+    {
+        if (buffSlots == null || buffSlots.Length == 0)
+            return;
+
+        var clickedObject = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
+
+        for (int i = 0; i < buffSlots.Length; i++)
+        {
+            var slot = buffSlots[i];
+            if (slot == null)
+                continue;
+
+            if (slot.gameObject == clickedObject || clickedObject.transform.IsChildOf(slot.transform))
+            {
+                Debug.Log($"[InterfaceInstance] Bouton buff appuyé: index={i}, nom={slot.gameObject.name}", slot);
+                return;
+            }
+        }
+
+        Debug.Log($"[InterfaceInstance] Bouton buff non reconnu: {clickedObject.name}", clickedObject);
     }
 }
