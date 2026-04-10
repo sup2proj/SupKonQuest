@@ -1837,6 +1837,8 @@ GameObject:
   - component: {fileID: 1877838075291778614}
   - component: {fileID: 1514991253467048920}
   - component: {fileID: 5121653130452320911}
+  - component: {fileID: 7881555108746137697}
+  - component: {fileID: 8938103991001808169}
   m_Layer: 0
   m_Name: Antiblindage
   m_TagString: Units
@@ -1902,11 +1904,6 @@ MonoBehaviour:
   circleUnderFeet: {fileID: 5643479693024411278}
   animator: {fileID: 0}
   healthBar: {fileID: 2731449005562521216}
-  currentHealth: 0
-  healthBarAnchor: {fileID: 0}
-  healthBarLocalY: 2
-  healthBarLocalOffset: {x: 0, y: 0, z: 0}
-  healthBarFaceCamera: 1
 --- !u!54 &1514991253467048920
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1955,6 +1952,37 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &7881555108746137697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8523093793290564380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64cb831562a6bdf41a4a4ca58a11e281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
+  animator: {fileID: 0}
+  moveSpeed: 1
+  SelectionMarker: {fileID: 5643479693024411278}
+--- !u!114 &8938103991001808169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8523093793290564380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f458f2bfb879834291da7ef83364c8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectableObject
+  SelectionMarker: {fileID: 5643479693024411278}
+  MyMeshRenderer: {fileID: 0}
+  RedMat: {fileID: 0}
+  GreenMat: {fileID: 0}
 --- !u!1 &8689228255493868555
 GameObject:
   m_ObjectHideFlags: 0

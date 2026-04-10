@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class cameraMouvement : MonoBehaviour
@@ -49,19 +49,40 @@ public class cameraMouvement : MonoBehaviour
     void CameraMove()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();
+        int compteurEst = 0;
+        int compteurOuest = 0;
 
-        if (mousePos.x > screenBoundsWidth - boundary || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        if (mousePos.x > screenBoundsWidth - boundary || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow)){
+            compteurEst++;
             position.x += speed * Time.deltaTime;
+        }
 
-        if (mousePos.x < boundary || Input.GetKey(isAZERTY ? KeyCode.Q : KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        if (mousePos.x < boundary || Input.GetKey(isAZERTY ? KeyCode.Q : KeyCode.A) || Input.GetKey(KeyCode.LeftArrow)){
+            compteurOuest++;
             position.x -= speed * Time.deltaTime;
+        }
 
-        if (mousePos.y > screenBoundsHeight - boundary || Input.GetKey(isAZERTY ? KeyCode.Z : KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-            position.y += speed * Time.deltaTime;
+        if (mousePos.y > screenBoundsHeight - boundary || Input.GetKey(isAZERTY ? KeyCode.Z : KeyCode.W) || Input.GetKey(KeyCode.UpArrow)){
+            if (compteurOuest >0 || compteurEst > 0)
+                position.y +=speed * Time.deltaTime / 2;
+            else
+                position.y += speed * Time.deltaTime;
+            
+            compteurEst = 0;
+            compteurOuest = 0;
+        }
+            
+        if (mousePos.y < boundary || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow)){
+            if (compteurOuest > 0 || compteurEst > 0)
+                position.y -=speed * Time.deltaTime / 2;
+                
+            else
+                position.y -= speed * Time.deltaTime;
+            
+            compteurEst = 0;
+            compteurOuest = 0;
 
-        if (mousePos.y < boundary || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-            position.y -= speed * Time.deltaTime;
-
+        }
     }
     void CameraZoom()
     {
