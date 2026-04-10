@@ -28,10 +28,14 @@ public class SelectableObject : MonoBehaviour
 
     public void SelectMe()
     {
-        Debug.Log("Selected selectme: " + gameObject.name);
-        IsSelected = true;
-        if (markerSprite != null)
-            markerSprite.color = Color.green;
+        int playerUnitsId = gameObject.GetComponent<UnitInstance>().playerId;
+        int playerId = PlayerManager.Instance.GetActivePlayerId();
+        if (playerId == playerUnitsId)
+        {
+            IsSelected = true;
+            if (markerSprite != null)
+                markerSprite.color = Color.green;
+        }
     }
     
     public void DeselectMe()
