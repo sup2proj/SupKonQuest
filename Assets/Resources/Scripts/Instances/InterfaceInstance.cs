@@ -21,6 +21,10 @@ public class InterfaceInstance : MonoBehaviour
     
 	[Header("Player Statistics")]
 	[SerializeField] private StatisticsInterface statisticsInterface;
+    
+    [Header("Buff (support/healer)")]
+    [SerializeField] private Image[] buffSlots;
+    
 
     [Header("TEMPORAIRE JOUEUR LIST")] 
     [SerializeField] private List<Image> playersList;
@@ -95,7 +99,7 @@ public class InterfaceInstance : MonoBehaviour
 
         if (playerManager == null)
             playerManager = FindFirstObjectByType<PlayerManager>();
-
+        hideBuffIcons();
         WirePlayersListClicks();
         WireProtectorSlotClicks();
         RefreshPlayerStatisticsUI();
@@ -475,8 +479,38 @@ public class InterfaceInstance : MonoBehaviour
             else
             {
                 unitsProtectorSlots[2].gameObject.SetActive(true);
-
             }
         }
+    }
+
+    public void hideBuffIcons()
+    {
+        if (buffSlots == null)
+            return;
+
+        foreach (var buffIcon in buffSlots)
+        {
+            if (buffIcon == null) continue;
+            buffIcon.gameObject.SetActive(false);
+        }
+    }
+
+    public void ShowSupportIcons()
+    {
+        int slotsToShow = Mathf.Min(buffSlots.Length, 3);
+        for (int i = 0; i < slotsToShow; i++)
+        {
+            if (buffSlots[i] == null) continue;
+            buffSlots[i].gameObject.SetActive(true);
+        }
+    }
+    public void ShowHealerIcon()
+    {
+        int healerIndex = buffSlots.Length - 1;
+        if (buffSlots[healerIndex] == null)
+            return;
+
+        buffSlots[healerIndex].gameObject.SetActive(true);
+        
     }
 }

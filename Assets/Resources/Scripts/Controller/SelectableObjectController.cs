@@ -10,7 +10,7 @@ public class SelectableObject : MonoBehaviour
     private Color originalColor;
 
     private SpriteRenderer markerSprite;
-
+    private bool buffIcons = false;
     private void OnEnable()
     {
         if (SelectionManager.Instance != null)
@@ -28,13 +28,25 @@ public class SelectableObject : MonoBehaviour
 
     public void SelectMe()
     {
-        int playerUnitsId = gameObject.GetComponent<UnitInstance>().playerId;
+        UnitInstance unitInstance = gameObject.GetComponent<UnitInstance>();
+        int playerUnitsId = unitInstance.playerId;
         int playerId = PlayerManager.Instance.GetActivePlayerId();
         if (playerId == playerUnitsId)
         {
             IsSelected = true;
             if (markerSprite != null)
                 markerSprite.color = Color.green;
+            if (unitInstance.unitData.type == UnitsType.Support)
+            {
+                InterfaceInstance.Instance.ShowSupportIcons();
+                buffIcons = true;
+            }
+            else if (unitInstance.unitData.type == UnitsType.Healer)
+            {
+                InterfaceInstance.Instance.ShowHealerIcon();
+                buffIcons = true;
+
+            }
         }
     }
     
@@ -42,7 +54,7 @@ public class SelectableObject : MonoBehaviour
     {
         Debug.Log("Deselected: " + gameObject.name);
         IsSelected = false;
-
+        if (buffIcons) InterfaceInstance.Instance.hideBuffIcons();
         if (markerSprite != null)
             markerSprite.color = originalColor;
     }
