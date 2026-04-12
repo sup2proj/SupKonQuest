@@ -1940,7 +1940,7 @@ Animator:
   m_GameObject: {fileID: 8817759546670376350}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 240a8a0381738482d9509371c7c98931, type: 3}
-  m_Controller: {fileID: 9100000, guid: ab364d38205cd4b2fac6c796bb400cc7, type: 2}
+  m_Controller: {fileID: 9100000, guid: a12ec44147161fa4b9a0160ac02bb194, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -2031,24 +2031,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a172c3567a083c46a520a541297c332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuffSpell
-  scanRadius: 5
-  unitsLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  debugScanKey: 112
-  showCircleWhenPressingKey: 1
-  circleSegments: 64
-  circleWidth: 0.05
-  circleColor: {r: 0.55, g: 1, b: 0.55, a: 1}
-  circleOutlineAlpha: 0.45
-  circleDurationSeconds: 1
-  circleHeightOffset: 0.05
-  showFilledDisc: 1
-  fillAlpha: 0.06
-  includeSelf: 1
   regenTickInterval: 0.25
-  autoUseCasterHealRange: 1
-  requireUnitsTag: 1
 --- !u!114 &-3349253672883374585
 MonoBehaviour:
   m_ObjectHideFlags: 0
