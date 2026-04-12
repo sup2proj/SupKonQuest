@@ -25,15 +25,19 @@ public class SelectionManager : MonoBehaviour
     {
         AnalyzeSelectableObjectsContinuously();
 
-        if(Mouse.current.leftButton.wasPressedThisFrame)
+        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
-            isMouseDown = true;
-            mouseStartPos = Mouse.current.position.ReadValue();
-            foreach (SelectableObject so in CurrentlySelectedObjects)
+            bool attackOrderIssued = TryIssueAttackMoveOrder();
+            if (!attackOrderIssued)
             {
-                so.DeselectMe();
+                isMouseDown = true;
+                mouseStartPos = Mouse.current.position.ReadValue();
+                foreach (SelectableObject so in CurrentlySelectedObjects)
+                {
+                    so.DeselectMe();
+                }
+                CurrentlySelectedObjects.Clear();
             }
-            CurrentlySelectedObjects.Clear();
         }
     
         if (isMouseDown)
@@ -127,4 +131,69 @@ public class SelectionManager : MonoBehaviour
             }
         }
     }
+
+private bool TryIssueAttackMoveOrder()
+   {
+       if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0)
+           return false;
+   
+       Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+       if (!Physics.Raycast(ray, out RaycastHit hit))
+           return false;
+   
+       UnitInstance targetUnit = hit.collider != null ? hit.collider.GetComponentInParent<UnitInstance>() : null;
+       if (targetUnit == null)
+           return false;
+   
+       int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
+       if (targetUnit.playerId == activePlayerId)
+           return false;
+   
+       List<UnitInstance> combatUnits = new List<UnitInstance>();
+   
+       for (int i = CurrentlySelectedObjects.Count - 1; i >= 0; i--)
+       {
+           SelectableObject so = CurrentlySelectedObjects[i];
+           if (so == null)
+               continue;
+   
+           UnitInstance unit = so.GetComponent<UnitInstance>();
+           if (unit == null || unit.unitData == null)
+               continue;
+   
+           if (unit.playerId != activePlayerId)
+               continue;
+   
+           // On n'envoie pas les supports/healers
+           UnitsType type = unit.unitData.type;
+           if (type == UnitsType.Support || type == UnitsType.Healer)
+               continue;
+   
+           combatUnits.Add(unit);
+       }
+   
+       // Si aucune unité de combat, on considère que l'ordre est consommé
+       // pour ne pas désélectionner la box au clic ennemi.
+       if (combatUnits.Count == 0)
+       {
+           Debug.Log("Ordre refusé: aucune unité de combat sélectionnée.");
+           return true;
+       }
+   
+       foreach (UnitInstance unit in combatUnits)
+       {
+           UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
+           if (mover == null)
+               continue;
+   
+           float attackRange = 0f;
+           if (unit.unitData is UnitCombatData combatData)
+               attackRange = Mathf.Max(0f, combatData.attackRange);
+   
+           mover.MoveToTarget(targetUnit.transform, attackRange);
+       }
+   
+       return true;
+   }
+   
 }

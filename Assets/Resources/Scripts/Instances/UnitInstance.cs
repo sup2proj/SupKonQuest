@@ -159,23 +159,23 @@ public class UnitInstance : MonoBehaviour
 
     void HandleAttack()
     {
-        if (Keyboard.current == null)
-            return;
-
-        bool isAttacking = Keyboard.current.gKey.isPressed;
-
-        if (animator != null)
-        {
-            animator.SetBool("isAttacking", isAttacking);
-        }
-        else
-        {
-            Debug.LogError("Animator est null dans HandleAttack pour " + gameObject.name);
-        }
-        if (objectModel != null)
-        {
-            objectModel.SetActive(isAttacking);
-        }
+        // if (Keyboard.current == null)
+        //     return;
+        //
+        // bool isAttacking = Keyboard.current.gKey.isPressed;
+        //
+        // if (animator != null)
+        // {
+        //     animator.SetBool("isAttacking", isAttacking);
+        // }
+        // else
+        // {
+        //     Debug.LogError("Animator est null dans HandleAttack pour " + gameObject.name);
+        // }
+        // if (objectModel != null)
+        // {
+        //     objectModel.SetActive(isAttacking);
+        // }
     }
 
     public void TakeDamage(float amount)
