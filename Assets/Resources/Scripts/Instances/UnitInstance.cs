@@ -236,31 +236,30 @@ public class UnitInstance : MonoBehaviour
     }
 
     private void OnCollisionEnter(Collision collision)
+{
+    if (!collision.gameObject.CompareTag("Units"))
+        return;
+
+    Rigidbody rb = GetComponent<Rigidbody>();
+    if (rb == null)
+        return;
+
+    // Distance centre à centre en XZ
+    Vector3 a = transform.position; a.y = 0f;
+    Vector3 b = collision.transform.position; b.y = 0f;
+    float dist = Vector3.Distance(a, b);
+
+    // Rayon minimal de séparation souhaité (par exemple la moitié de la taille d'une unité)
+    float minSeparation = 0.3f;
+
+    if (dist < minSeparation && dist > 0.001f)
     {
-        // Ignorer les collisions avec le sol (tiles)
-        if (collision.gameObject.CompareTag("Ground"))
-            return;
-
-        // Vérifier si l'objet est une unité valide
-        if (!collision.gameObject.CompareTag("Units"))
-            return;
-
-        Debug.Log("Collision détectée avec : " + collision.gameObject.name);
-
-        // Récupérer le Rigidbody
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb == null)
-            return;
-
-        // Calculer la direction pour repousser l'unité
-        Vector3 pushDirection = transform.position - collision.contacts[0].point;
-        pushDirection.y = 0f;
-        pushDirection.Normalize();
-
-        // Appliquer une force de recul
-        float pushForce = 5f;
-        rb.AddForce(pushDirection * pushForce, ForceMode.Impulse);
+        Vector3 pushDir = (a - b).normalized;
+        float pushForce = 0.5f; // très faible
+        rb.AddForce(pushDir * pushForce, ForceMode.Impulse);
     }
+}
+
 
     public void SetHealth(float healthChange)
     {
