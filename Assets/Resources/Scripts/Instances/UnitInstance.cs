@@ -48,9 +48,6 @@ public class UnitInstance : MonoBehaviour
 
     void Update()
     {
-        HandleMovement();
-        HandleAttack();
-
         if (healthBar != null && healthBar.isActiveAndEnabled && Camera.main != null)
         {
             Vector3 forward = Camera.main.transform.forward;
@@ -130,54 +127,6 @@ public class UnitInstance : MonoBehaviour
         healthBar.transform.localPosition = (1.1f * Vector3.up);
     }
 
-    void HandleMovement()
-    {
-        if (unitData == null)
-            return;
-
-        if (Keyboard.current == null)
-            return;
-
-        bool isMoving = Keyboard.current.spaceKey.isPressed;
-        if (animator != null)
-            animator.SetBool("isMoving", isMoving);
-
-        if (isMoving)
-        {
-            Rigidbody rb = GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                Vector3 move = transform.forward * unitData.speed * Time.deltaTime;
-                rb.MovePosition(rb.position + move);
-            }
-            else
-            {
-                transform.Translate(Vector3.forward * unitData.speed * Time.deltaTime);
-            }
-        }
-    }
-
-    void HandleAttack()
-    {
-        // if (Keyboard.current == null)
-        //     return;
-        //
-        // bool isAttacking = Keyboard.current.gKey.isPressed;
-        //
-        // if (animator != null)
-        // {
-        //     animator.SetBool("isAttacking", isAttacking);
-        // }
-        // else
-        // {
-        //     Debug.LogError("Animator est null dans HandleAttack pour " + gameObject.name);
-        // }
-        // if (objectModel != null)
-        // {
-        //     objectModel.SetActive(isAttacking);
-        // }
-    }
-
     public void TakeDamage(float amount)
     {
         if (unitData == null)
@@ -209,23 +158,6 @@ public class UnitInstance : MonoBehaviour
         }
     }
 
-
-    public void Heal(float amount)
-    {
-        if (unitData == null)
-            return;
-
-        if (!(unitData is UnitHealerData))
-            return;
-
-        currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0f, unitData.maxHealth);
-
-        if (healthBar != null)
-            healthBar.SetHealth(currentHealth);
-    }
-
-
     public void ApplyBuff()
     {
         if (unitData == null)
@@ -244,18 +176,16 @@ public class UnitInstance : MonoBehaviour
     if (rb == null)
         return;
 
-    // Distance centre à centre en XZ
     Vector3 a = transform.position; a.y = 0f;
     Vector3 b = collision.transform.position; b.y = 0f;
     float dist = Vector3.Distance(a, b);
 
-    // Rayon minimal de séparation souhaité (par exemple la moitié de la taille d'une unité)
     float minSeparation = 0.3f;
 
     if (dist < minSeparation && dist > 0.001f)
     {
         Vector3 pushDir = (a - b).normalized;
-        float pushForce = 0.5f; // très faible
+        float pushForce = 0.5f;
         rb.AddForce(pushDir * pushForce, ForceMode.Impulse);
     }
 }

@@ -74,20 +74,19 @@ public class MovementManager : MonoBehaviour
 
         movement = resolvedDir;
 
-        float finalSpeed = moveSpeed;
-        GetUnitSpeed(finalSpeed);
+        float finalSpeed = GetUnitSpeed();
         transform.position += movement * finalSpeed * Time.deltaTime;
 
         Quaternion targetRot = Quaternion.LookRotation(movement, Vector3.up);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
     }
 
-    private public GetUnitSpeed(float finalSpeed)
+    private float GetUnitSpeed()
     {
         if (unitInstance != null && unitInstance.unitData != null)
         {
-            finalSpeed = unitInstance.unitData.speed;
+            return unitInstance.unitData.speed;
         }
-        return finalSpeed;
+        return moveSpeed;
     }
 }
