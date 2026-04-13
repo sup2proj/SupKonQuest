@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class OptionsManager : MonoBehaviour
 {
     [Header("Volume")]
+    public AudioMixer audioMixer;
     public Slider musicSlider;
     public Slider sfxSlider;
 
@@ -31,6 +32,10 @@ public class OptionsManager : MonoBehaviour
         fullscreenToggle.isOn = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
         resolutions = Screen.resolutions;
         currentResolution = PlayerPrefs.GetInt("Resolution", resolutions.Length - 1);
+
+        ApplyMusicVolume(musicSlider.value);
+        ApplySFXVolume(sfxSlider.value);
+
         UpdateLanguageText();
         UpdateResolutionText();
     }
@@ -38,12 +43,31 @@ public class OptionsManager : MonoBehaviour
     public void OnMusicVolumeChanged(float value)
     {
         PlayerPrefs.SetFloat("MusicVolume", value);
+        ApplyMusicVolume(value);
     }
 
     public void OnSFXVolumeChanged(float value)
     {
         PlayerPrefs.SetFloat("SFXVolume", value);
+        ApplySFXVolume(value);
     }
+
+    void ApplyMusicVolume(float value)
+    {
+        if (value <= 0)
+            audioMixer.SetFloat("MusicVolume", -80f);
+        else
+            audioMixer.SetFloat("MusicVolume", Mathf.Log10(value) * 80f);
+    }
+ 
+    void ApplySFXVolume(float value)
+    {
+        if (value <= 0)
+            audioMixer.SetFloat("SFXVolume", -80f);
+        else
+            audioMixer.SetFloat("SFXVolume", Mathf.Log10(value) * 80f);
+    }
+
 
     public void NextLanguage()
     {
