@@ -886,24 +886,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a172c3567a083c46a520a541297c332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SupportSpell
-  scanRadius: 5
-  unitsLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  debugScanKey: 112
-  showCircleWhenPressingKey: 1
-  circleSegments: 64
-  circleWidth: 0.05
-  circleColor: {r: 0.55, g: 1, b: 0.55, a: 1}
-  circleOutlineAlpha: 0.45
-  circleDurationSeconds: 1
-  circleHeightOffset: 0.05
-  showFilledDisc: 1
-  fillAlpha: 0.06
-  includeSelf: 1
   regenTickInterval: 0.25
-  autoUseCasterHealRange: 1
-  requireUnitsTag: 1
 --- !u!114 &1889348772494606766
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -918,7 +901,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
   animator: {fileID: 0}
   moveSpeed: 1
-  SelectionMarker: {fileID: 1236961838787046027}
 --- !u!114 &-7168849867650191033
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1762,7 +1762,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
   animator: {fileID: 0}
   moveSpeed: 1
-  SelectionMarker: {fileID: 2615190501803727386}
 --- !u!114 &-7223385642623911744
 MonoBehaviour:
   m_ObjectHideFlags: 0
