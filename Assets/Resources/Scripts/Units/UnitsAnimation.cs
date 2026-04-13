@@ -1,7 +1,5 @@
-using NUnit.Framework;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class UnitsAnimation : MonoBehaviour
 {
@@ -14,35 +12,32 @@ public class UnitsAnimation : MonoBehaviour
     private float stoppingDistance = 0.1f;
     private Transform followTarget;
 
-    // Etat d'attaque continue
     private bool autoAttackLoop = false;
     private Transform attackTarget;
     private float attackRange = 0f;
+    private int activeGroupMoveId = -1;
+    private bool isGroupLeader = false;
 
-    private SelectableObject selectable;
-    public GameObject SelectionMarker;
+    private static readonly HashSet<int> completedGroupMoves = new HashSet<int>();
+
+    private UnitInstance cachedUnit;
 
     void Awake()
     {
         if (animator == null)
             animator = GetComponent<Animator>();
-    }
-
-    void Start()
-    {
-        selectable = GetComponent<SelectableObject>();
+        cachedUnit = GetComponent<UnitInstance>();
     }
 
     void Update()
     {
-        HandleMouseClick();
         HandleMovement();
         HandleAutoAttackLoop();
 
         if (animator != null)
         {
             animator.SetBool("isMoving", isMovingToTarget);
-            UnitInstance unit = GetComponent<UnitInstance>();
+            UnitInstance unit = cachedUnit;
             if (unit != null && unit.objectModel != null && unit.unitData != null)
             {
                 // Archer visible pendant le déplacement
@@ -55,23 +50,18 @@ public class UnitsAnimation : MonoBehaviour
         }
     }
 
-    void HandleMouseClick()
-    {
-        if (Mouse.current.rightButton.wasPressedThisFrame && selectable.IsSelected)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                MoveToPosition(hit.point, 0.1f);
-            }
-        }
-    }
-
     void HandleMovement()
     {
         if (!isMovingToTarget)
         {
             movement = Vector3.zero;
+            return;
+        }
+
+        // Si le meneur de ce groupe est déjà arrivé, tous les autres s'arrêtent.
+        if (!isGroupLeader && activeGroupMoveId >= 0 && completedGroupMoves.Contains(activeGroupMoveId))
+        {
+            StopMovementInternal();
             return;
         }
 
@@ -88,11 +78,10 @@ public class UnitsAnimation : MonoBehaviour
 
         if (distance <= stoppingDistance)
         {
-            isMovingToTarget = false;
-            movement = Vector3.zero;
+            StopMovementInternal();
 
-            if (animator != null)
-                animator.SetBool("isMoving", false);
+            if (isGroupLeader && activeGroupMoveId >= 0)
+                completedGroupMoves.Add(activeGroupMoveId);
 
             // Si on suivait une unité ennemie: démarre la boucle d'attaque
             if (followTarget != null)
@@ -103,7 +92,7 @@ public class UnitsAnimation : MonoBehaviour
                 if (animator != null)
                     animator.SetBool("isAttacking", true);
 
-                UnitInstance unit = GetComponent<UnitInstance>();
+                UnitInstance unit = cachedUnit;
                 if (unit != null && unit.objectModel != null)
                     unit.objectModel.SetActive(true);
             }
@@ -126,7 +115,7 @@ public class UnitsAnimation : MonoBehaviour
 
     void HandleAutoAttackLoop()
 {
-    UnitInstance unit = GetComponent<UnitInstance>();
+    UnitInstance unit = cachedUnit;
 
     if (!autoAttackLoop)
     {
@@ -206,6 +195,7 @@ public class UnitsAnimation : MonoBehaviour
 
     public void MoveToPosition(Vector3 destination, float stopDistance = 0.1f)
     {
+        ClearGroupMoveState();
         followTarget = null;
         attackTarget = null;
         autoAttackLoop = false;
@@ -221,6 +211,7 @@ public class UnitsAnimation : MonoBehaviour
         if (target == null)
             return;
 
+        ClearGroupMoveState();
         followTarget = target;
         attackTarget = null;
         autoAttackLoop = false;
@@ -230,5 +221,36 @@ public class UnitsAnimation : MonoBehaviour
         attackRange = Mathf.Max(0.01f, stopDistance);
         stoppingDistance = attackRange; // arrêt à la portée d'attaque
         isMovingToTarget = true;
+    }
+
+    public void MoveToPositionAsGroup(Vector3 destination, float stopDistance, int groupMoveId, bool leader)
+    {
+        completedGroupMoves.Remove(groupMoveId);
+        activeGroupMoveId = groupMoveId;
+        isGroupLeader = leader;
+
+        followTarget = null;
+        attackTarget = null;
+        autoAttackLoop = false;
+
+        targetPosition = destination;
+        targetPosition.y = transform.position.y;
+        stoppingDistance = Mathf.Max(0.01f, stopDistance);
+        isMovingToTarget = true;
+    }
+
+    private void StopMovementInternal()
+    {
+        isMovingToTarget = false;
+        movement = Vector3.zero;
+
+        if (animator != null)
+            animator.SetBool("isMoving", false);
+    }
+
+    private void ClearGroupMoveState()
+    {
+        activeGroupMoveId = -1;
+        isGroupLeader = false;
     }
 }
