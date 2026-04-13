@@ -132,68 +132,91 @@ public class SelectionManager : MonoBehaviour
         }
     }
 
-private bool TryIssueAttackMoveOrder()
-   {
-       if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0)
-           return false;
-   
-       Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-       if (!Physics.Raycast(ray, out RaycastHit hit))
-           return false;
-   
-       UnitInstance targetUnit = hit.collider != null ? hit.collider.GetComponentInParent<UnitInstance>() : null;
-       if (targetUnit == null)
-           return false;
-   
-       int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
-       if (targetUnit.playerId == activePlayerId)
-           return false;
-   
-       List<UnitInstance> combatUnits = new List<UnitInstance>();
-   
-       for (int i = CurrentlySelectedObjects.Count - 1; i >= 0; i--)
-       {
-           SelectableObject so = CurrentlySelectedObjects[i];
-           if (so == null)
-               continue;
-   
-           UnitInstance unit = so.GetComponent<UnitInstance>();
-           if (unit == null || unit.unitData == null)
-               continue;
-   
-           if (unit.playerId != activePlayerId)
-               continue;
-   
-           // On n'envoie pas les supports/healers
-           UnitsType type = unit.unitData.type;
-           if (type == UnitsType.Support || type == UnitsType.Healer)
-               continue;
-   
-           combatUnits.Add(unit);
-       }
-   
-       // Si aucune unité de combat, on considère que l'ordre est consommé
-       // pour ne pas désélectionner la box au clic ennemi.
-       if (combatUnits.Count == 0)
-       {
-           Debug.Log("Ordre refusé: aucune unité de combat sélectionnée.");
-           return true;
-       }
-   
-       foreach (UnitInstance unit in combatUnits)
-       {
-           UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
-           if (mover == null)
-               continue;
-   
-           float attackRange = 0f;
-           if (unit.unitData is UnitCombatData combatData)
-               attackRange = Mathf.Max(0f, combatData.attackRange);
-   
-           mover.MoveToTarget(targetUnit.transform, attackRange);
-       }
-   
-       return true;
-   }
-   
+    // Règle d'ordre d'attaque/déplacement :
+    // - Si la sélection contient uniquement des Supports/Healers => on consomme le clic mais on ne déplace personne.
+    // - Si la sélection contient au moins une unité de combat => on déplace TOUTES les unités valides (combat + support + healer)
+    //   vers la cible ennemie. Les unités de combat s'arrêtent à leur attackRange, les autres suivent sans portée propre.
+    private bool TryIssueAttackMoveOrder()
+    {
+        if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0)
+            return false;
+    
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        if (!Physics.Raycast(ray, out RaycastHit hit))
+            return false;
+    
+        UnitInstance targetUnit = hit.collider != null ? hit.collider.GetComponentInParent<UnitInstance>() : null;
+        if (targetUnit == null)
+            return false;
+    
+        int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
+        if (targetUnit.playerId == activePlayerId)
+            return false;
+    
+        List<UnitInstance> groupUnits = new List<UnitInstance>();
+        bool hasCombatUnit = false;
+    
+        // Parcours de tous les objets sélectionnés du joueur actif
+        for (int i = CurrentlySelectedObjects.Count - 1; i >= 0; i--)
+        {
+            SelectableObject so = CurrentlySelectedObjects[i];
+            if (so == null)
+                continue;
+    
+            UnitInstance unit = so.GetComponent<UnitInstance>();
+            if (unit == null || unit.unitData == null)
+                continue;
+    
+            if (unit.playerId != activePlayerId)
+                continue;
+    
+            groupUnits.Add(unit);
+    
+            // Détecte au moins une unité de combat réelle (UnitCombatData)
+            if (unit.unitData is UnitCombatData)
+                hasCombatUnit = true;
+        }
+    
+        // Si aucune unité du joueur actif => rien à faire, on laisse la sélection se gérer normalement
+        if (groupUnits.Count == 0)
+            return false;
+    
+        // Si aucune unité de combat dans le groupe : sélection uniquement Support/Healer
+        // On consomme l'ordre (retourne true) mais on ne déplace personne.
+        if (!hasCombatUnit)
+        {
+            Debug.Log("Ordre refusé: uniquement des unités support/healer sélectionnées.");
+            return true;
+        }
+    
+        // Ici : on a au moins une unité de combat => on déplace tout le groupe (combat + support + healer)
+        foreach (UnitInstance unit in groupUnits)
+        {
+            if (unit == null || unit.unitData == null)
+                continue;
+    
+            UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
+            if (mover == null)
+                continue;
+    
+            float stopDistance = 0.1f;
+    
+            if (unit.unitData is UnitCombatData combatData)
+            {
+                // Les unités de combat s'arrêtent à leur portée d'attaque
+                stopDistance = Mathf.Max(0f, combatData.attackRange);
+            }
+            else
+            {
+                // Supports/Healers : on les fait simplement suivre la cible, très proche.
+                // Tu pourras ajuster cette distance si tu veux qu'ils restent un peu en arrière.
+                stopDistance = 0.3f;
+            }
+    
+            mover.MoveToTarget(targetUnit.transform, stopDistance);
+        }
+    
+        return true;
+    }
+    
 }
