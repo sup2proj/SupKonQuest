@@ -119,10 +119,20 @@ public class UnitsAnimation : MonoBehaviour
     void HandleAutoAttack()
     {
         UnitInstance unit = cachedUnit;
+        if (unit != null && unit.unitData != null &&
+            (unit.unitData.type == UnitsType.Support || unit.unitData.type == UnitsType.Healer))
+        {
+            Debug.Log("[UnitsAnimation] HandleAutoAttack skipped for support/healer " + gameObject.name, this);
+            return;
+        }
+
         if (attackTarget == null)
         {
             if (animator != null)
+            {
+                Debug.Log("[UnitsAnimation] HandleAutoAttack: attackTarget null, setting isAttacking=false for " + gameObject.name, this);
                 animator.SetBool("isAttacking", false);
+            }
 
             if (unit != null && unit.objectModel != null)
                 unit.objectModel.SetActive(false);
@@ -186,5 +196,12 @@ public class UnitsAnimation : MonoBehaviour
         targetPosition = destination;
         stoppingDistance = Mathf.Max(0f, stopDistance);
         isMovingToTarget = true;
+    }
+	
+    public void StartAttackAnimationFromSpell()
+    {
+        UnitInstance unit = cachedUnit != null ? cachedUnit : GetComponent<UnitInstance>();
+        animator.SetBool("isAttacking", true);
+        unit.objectModel.SetActive(true);
     }
 }

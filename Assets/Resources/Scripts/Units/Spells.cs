@@ -59,14 +59,29 @@ public class Spells : MonoBehaviour
         if (casterUnit == null || casterUnit.unitData == null)
             return;
         Debug.Log("[BuffSpell] ButtonListener called with choice=" + choice, this);
+        
+        UnitsAnimation anim = casterUnit.GetComponent<UnitsAnimation>();
+
         if (choice == 3 && casterUnit.unitData is UnitHealerData)
+        {
             TriggerSpell(Color.red, 1);
+            anim.StartAttackAnimationFromSpell();
+        }
         if (choice == 0 && casterUnit.unitData is UnitSupportData)
+        {
             TriggerSpell(Color.green, 2);
+            anim.StartAttackAnimationFromSpell();
+        }
         if (choice == 1 && casterUnit.unitData is UnitSupportData)
+        {
             TriggerSpell(Color.yellow, 3);
+            anim.StartAttackAnimationFromSpell();
+        }
         if (choice == 2 && casterUnit.unitData is UnitSupportData)
+        {
             TriggerSpell(Color.blue, 4);
+            anim.StartAttackAnimationFromSpell();
+        }
     }
 
     private void TriggerSpell(Color spellColor, int spell)
