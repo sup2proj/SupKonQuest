@@ -14,16 +14,34 @@ public class OptionsManager : MonoBehaviour
 
     [Header("Language")]
     public TextMeshProUGUI languageText;
+    public GameObject languageRow;
+    public TextMeshProUGUI langLeftArrow;
+    public TextMeshProUGUI langRightArrow;
     private string[] languages = { "English", "Français" };
     private int currentLanguage = 0;
 
     [Header("Resolution")]
     public TextMeshProUGUI resolutionText;
+    public GameObject resolutionRow;
+    public TextMeshProUGUI resLeftArrow;
+    public TextMeshProUGUI resRightArrow;
     private Resolution[] resolutions;
     private int currentResolution = 0;
 
     [Header("Fullscreen")]
     public Toggle fullscreenToggle;
+    public TextMeshProUGUI fullscreenText;
+
+    [Header("Colors")]
+    public Color normalColor = Color.grey;
+    public Color selectedColor = Color.white;
+    private GameObject lastSelectedRow;
+
+    [Header("ButtonBack")]
+    public GameObject btnBack;
+    public TextMeshProUGUI btnBackText;
+    public float normalSize = 40f;
+    public float selectedSize = 50f;
 
     void Start()
     {
@@ -40,7 +58,78 @@ public class OptionsManager : MonoBehaviour
         UpdateLanguageText();
         UpdateResolutionText();
 
+        ResetArrowsColor();
         EventSystem.current.SetSelectedGameObject(musicSlider.gameObject);
+    }
+
+    void Update()
+    {
+        GameObject selectedObj = EventSystem.current.currentSelectedGameObject;
+        
+        if (selectedObj != lastSelectedRow)
+        {
+            ResetArrowsColor();
+
+            if (selectedObj == languageRow)
+            {
+                if (langLeftArrow != null) langLeftArrow.color = selectedColor;
+                if (langRightArrow != null) langRightArrow.color = selectedColor;
+            }
+            else if (selectedObj == resolutionRow)
+            {
+                if (resLeftArrow != null) resLeftArrow.color = selectedColor;
+                if (resRightArrow != null) resRightArrow.color = selectedColor;
+            }
+            else if (selectedObj == fullscreenToggle.gameObject)
+            {
+                if (fullscreenText != null) fullscreenText.color = selectedColor;
+            }
+            else if (selectedObj == btnBack.gameObject)
+            {
+                if (btnBackText != null) 
+                {
+                    btnBackText.color = selectedColor;
+                }
+            }
+            UpdateTextSize(selectedObj == btnBack);
+
+            lastSelectedRow = selectedObj;
+        }
+
+        if (selectedObj != null)
+        {
+            if (selectedObj == languageRow)
+            {
+                if (Input.GetKeyDown(KeyCode.LeftArrow)) PreviousLanguage();
+                else if (Input.GetKeyDown(KeyCode.RightArrow)) NextLanguage();
+            }
+            else if (selectedObj == resolutionRow)
+            {
+                if (Input.GetKeyDown(KeyCode.LeftArrow)) PreviousResolution();
+                else if (Input.GetKeyDown(KeyCode.RightArrow)) NextResolution();
+            }
+        }
+    }
+
+    void UpdateTextSize(bool isSelected)
+    {
+        if (btnBackText == null)
+            return;
+
+        if (isSelected)
+            btnBackText.fontSize = selectedSize;
+        else
+            btnBackText.fontSize = normalSize;
+    }
+
+    void ResetArrowsColor()
+    {
+        if (langLeftArrow != null) langLeftArrow.color = normalColor;
+        if (langRightArrow != null) langRightArrow.color = normalColor;
+        if (resLeftArrow != null) resLeftArrow.color = normalColor;
+        if (resRightArrow != null) resRightArrow.color = normalColor;
+        if (fullscreenText != null) fullscreenText.color = normalColor;
+        if (btnBackText != null) btnBackText.color = normalColor;
     }
 
     public void OnMusicVolumeChanged(float value)
