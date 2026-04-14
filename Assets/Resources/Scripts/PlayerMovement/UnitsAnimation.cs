@@ -38,15 +38,7 @@ public class UnitsAnimation : MonoBehaviour
         HandleMouseClick();
         HandleMovement();
         
-
-        if(isMovingToTarget)
-        {
-            animator.SetBool("isMoving", true);
-        }
-        else
-        {
-            animator.SetBool("isMoving", false);
-        }
+        animator.SetBool("isMoving", isMovingToTarget);
         
     }
 
