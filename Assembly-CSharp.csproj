@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\Enums\Structure\BuildingType.cs" />
     <Compile Include="Assets\Scripts\Enums\Player\PlayerNumber.cs" />
     <Compile Include="Assets\Scripts\Building\BuildingController.cs" />
+    <Compile Include="Assets\Scripts\Manager\NewGameManager.cs" />
     <Compile Include="Assets\Scripts\Data\BoatUnitsData\Frigate.cs" />
     <Compile Include="Assets\Scripts\camera\cameraMouvement.cs" />
     <Compile Include="Assets\Scripts\Data\LandUntisData\LandUnitsSO\UnitCombatData.cs" />

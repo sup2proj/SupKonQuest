@@ -2,12 +2,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-public class MainMenuManager : MonoBehaviour
+public class NewGameManager : MonoBehaviour
 {
     public TextMeshProUGUI[] buttons;
 
-    public float normalSize   = 24f;
-    public float selectedSize = 36f;
+    public float normalSize = 50f;
+    public float selectedSize = 60f;
 
     private int currentIndex = 0;
 
@@ -18,7 +18,7 @@ public class MainMenuManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+        if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             currentIndex = currentIndex + 1;
             if (currentIndex > buttons.Length - 1)
@@ -26,7 +26,7 @@ public class MainMenuManager : MonoBehaviour
             UpdateSizes();
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             currentIndex = currentIndex - 1;
             if (currentIndex < 0)
@@ -53,14 +53,12 @@ public class MainMenuManager : MonoBehaviour
 
     void Confirm()
     {
-        if (currentIndex == 0) NewGame();
-        if (currentIndex == 1) Continue();
-        if (currentIndex == 2) Options();
-        if (currentIndex == 3) Quit();
+        if (currentIndex == 0) PreparingLocalGame();
+        if (currentIndex == 1) PreparingMultiGame();
+        if (currentIndex == 2) Back();
     }
 
-    public void NewGame()  { SceneManager.LoadScene("NewGame"); }
-    public void Continue() { SceneManager.LoadScene("GameScene"); }
-    public void Options()  { SceneManager.LoadScene("Options");   }
-    public void Quit()     { Application.Quit();                  }
+    public void PreparingLocalGame()  { SceneManager.LoadScene("GameScene"); }
+    public void PreparingMultiGame() { SceneManager.LoadScene("GameScene"); }
+    public void Back()  { SceneManager.LoadScene("MainMenu");   }
 }
