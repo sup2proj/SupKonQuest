@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Audio;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class OptionsManager : MonoBehaviour
 {
@@ -38,6 +39,8 @@ public class OptionsManager : MonoBehaviour
 
         UpdateLanguageText();
         UpdateResolutionText();
+
+        EventSystem.current.SetSelectedGameObject(musicSlider.gameObject);
     }
 
     public void OnMusicVolumeChanged(float value)
