@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class UnitsAnimation : MonoBehaviour
@@ -19,6 +20,7 @@ public class UnitsAnimation : MonoBehaviour
     private static readonly HashSet<int> completedGroupMoves = new HashSet<int>();
 
     private UnitInstance cachedUnit;
+    private Coroutine attackCoroutine;
 
     void Awake()
     {
@@ -53,8 +55,6 @@ public class UnitsAnimation : MonoBehaviour
             movement = Vector3.zero;
             return;
         }
-
-        // Si le meneur de ce groupe est déjà arrivé, tous les autres s'arrêtent.
         if (!isGroupLeader && activeGroupMoveId >= 0 && completedGroupMoves.Contains(activeGroupMoveId))
         {
             StopMovementInternal();
@@ -64,7 +64,6 @@ public class UnitsAnimation : MonoBehaviour
         if (followTarget != null)
             targetPosition = followTarget.position;
 
-        // Distance en XZ pour éviter les soucis de hauteur
         Vector3 flatCurrent = transform.position;
         Vector3 flatTarget = targetPosition;
         flatCurrent.y = 0f;
@@ -79,7 +78,6 @@ public class UnitsAnimation : MonoBehaviour
             if (isGroupLeader && activeGroupMoveId >= 0)
                 completedGroupMoves.Add(activeGroupMoveId);
 
-            // Si on suivait une unite ennemie: démarre la boucle d'attaque
             if (followTarget != null)
             {
                 attackTarget = followTarget;
@@ -87,15 +85,10 @@ public class UnitsAnimation : MonoBehaviour
                 UnitInstance unit = cachedUnit;
                 if (unit != null && unit.unitData != null)
                 {
-                    // Seules les unités de combat déclenchent l'attaque automatique.
                     if (unit.unitData.type != UnitsType.Healer &&
                         unit.unitData.type != UnitsType.Support)
                     {
-                        if (animator != null)
-                            animator.SetBool("isAttacking", true);
-
-                        if (unit.objectModel != null)
-                            unit.objectModel.SetActive(true);
+                        StartAttackWithDamage();
                     }
                 }
             }
@@ -116,35 +109,110 @@ public class UnitsAnimation : MonoBehaviour
         }
     }
 
+    public void StartAttackWithDamage()
+    {
+        UnitInstance unit = cachedUnit;
+        if (unit != null && unit.unitData != null && (unit.unitData.type == UnitsType.Support || unit.unitData.type == UnitsType.Healer))
+        {
+            Debug.Log("[UnitsAnimation] StartAttackWithDamage ignored for support/healer " + gameObject.name, this);
+            return;
+        }
+
+        animator.SetBool("isAttacking", true);
+
+        if (unit != null && unit.objectModel != null)
+            unit.objectModel.SetActive(true);
+
+        if (attackCoroutine != null)
+        {
+            StopCoroutine(attackCoroutine);
+            attackCoroutine = null;
+        }
+        attackCoroutine = StartCoroutine(AttackLoopCoroutine());
+    }
+
+    private IEnumerator AttackLoopCoroutine()
+    {
+        while (true)
+        {
+            AnimationClip attackClip = GetAttackClip();
+            if (attackClip == null)
+                break;
+
+            float halfDuration = attackClip.length * 0.5f;
+            yield return new WaitForSeconds(halfDuration);
+
+            UnitInstance attackerUnit = cachedUnit;
+			UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+
+            if (targetUnit == null)
+                break;
+
+            float attack = 0f;
+			if (attackerUnit != null && attackerUnit.unitData is UnitCombatData combatData)
+            	attack = combatData.attack;
+			targetUnit.TakeDamage(attack);
+
+            yield return new WaitForSeconds(halfDuration);
+        }
+
+        StopAttackInternal();
+    }
+
+    private AnimationClip GetAttackClip()
+    {
+        foreach (var clip in animator.runtimeAnimatorController.animationClips)
+        {
+            if (clip != null && clip.name.Contains("Attack"))
+                return clip;
+        }
+
+        return null;
+    }
+
+    private void StopAttackInternal()
+    {
+        if (attackCoroutine != null)
+        {
+            StopCoroutine(attackCoroutine);
+            attackCoroutine = null;
+        }
+        UnitInstance unit = cachedUnit;
+        if (unit != null && unit.objectModel != null)
+            unit.objectModel.SetActive(false);
+        attackTarget = null;
+    }
+
     void HandleAutoAttack()
     {
         UnitInstance unit = cachedUnit;
-        if (unit != null && unit.unitData != null &&
-            (unit.unitData.type == UnitsType.Support || unit.unitData.type == UnitsType.Healer))
+        if (unit != null && unit.unitData != null && (unit.unitData.type == UnitsType.Support || unit.unitData.type == UnitsType.Healer))
         {
-            Debug.Log("[UnitsAnimation] HandleAutoAttack skipped for support/healer " + gameObject.name, this);
             return;
         }
 
         if (attackTarget == null)
         {
             if (animator != null)
-            {
-                Debug.Log("[UnitsAnimation] HandleAutoAttack: attackTarget null, setting isAttacking=false for " + gameObject.name, this);
                 animator.SetBool("isAttacking", false);
-            }
-
             if (unit != null && unit.objectModel != null)
                 unit.objectModel.SetActive(false);
-
             return;
         }
 
         UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+        if (targetUnit == null)
+        {
+            StopAttackInternal();
+            return;
+        }
 
         Vector3 a = transform.position; a.y = 0f;
         Vector3 b = attackTarget.position; b.y = 0f;
         float dist = Vector3.Distance(a, b);
+
+        if (dist > stoppingDistance + 0.1f)
+            StopAttackInternal();
     }
 
     private void StopMovementInternal()
@@ -166,6 +234,7 @@ public class UnitsAnimation : MonoBehaviour
     {
         followTarget = null;
         attackTarget = null;
+        StopAttackInternal();
         ClearGroupMoveState();
 
         targetPosition = destination;
@@ -177,6 +246,7 @@ public class UnitsAnimation : MonoBehaviour
     {
         followTarget = target;
         attackTarget = null;
+        StopAttackInternal();
         ClearGroupMoveState();
 
         if (target != null)
@@ -192,16 +262,19 @@ public class UnitsAnimation : MonoBehaviour
         isGroupLeader = isLeader;
         followTarget = null;
         attackTarget = null;
+        StopAttackInternal();
 
         targetPosition = destination;
         stoppingDistance = Mathf.Max(0f, stopDistance);
         isMovingToTarget = true;
     }
-	
+
     public void StartAttackAnimationFromSpell()
     {
         UnitInstance unit = cachedUnit != null ? cachedUnit : GetComponent<UnitInstance>();
-        animator.SetBool("isAttacking", true);
-        unit.objectModel.SetActive(true);
+        if (animator != null)
+            animator.SetBool("isAttacking", true);
+        if (unit != null && unit.objectModel != null)
+            unit.objectModel.SetActive(true);
     }
 }
