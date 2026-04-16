@@ -59,6 +59,7 @@
     <Compile Include="Assets\Scripts\Manager\MainMenuManager.cs" />
     <Compile Include="Assets\Scripts\Data\LandUntisData\LandUnitsSO\UnitHealerData.cs" />
     <Compile Include="Assets\Scripts\Map\TileData.cs" />
+    <Compile Include="Assets\Scripts\Manager\LaunchingLocalNewGame.cs" />
     <Compile Include="Assets\Scripts\Data\LandUntisData\LandUnitsSO\UnitSupportData.cs" />
     <Compile Include="Assets\Scripts\UI\ActionInterface.cs" />
     <Compile Include="Assets\Scripts\Data\BoatUnitsData\TransportBoat.cs" />

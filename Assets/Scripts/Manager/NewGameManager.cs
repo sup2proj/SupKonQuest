@@ -58,7 +58,7 @@ public class NewGameManager : MonoBehaviour
         if (currentIndex == 2) Back();
     }
 
-    public void PreparingLocalGame()  { SceneManager.LoadScene("GameScene"); }
+    public void PreparingLocalGame()  { SceneManager.LoadScene("LaunchingLocalNewGame"); }
     public void PreparingMultiGame() { SceneManager.LoadScene("GameScene"); }
     public void Back()  { SceneManager.LoadScene("MainMenu");   }
 }
