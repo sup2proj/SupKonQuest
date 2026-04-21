@@ -21,6 +21,7 @@ public class UnitsAnimation : MonoBehaviour
 
     private UnitInstance cachedUnit;
     private Coroutine attackCoroutine;
+    private bool isCounterAttacking = false;
 
     void Awake()
     {
@@ -88,6 +89,7 @@ public class UnitsAnimation : MonoBehaviour
                     if (unit.unitData.type != UnitsType.Healer &&
                         unit.unitData.type != UnitsType.Support)
                     {
+                        AttackTheAttacker();
                         StartAttackWithDamage();
                     }
                 }
@@ -109,6 +111,36 @@ public class UnitsAnimation : MonoBehaviour
         }
     }
 
+    public void AttackTheAttacker(Transform attacker = null)
+    {
+        UnitInstance selfUnit = cachedUnit;
+        if (attackCoroutine != null)
+        {
+            UnitInstance currentTargetUnit = attackTarget.GetComponent<UnitInstance>();
+            if (currentTargetUnit != null)
+            {
+                if (animator != null)
+                    animator.SetBool("isAttacking", true);
+                if (selfUnit != null && selfUnit.objectModel != null)
+                    selfUnit.objectModel.SetActive(true);
+                return;
+            }
+        }
+
+        if (animator != null && selfUnit != null && selfUnit.objectModel != null)
+        {
+            animator.SetBool("isAttacking", true);
+            selfUnit.objectModel.SetActive(true);
+        }
+            
+        if (attackCoroutine != null)
+        {
+            StopCoroutine(attackCoroutine);
+            attackCoroutine = null;
+        }
+        attackCoroutine = StartCoroutine(AttackLoopCoroutine());
+    }
+    
     public void StartAttackWithDamage()
     {
         UnitInstance unit = cachedUnit;
@@ -118,6 +150,7 @@ public class UnitsAnimation : MonoBehaviour
             return;
         }
 
+        isCounterAttacking = false;
         animator.SetBool("isAttacking", true);
 
         if (unit != null && unit.objectModel != null)
@@ -135,6 +168,9 @@ public class UnitsAnimation : MonoBehaviour
     {
         while (true)
         {
+            if (attackTarget == null)
+                break;
+
             AnimationClip attackClip = GetAttackClip();
             if (attackClip == null)
                 break;
@@ -143,15 +179,19 @@ public class UnitsAnimation : MonoBehaviour
             yield return new WaitForSeconds(halfDuration);
 
             UnitInstance attackerUnit = cachedUnit;
-			UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+            UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
 
             if (targetUnit == null)
                 break;
 
             float attack = 0f;
-			if (attackerUnit != null && attackerUnit.unitData is UnitCombatData combatData)
-            	attack = combatData.attack;
-			targetUnit.TakeDamage(attack);
+            if (attackerUnit != null && attackerUnit.unitData is UnitCombatData combatData)
+                attack = combatData.attack;
+            targetUnit.TakeDamage(attack);
+
+            UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
+            if (targetAnimation != null && attackerUnit != null)
+                targetAnimation.AttackTheAttacker(transform);
 
             yield return new WaitForSeconds(halfDuration);
         }
@@ -161,6 +201,9 @@ public class UnitsAnimation : MonoBehaviour
 
     private AnimationClip GetAttackClip()
     {
+        if (animator == null || animator.runtimeAnimatorController == null)
+            return null;
+
         foreach (var clip in animator.runtimeAnimatorController.animationClips)
         {
             if (clip != null && clip.name.Contains("Attack"))
@@ -181,6 +224,7 @@ public class UnitsAnimation : MonoBehaviour
         if (unit != null && unit.objectModel != null)
             unit.objectModel.SetActive(false);
         attackTarget = null;
+        isCounterAttacking = false;
     }
 
     void HandleAutoAttack()
@@ -211,7 +255,7 @@ public class UnitsAnimation : MonoBehaviour
         Vector3 b = attackTarget.position; b.y = 0f;
         float dist = Vector3.Distance(a, b);
 
-        if (dist > stoppingDistance + 0.1f)
+        if (!isCounterAttacking && dist > stoppingDistance + 0.1f)
             StopAttackInternal();
     }
 
