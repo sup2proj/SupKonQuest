@@ -114,6 +114,15 @@ public class UnitsAnimation : MonoBehaviour
     public void AttackTheAttacker(Transform attacker = null)
     {
         UnitInstance selfUnit = cachedUnit;
+        if (attacker != null)
+        {
+            attackTarget = attacker;
+            isCounterAttacking = true;
+        }
+
+        if (attackTarget == null)
+            return;
+
         if (attackCoroutine != null)
         {
             UnitInstance currentTargetUnit = attackTarget.GetComponent<UnitInstance>();
@@ -254,9 +263,19 @@ public class UnitsAnimation : MonoBehaviour
         Vector3 a = transform.position; a.y = 0f;
         Vector3 b = attackTarget.position; b.y = 0f;
         float dist = Vector3.Distance(a, b);
+        float currentAttackRange = GetCurrentAttackRange();
 
-        if (!isCounterAttacking && dist > stoppingDistance + 0.1f)
+        if (dist > currentAttackRange + 0.1f)
             StopAttackInternal();
+    }
+
+    private float GetCurrentAttackRange()
+    {
+        UnitInstance unit = cachedUnit;
+        if (unit != null && unit.unitData is UnitCombatData combatData)
+            return Mathf.Max(0f, combatData.attackRange);
+
+        return Mathf.Max(0f, stoppingDistance);
     }
 
     private void StopMovementInternal()

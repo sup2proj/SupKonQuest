@@ -171,23 +171,6 @@ public class UnitInstance : MonoBehaviour
 {
     if (!collision.gameObject.CompareTag("Units"))
         return;
-
-    Rigidbody rb = GetComponent<Rigidbody>();
-    if (rb == null)
-        return;
-
-    Vector3 a = transform.position; a.y = 0f;
-    Vector3 b = collision.transform.position; b.y = 0f;
-    float dist = Vector3.Distance(a, b);
-
-    float minSeparation = 0.3f;
-
-    if (dist < minSeparation && dist > 0.001f)
-    {
-        Vector3 pushDir = (a - b).normalized;
-        float pushForce = 0.5f;
-        rb.AddForce(pushDir * pushForce, ForceMode.Impulse);
-    }
 }
 
 
