@@ -1,61 +1,56 @@
-using NUnit.Framework;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
 
 public class UnitsAnimation : MonoBehaviour
 {
     public Animator animator;
     public float moveSpeed = 1f;
-    private Vector3 movement;
+
     private Vector3 targetPosition;
     private bool isMovingToTarget = false;
-    private float stoppingDistance = 0.1f;
 
     private SelectableObject selectable;
-
     public GameObject SelectionMarker;
+    public UnityEngine.AI.NavMeshAgent agent;
 
-    
     void Awake()
-        {
-            if (animator == null)
-                animator = GetComponent<Animator>();
-        }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    
-    void Start()
-    {   
-        selectable = GetComponent<SelectableObject>();
-        //targetPosition = transform.position;
+    {
+        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (animator == null)
+            animator = GetComponent<Animator>();
+        Debug.Log("Awake called, agent assigned: " + (agent != null));
     }
-    
 
-    // Update is called once per frame
+    void Start()
+    {
+        selectable = GetComponent<SelectableObject>();
+
+        // Synchronise la position de l'unité sur le NavMesh au démarrage
+        if (UnityEngine.AI.NavMesh.SamplePosition(transform.position, out UnityEngine.AI.NavMeshHit hit, 2.0f, UnityEngine.AI.NavMesh.AllAreas))
+        {
+            agent.Warp(hit.position);
+        }
+    }
+
     void Update()
     {
         HandleMouseClick();
         HandleMovement();
-        
-        animator.SetBool("isMoving", isMovingToTarget);
-        
     }
 
     void HandleMouseClick()
     {
-        // Détector le clic gauche de la souris
         if (Mouse.current.rightButton.wasPressedThisFrame && selectable.IsSelected)
         {
-            Debug.Log("Clic droit détecté sur " );
+            Debug.Log("Clic droit détecté");
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            
-            // Créer un raycast pour trouver où on a cliqué
+
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                Debug.Log("COLLISION WOUHOU: " + hit.point);
-                targetPosition = hit.point;
-                targetPosition.y = 0; // afin que le perso reste au sol
+                Debug.Log("Destination : " + hit.point);
+
+                // FIX : déléguer le déplacement au NavMeshAgent, ne plus toucher transform.position
+                agent.SetDestination(hit.point);
                 isMovingToTarget = true;
             }
         }
@@ -65,31 +60,19 @@ public class UnitsAnimation : MonoBehaviour
     {
         if (isMovingToTarget)
         {
-            // Se déplacer vers la cible
-            movement = (targetPosition - transform.position).normalized;
-            
-            // Vérifier si on est arrivé
-            float distance = Vector3.Distance(transform.position, targetPosition);
-            if (distance < stoppingDistance)
+            // L'agent a-t-il atteint sa destination ?
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             {
                 isMovingToTarget = false;
-                movement = Vector3.zero;
             }
         }
-        else
-        {
-            movement = Vector3.zero;
-        }
 
-        // Déplacer le personnage
-        transform.position += movement * moveSpeed * Time.deltaTime;
+        // FIX : utiliser la vélocité de l'agent pour piloter l'animation
+        bool isActuallyMoving = isMovingToTarget && agent.velocity.magnitude > 0.1f;
+        if (animator != null)
+            animator.SetBool("isMoving", isActuallyMoving);
 
-        // Tourner le personnage dans la direction du mouvement
-        if (movement.magnitude > 0)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(movement);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
-        }
+        // FIX : suppression du Quaternion.LookRotation manuel
+        // Le NavMeshAgent gère la rotation via son angularSpeed (configurable dans l'Inspector)
     }
 }
-

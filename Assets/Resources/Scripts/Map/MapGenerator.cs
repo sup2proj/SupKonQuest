@@ -1,8 +1,9 @@
-﻿using Enums.Environment;
+using Enums.Environment;
 using Enums.Nature;
 using Enums.Structure;
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.AI.Navigation;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -12,8 +13,12 @@ public class MapGenerator : MonoBehaviour
     private readonly Color32 _colorWater = new Color32(0, 10, 170, 255);
     public GroundType groundType;
     public TreeType treeType;
+    public NavMeshSurface navMeshSurface;
     
     public TileData[,] allTiles;
+
+    // Event déclenché une fois le NavMesh baké et la map prête
+    public event System.Action OnMapReady;
 
     [Header("Source")]
     public Texture2D mapLayout;
@@ -51,18 +56,43 @@ public class MapGenerator : MonoBehaviour
     public void LoadAndGenerate(string folderName)
     {
         SetupResources();
+
+        // Si la surface n'est pas assignée, on la crée dynamiquement
+        if (navMeshSurface == null)
+        {
+            GameObject navObj = new GameObject("DynamicNavMesh");
+            navObj.transform.SetParent(this.transform);
+            navMeshSurface = navObj.AddComponent<NavMeshSurface>();
+
+            // FIX : utiliser RenderMeshes plutôt que PhysicsColliders
+            // car les MeshColliders des tuiles sont supprimés pour les performances
+            navMeshSurface.useGeometry = UnityEngine.AI.NavMeshCollectGeometry.RenderMeshes;
+            navMeshSurface.collectObjects = Unity.AI.Navigation.CollectObjects.All;
+        }
+
         groundFolder = GetOrCreateFolder("Ground");
         structuresFolder = GetOrCreateFolder("Structures");
         natureFolder = GetOrCreateFolder("Nature");
+
         string path = "Maps/" + folderName + "/";
         mapLayout = Resources.Load<Texture2D>(path + "MapLayout");
         MapJsonData jsonData = StructureInstance.LoadDataFromPath(path + "MapData");
 
         if (mapLayout != null && jsonData != null)
         {
-            GenerateWorld();      
-            PlaceStructures(jsonData); 
-            AddNature();     
+            GenerateWorld();
+            PlaceStructures(jsonData);
+            AddNature();
+
+            // Bake en dernier, après que toute la géométrie soit en place
+            if (navMeshSurface != null)
+            {
+                navMeshSurface.BuildNavMesh();
+            }
+
+            // Notifier que la map est prête (les unités peuvent maintenant spawner)
+            OnMapReady?.Invoke();
+
             Debug.Log($"Monde '{folderName}' généré avec succès !");
         }
         else
@@ -101,7 +131,11 @@ public class MapGenerator : MonoBehaviour
                 floor.transform.localScale = new Vector3(0.1f, 1f, 0.1f);
                 floor.name = $"Tile_{x}_{y}";
                 floor.tag = "Ground";
-                Destroy(floor.GetComponent<MeshCollider>());
+
+                // FIX : ne pas détruire le MeshCollider — il est nécessaire pour les raycasts
+                // (clic de déplacement des unités) et pour NavMeshSurface en mode PhysicsColliders.
+                // Si tu veux absolument les supprimer, garde useGeometry = RenderMeshes ci-dessus.
+                // Destroy(floor.GetComponent<MeshCollider>()); // ← ligne supprimée
             }
         }
     }
@@ -109,12 +143,12 @@ public class MapGenerator : MonoBehaviour
     void PlaceStructures(MapJsonData data)
     {
         SpawnStructureGroup(data.startPoints, StructureCastle, StructureType.Structure, 1);
-        SpawnStructureGroup(data.castles, StructureCastle,  StructureType.Structure, 1);
-        SpawnStructureGroup(data.harbours, StructureHarbour,  StructureType.Harbour, 1);
-        SpawnStructureGroup(data.special, StructureSpecial,  StructureType.NeutralStructure, 1);
+        SpawnStructureGroup(data.castles, StructureCastle, StructureType.Structure, 1);
+        SpawnStructureGroup(data.harbours, StructureHarbour, StructureType.Harbour, 1);
+        SpawnStructureGroup(data.special, StructureSpecial, StructureType.NeutralStructure, 1);
     }
 
-    void SpawnStructureGroup(List<PointData> points, GameObject prefab,  StructureType type, int income)
+    void SpawnStructureGroup(List<PointData> points, GameObject prefab, StructureType type, int income)
     {
         if (points == null || prefab == null) return;
         int h = mapLayout.height;
@@ -123,9 +157,9 @@ public class MapGenerator : MonoBehaviour
         {
             if (p.x >= 0 && p.x < allTiles.GetLength(0) && p.y >= 0 && p.y < allTiles.GetLength(1))
             {
-                int unityY = (h - 1 - p.y) ;
-                Vector3 pos = new Vector3(p.x * tileSize, 0, unityY* tileSize);
-                
+                int unityY = (h - 1 - p.y);
+                Vector3 pos = new Vector3(p.x * tileSize, 0, unityY * tileSize);
+
                 GameObject structureObj = Instantiate(prefab, pos, Quaternion.identity, structuresFolder);
                 structureObj.transform.localScale = new Vector3(3f, 3f, 3f);
                 structureObj.name = $"{type}_{p.x}_{p.y}";
@@ -150,7 +184,7 @@ public class MapGenerator : MonoBehaviour
     {
         int voisinX = 0;
         int voisinY = 0;
-        
+
         for (int i = -3; i < 4; i++)
         {
             for (int j = -3; j < 4; j++)
@@ -164,7 +198,7 @@ public class MapGenerator : MonoBehaviour
             }
         }
     }
-    
+
     void AddNature()
     {
         int h = mapLayout.height;
@@ -187,8 +221,9 @@ public class MapGenerator : MonoBehaviour
 
                         if (treeObj != null)
                         {
-                            Vector3 pos = new Vector3(x * tileSize, 0, y);
-                            
+                            // FIX : y * tileSize manquait, les arbres étaient mal positionnés
+                            Vector3 pos = new Vector3(x * tileSize, 0, y * tileSize);
+
                             Quaternion rot = Quaternion.Euler(0, Random.Range(0, 360), 0);
                             GameObject tree = Instantiate(treeObj, pos, rot, natureFolder);
                             tree.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
@@ -213,24 +248,24 @@ public class MapGenerator : MonoBehaviour
         if (IsColor(c, _colorSnow)) return (GroundType.Snow, groundSnow);
         return (GroundType.Grass, groundGrass);
     }
-    
+
     void SetupResources()
     {
         string environmentPath = "Prefabs/Environment/";
         string naturePath = "Prefabs/Nature/";
         string StructurePath = "Prefabs/Structures/";
-        
-        if (groundDirt == null) groundDirt = Resources.Load<GameObject>(environmentPath+"Env_Ground_Dirt");
-        if (groundGrass == null) groundGrass = Resources.Load<GameObject>(environmentPath+"Env_Ground_Grass");
-        if (groundSnow == null) groundSnow = Resources.Load<GameObject>(environmentPath+"Env_Ground_Snow");
-        if (groundWater == null) groundWater = Resources.Load<GameObject>(environmentPath+"Env_Ground_Water");
 
-        if (treeDirt == null) treeDirt = Resources.Load<GameObject>(naturePath+"Nature_Tree_Dirt");
-        if (treeGrass == null) treeGrass = Resources.Load<GameObject>(naturePath+"Nature_Tree_Grass");
-        if (treeSnow == null) treeSnow = Resources.Load<GameObject>(naturePath+"Nature_Tree_Snow");
+        if (groundDirt == null) groundDirt = Resources.Load<GameObject>(environmentPath + "Env_Ground_Dirt");
+        if (groundGrass == null) groundGrass = Resources.Load<GameObject>(environmentPath + "Env_Ground_Grass");
+        if (groundSnow == null) groundSnow = Resources.Load<GameObject>(environmentPath + "Env_Ground_Snow");
+        if (groundWater == null) groundWater = Resources.Load<GameObject>(environmentPath + "Env_Ground_Water");
 
-        if (StructureCastle == null) StructureCastle = Resources.Load<GameObject>(StructurePath+"Structure");
-        if (StructureHarbour == null) StructureHarbour = Resources.Load<GameObject>(StructurePath+"Harbour");
-        if (StructureSpecial == null) StructureSpecial = Resources.Load<GameObject>(StructurePath+"NeutralStructure");
+        if (treeDirt == null) treeDirt = Resources.Load<GameObject>(naturePath + "Nature_Tree_Dirt");
+        if (treeGrass == null) treeGrass = Resources.Load<GameObject>(naturePath + "Nature_Tree_Grass");
+        if (treeSnow == null) treeSnow = Resources.Load<GameObject>(naturePath + "Nature_Tree_Snow");
+
+        if (StructureCastle == null) StructureCastle = Resources.Load<GameObject>(StructurePath + "Structure");
+        if (StructureHarbour == null) StructureHarbour = Resources.Load<GameObject>(StructurePath + "Harbour");
+        if (StructureSpecial == null) StructureSpecial = Resources.Load<GameObject>(StructurePath + "NeutralStructure");
     }
 }
