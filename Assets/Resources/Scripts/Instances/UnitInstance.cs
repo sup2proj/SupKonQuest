@@ -167,12 +167,6 @@ public class UnitInstance : MonoBehaviour
         Debug.Log("Buff applied to " + unitData.type);
     }
 
-    private void OnCollisionEnter(Collision collision)
-{
-    if (!collision.gameObject.CompareTag("Units"))
-        return;
-}
-
 
     public void SetHealth(float healthChange)
     {

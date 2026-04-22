@@ -61,9 +61,19 @@ public class InterfaceInstance : MonoBehaviour
     [Header("Runtime")]
     public static float currentProgression;
     
-    private int slotAvailabel = -1;
-    
-    private bool isSpawning = false;
+    private StructureInstance displayedStructure;
+    private readonly Dictionary<int, List<Sprite>> queuedSpritesByStructure = new Dictionary<int, List<Sprite>>();
+    private readonly Dictionary<int, BuildingCreationState> creationStateByStructure = new Dictionary<int, BuildingCreationState>();
+    private int progressBarBoundStructureId = -1;
+
+    private class BuildingCreationState
+    {
+        public readonly Queue<UnitCreationRequest> queue = new Queue<UnitCreationRequest>();
+        public Coroutine coroutine;
+        public bool hasCurrentRequest;
+        public float currentCreationStartedAt;
+        public float currentCreationDuration;
+    }
 
     private struct UnitCreationRequest
     {
@@ -75,10 +85,9 @@ public class InterfaceInstance : MonoBehaviour
         public int playerId;
         public int paidCost;
         public int buildingPlayerId;
+        public int sourceStructureId;
     }
     
-    private readonly Queue<UnitCreationRequest> creationQueue = new Queue<UnitCreationRequest>();
-
     void Awake()
     {
         Instance = this;
@@ -100,6 +109,7 @@ public class InterfaceInstance : MonoBehaviour
 
         if (playerManager == null)
             playerManager = FindFirstObjectByType<PlayerManager>();
+        HideProgressBarVisual(resetProgress: false);
         hideBuffIcons();
         WireBuffSlotClicks();
         WirePlayersListClicks();
@@ -116,9 +126,9 @@ public class InterfaceInstance : MonoBehaviour
         unitsQueue.SetActive(true);
         unitsProtector.SetActive(true);
         hideUnitsProtectorSlots();
-        // ClearFirstQueueSlot();
-        
+        displayedStructure = StructureInstance.CurrentlySelected;
         RefreshQueueSlotsVisibility();
+        RefreshProgressBarVisibility();
     }
 
     public void HideStructureInterface()
@@ -126,20 +136,27 @@ public class InterfaceInstance : MonoBehaviour
         unitsQueue.SetActive(false);
         unitsProtector.SetActive(false);
         SetAllQueueSlotsActive(false);
+        HideProgressBarVisual(resetProgress: false);
     }
 
     public void addUnitToQueue(GameObject clickedUnit)
     {
-        for (int i = 0; i < queueSlots.Length; i++)
-        {
-            if (queueSlots[i] != null && queueSlots[i].sprite == null)
-            {
-                FillSlotImage(i, clickedUnit);
-                slotAvailabel = i + 1;
-                RefreshQueueSlotsVisibility();
-                return;
-            }
-        }
+        int structureId = GetCurrentStructureId();
+        if (structureId == -1 || clickedUnit == null)
+            return;
+
+        var source = clickedUnit.GetComponentInChildren<Image>(true);
+        if (source == null || source.sprite == null)
+            return;
+
+        var queue = GetOrCreateStructureQueue(structureId);
+        if (queueSlots == null)
+            return;
+        if (queue.Count >= queueSlots.Length)
+            return;
+
+        queue.Add(source.sprite);
+        RefreshQueueSlotsVisibility();
     }
 
     public void FillSlotImage(int slotIndex, GameObject clickedUnit)
@@ -184,12 +201,14 @@ public class InterfaceInstance : MonoBehaviour
         
         int buildingPlayerId = playerId;
         var selectedStructure = StructureInstance.CurrentlySelected;
+        int sourceStructureId = selectedStructure.GetInstanceID();
         if (selectedStructure != null)
         {
             buildingPlayerId = selectedStructure.playerId;
         }
         
-        creationQueue.Enqueue(new UnitCreationRequest
+        var creationState = GetOrCreateCreationState(sourceStructureId);
+        creationState.queue.Enqueue(new UnitCreationRequest
         {
             unitIndex = unitIndex,
             type = type,
@@ -199,10 +218,11 @@ public class InterfaceInstance : MonoBehaviour
             playerId = playerId,
             paidCost = cost,
             buildingPlayerId = buildingPlayerId,
+            sourceStructureId = sourceStructureId,
         });
 
-        if (!isSpawning)
-            StartCoroutine(ProcessCreationQueue());
+        if (creationState.coroutine == null)
+            creationState.coroutine = StartCoroutine(ProcessCreationQueue(sourceStructureId));
 
         RefreshPlayerStatisticsUI();
         return true;
@@ -289,21 +309,30 @@ public class InterfaceInstance : MonoBehaviour
     }
     // TEMPORAIRE -----------------------------------------------------------------------------
 
-    private IEnumerator ProcessCreationQueue()
+    private IEnumerator ProcessCreationQueue(int structureId)
     {
-        isSpawning = true;
+        if (structureId == -1)
+            yield break;
 
-        while (creationQueue.Count > 0)
+        var creationState = GetOrCreateCreationState(structureId);
+        while (creationState.queue.Count > 0)
         {
-            UnitCreationRequest req = creationQueue.Dequeue();
+            UnitCreationRequest req = creationState.queue.Dequeue();
 
             var actionInterface = ActionInterface.Instance;
             float creationTime = actionInterface.unitDatas[req.unitIndex].creationTime;
+            creationState.hasCurrentRequest = true;
+            creationState.currentCreationStartedAt = Time.time;
+            creationState.currentCreationDuration = creationTime;
 
             if (progressBar != null)
             {
-                progressBar.StartCreation(creationTime);
-                progressBar.transform.localPosition = (1.1f * Vector3.up);
+                RefreshProgressBarVisibility();
+                if (progressBarBoundStructureId == structureId)
+                {
+                    progressBar.StartCreation(creationTime);
+                    progressBar.transform.localPosition = (1.1f * Vector3.up);
+                }
             }
 
             float elapsed = 0f;
@@ -314,7 +343,10 @@ public class InterfaceInstance : MonoBehaviour
             }
 
             if (progressBar != null)
-                progressBar.StopCreation(resetToZero: true);
+            {
+                if (progressBarBoundStructureId == structureId)
+                    HideProgressBarVisual(resetProgress: true);
+            }
 
             if (StructureManager.Instance == null)
             {
@@ -332,43 +364,26 @@ public class InterfaceInstance : MonoBehaviour
                 );
             }
 
-            ShiftQueueLeft();
+            ShiftQueueLeft(req.sourceStructureId);
+            creationState.hasCurrentRequest = false;
+            creationState.currentCreationDuration = 0f;
         }
 
-        isSpawning = false;
+        creationState.coroutine = null;
+        creationState.hasCurrentRequest = false;
+        creationState.currentCreationDuration = 0f;
+        if (progressBarBoundStructureId == structureId)
+            HideProgressBarVisual(resetProgress: true);
     }
 
-    private void ClearFirstQueueSlot()
+    private void ShiftQueueLeft(int structureId)
     {
-        if (queueSlots == null || queueSlots.Length == 0)
+        if (structureId == -1)
             return;
 
-        if (queueSlots[0] != null)
-            queueSlots[0].sprite = null;
-
-        RefreshQueueSlotsVisibility();
-    }
-
-    private void ShiftQueueLeft()
-    {
-        if (queueSlots == null || queueSlots.Length == 0)
-            return;
-
-        for (int i = 0; i < queueSlots.Length - 1; i++)
-        {
-            if (queueSlots[i] == null) continue;
-            var nextSprite = queueSlots[i + 1] != null ? queueSlots[i + 1].sprite : null;
-            queueSlots[i].sprite = nextSprite;
-        }
-
-        if (queueSlots[^1] != null)
-            queueSlots[^1].sprite = null;
-
-        if (slotAvailabel > 0)
-            slotAvailabel--;
-        if (slotAvailabel < -1)
-            slotAvailabel = -1;
-
+        var queue = GetOrCreateStructureQueue(structureId);
+        if (queue.Count > 0)
+            queue.RemoveAt(0);
         RefreshQueueSlotsVisibility();
     }
 
@@ -386,13 +401,74 @@ public class InterfaceInstance : MonoBehaviour
     private void RefreshQueueSlotsVisibility()
     {
         if (queueSlots == null) return;
+        int structureId = GetCurrentStructureId();
+        List<Sprite> queue = null;
+        if (structureId != -1)
+            queuedSpritesByStructure.TryGetValue(structureId, out queue);
 
-        foreach (var img in queueSlots)
+        for (int i = 0; i < queueSlots.Length; i++)
         {
+            var img = queueSlots[i];
             if (img == null) continue;
-            bool hasSprite = img.sprite != null;
+            Sprite sprite = (queue != null && i < queue.Count) ? queue[i] : null;
+            img.sprite = sprite;
+            bool hasSprite = sprite != null;
             img.gameObject.SetActive(hasSprite);
         }
+    }
+
+    private int GetCurrentStructureId()
+    {
+        if (displayedStructure == null)
+            displayedStructure = StructureInstance.CurrentlySelected;
+        return displayedStructure != null ? displayedStructure.GetInstanceID() : -1;
+    }
+
+    private List<Sprite> GetOrCreateStructureQueue(int structureId)
+    {
+        if (!queuedSpritesByStructure.TryGetValue(structureId, out var queue))
+        {
+            queue = new List<Sprite>();
+            queuedSpritesByStructure[structureId] = queue;
+        }
+        return queue;
+    }
+
+    private BuildingCreationState GetOrCreateCreationState(int structureId)
+    {
+        if (!creationStateByStructure.TryGetValue(structureId, out var state))
+        {
+            state = new BuildingCreationState();
+            creationStateByStructure[structureId] = state;
+        }
+        return state;
+    }
+
+    private void RefreshProgressBarVisibility()
+    {
+        if (progressBar == null)
+            return;
+
+        int displayedStructureId = GetCurrentStructureId();
+        progressBarBoundStructureId = displayedStructureId;
+        bool shouldShow = false;
+        if (displayedStructureId != -1 && creationStateByStructure.TryGetValue(displayedStructureId, out var state) && state.hasCurrentRequest)
+        {
+            float elapsed = Time.time - state.currentCreationStartedAt;
+            progressBar.StartCreationFromElapsed(state.currentCreationDuration, elapsed);
+            shouldShow = true;
+        }
+        progressBar.SetFillVisible(shouldShow);
+    }
+
+    private void HideProgressBarVisual(bool resetProgress)
+    {
+        if (progressBar == null)
+            return;
+
+        if (resetProgress)
+            progressBar.StopCreation(resetToZero: true);
+        progressBar.SetFillVisible(false);
     }
 
     private void hideUnitsProtectorSlots()

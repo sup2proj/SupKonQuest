@@ -57,6 +57,25 @@ public class ProgressBar : MonoBehaviour
         SetNormalized(0f);
     }
 
+    public void StartCreationFromElapsed(float creationTimeSeconds, float elapsedAlreadySeconds)
+    {
+        WidthInitialized();
+        if (creationTimeSeconds <= 0f)
+        {
+            durationSeconds = 0f;
+            elapsedSeconds = 0f;
+            creationStartTime = Time.time;
+            isRunning = false;
+            SetNormalized(0f);
+            return;
+        }
+        durationSeconds = creationTimeSeconds;
+        elapsedSeconds = Mathf.Clamp(elapsedAlreadySeconds, 0f, durationSeconds);
+        creationStartTime = Time.time - elapsedSeconds;
+        isRunning = elapsedSeconds < durationSeconds;
+        SetNormalized(durationSeconds > 0f ? elapsedSeconds / durationSeconds : 0f);
+    }
+
     public void StopCreation(bool resetToZero = false)
     {
         isRunning = false;
@@ -66,6 +85,14 @@ public class ProgressBar : MonoBehaviour
             elapsedSeconds = 0f;
             SetNormalized(0f);
         }
+    }
+
+    public void SetFillVisible(bool visible)
+    {
+        if (progressBar == null)
+            return;
+
+        progressBar.gameObject.SetActive(visible);
     }
 
     public bool IsFinished()
