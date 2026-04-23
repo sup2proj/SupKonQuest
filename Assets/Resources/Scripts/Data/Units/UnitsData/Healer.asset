@@ -21,4 +21,4 @@ MonoBehaviour:
   healAmount: 15
   healCooldown: 20
   healDuration: 4
-  healRange: 6
+  healRange: 2

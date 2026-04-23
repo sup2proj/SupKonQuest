@@ -28,6 +28,9 @@ public class StructureInstance : MonoBehaviour
     public int health = 1000;
     private Outline outline;
     private Collider structureCollider;
+    
+    [Header("UI")]
+    [SerializeField] public HealthBar healthBar;
 
     [Header("Detection")]
     [SerializeField] private float unitsFarRadius = 5f;
@@ -57,7 +60,16 @@ public class StructureInstance : MonoBehaviour
     void Start()
     {
         structurePosition = transform.position;
+        InitHealthBar();
         UnSelected();
+    }
+
+    void OnDestroy()
+    {
+        if (currentlySelected == this)
+        {
+            currentlySelected = null;
+        }
     }
 
     void Update()
@@ -67,7 +79,26 @@ public class StructureInstance : MonoBehaviour
             AddToQueue(UnitsType.Infantry);
         }
 
+        if (healthBar != null && healthBar.isActiveAndEnabled && Camera.main != null)
+        {
+            Vector3 forward = Camera.main.transform.forward;
+            healthBar.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+        }
+
         DetectClickOutside();
+    }
+
+    private void InitHealthBar()
+    {
+        if (healthBar == null)
+        {
+            Debug.LogWarning($"[StructureInstance] {name} : healthBar non assignée dans l'inspector.", this);
+            return;
+        }
+
+        healthBar.transform.localPosition = (1.1f * Vector3.up);
+        healthBar.SetMaxHealth(health);
+        healthBar.SetHealth(health);
     }
 
     public void AddToQueue(UnitsType type)
@@ -232,3 +263,4 @@ public class StructureInstance : MonoBehaviour
         return null;
     }
 }
+

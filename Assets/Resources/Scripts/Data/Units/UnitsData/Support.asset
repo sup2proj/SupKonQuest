@@ -23,4 +23,4 @@ MonoBehaviour:
   buffDamage: 1.15
   buffCooldown: 25
   buffDuration: 8
-  buffRange: 5
+  buffRange: 3
