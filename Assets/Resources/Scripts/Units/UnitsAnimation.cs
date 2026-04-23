@@ -21,6 +21,7 @@ public class UnitsAnimation : MonoBehaviour
 
     private UnitInstance cachedUnit;
     private Coroutine attackCoroutine;
+    private Coroutine spellAttackResetCoroutine;
     private bool isCounterAttacking = false;
 
     void Awake()
@@ -339,5 +340,18 @@ public class UnitsAnimation : MonoBehaviour
             animator.SetBool("isAttacking", true);
         if (unit != null && unit.objectModel != null)
             unit.objectModel.SetActive(true);
+        spellAttackResetCoroutine = StartCoroutine(ResetSpellAttackToIdleAfterAnimation());
+    }
+
+    private IEnumerator ResetSpellAttackToIdleAfterAnimation()
+    {
+        AnimationClip attackClip = GetAttackClip();
+        float duration =  attackClip.length;
+        duration = Mathf.Max(0.05f, duration);
+        yield return new WaitForSeconds(duration);
+        animator.SetBool("isAttacking", false);
+        UnitInstance unit = cachedUnit;
+        unit.objectModel.SetActive(false);
+        spellAttackResetCoroutine = null;
     }
 }

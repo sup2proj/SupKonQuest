@@ -65,6 +65,7 @@ public class InterfaceInstance : MonoBehaviour
     private readonly Dictionary<int, List<Sprite>> queuedSpritesByStructure = new Dictionary<int, List<Sprite>>();
     private readonly Dictionary<int, BuildingCreationState> creationStateByStructure = new Dictionary<int, BuildingCreationState>();
     private int progressBarBoundStructureId = -1;
+    private readonly Dictionary<int, Coroutine> buffSlotReappearCoroutines = new Dictionary<int, Coroutine>();
 
     private class BuildingCreationState
     {
@@ -611,7 +612,36 @@ public class InterfaceInstance : MonoBehaviour
         int healerIndex = buffSlots.Length - 1;
         if (buffSlots[healerIndex] == null)
             return;
-
+    
         buffSlots[healerIndex].gameObject.SetActive(true);
+    }
+
+    public void HideBuffIconForCooldown(int slotIndex, float cooldown)
+    {
+        Image slot = buffSlots[slotIndex];
+        if (slot == null)
+            return;
+        if (buffSlotReappearCoroutines.TryGetValue(slotIndex, out var existing) && existing != null)
+            StopCoroutine(existing);
+        slot.gameObject.SetActive(false);
+
+        if (cooldown <= 0f)
+        {
+            slot.gameObject.SetActive(true);
+            buffSlotReappearCoroutines.Remove(slotIndex);
+            return;
+        }
+
+        buffSlotReappearCoroutines[slotIndex] = StartCoroutine(ShowBuffIconAfterDelay(slotIndex, cooldown));
+    }
+
+    private IEnumerator ShowBuffIconAfterDelay(int slotIndex, float cooldown)
+    {
+        yield return new WaitForSeconds(cooldown);
+
+        if (buffSlots != null && slotIndex >= 0 && slotIndex < buffSlots.Length && buffSlots[slotIndex] != null)
+            buffSlots[slotIndex].gameObject.SetActive(true);
+
+        buffSlotReappearCoroutines.Remove(slotIndex);
     }
 }

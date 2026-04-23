@@ -36,12 +36,12 @@ public class SelectableObject : MonoBehaviour
             IsSelected = true;
             if (markerSprite != null)
                 markerSprite.color = Color.green;
-            if (unitInstance.unitData.type == UnitsType.Support)
+            if (unitInstance.unitData.type == UnitsType.Support && !Spells.Instance.IsSpellOnCooldown)
             {
                 InterfaceInstance.Instance.ShowSupportIcons();
                 buffIcons = true;
             }
-            else if (unitInstance.unitData.type == UnitsType.Healer)
+            else if (unitInstance.unitData.type == UnitsType.Healer && !Spells.Instance.IsSpellOnCooldown)
             {
                 InterfaceInstance.Instance.ShowHealerIcon();
                 buffIcons = true;

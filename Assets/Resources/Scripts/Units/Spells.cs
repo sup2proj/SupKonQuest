@@ -20,6 +20,7 @@ public class Spells : MonoBehaviour
     private MeshFilter rangeFillFilter;
     private float circleHideAtTime = -1f;
     private Color currentCircleColor = Color.red;
+    public float spellLockedUntil = -1f;
 
     private UnitInstance casterUnit;
 
@@ -35,6 +36,18 @@ public class Spells : MonoBehaviour
             scanRadius = healerData.healRange;
         }
     }
+    
+    public bool IsSpellOnCooldown
+    {
+        get
+        {
+            if (casterUnit.unitData is UnitHealerData || casterUnit.unitData is UnitSupportData)
+                return spellLockedUntil > Time.time;
+
+            return false;
+        }
+    }
+
 
     private void Update()
     {
@@ -59,28 +72,52 @@ public class Spells : MonoBehaviour
         if (casterUnit == null || casterUnit.unitData == null)
             return;
         Debug.Log("[BuffSpell] ButtonListener called with choice=" + choice, this);
-        
+
         UnitsAnimation anim = casterUnit.GetComponent<UnitsAnimation>();
+        float iconHideCooldown = 0f;
+        bool shouldHideIcon = false;
 
         if (choice == 3 && casterUnit.unitData is UnitHealerData)
         {
             TriggerSpell(Color.red, 1);
             anim.StartAttackAnimationFromSpell();
+            iconHideCooldown = GetHealerCooldwon();
+            if (iconHideCooldown > 0f)
+                spellLockedUntil = Time.time + iconHideCooldown;
+            shouldHideIcon = true;
         }
+
         if (choice == 0 && casterUnit.unitData is UnitSupportData)
         {
             TriggerSpell(Color.green, 2);
             anim.StartAttackAnimationFromSpell();
+            iconHideCooldown = GetSupportCooldwon();
+            if (iconHideCooldown > 0f)
+                spellLockedUntil = Time.time + iconHideCooldown;
+            shouldHideIcon = true;
         }
         if (choice == 1 && casterUnit.unitData is UnitSupportData)
         {
             TriggerSpell(Color.yellow, 3);
             anim.StartAttackAnimationFromSpell();
+            iconHideCooldown = GetSupportCooldwon();
+            if (iconHideCooldown > 0f)
+                spellLockedUntil = Time.time + iconHideCooldown;
+            shouldHideIcon = true;
         }
         if (choice == 2 && casterUnit.unitData is UnitSupportData)
         {
             TriggerSpell(Color.blue, 4);
             anim.StartAttackAnimationFromSpell();
+            iconHideCooldown = GetSupportCooldwon();
+            if (iconHideCooldown > 0f)
+                spellLockedUntil = Time.time + iconHideCooldown;
+            shouldHideIcon = true;
+        }
+
+        if (shouldHideIcon && InterfaceInstance.Instance != null)
+        {
+            InterfaceInstance.Instance.HideBuffIconForCooldown(choice, iconHideCooldown);
         }
     }
 
@@ -316,6 +353,20 @@ public class Spells : MonoBehaviour
     {
         if (casterUnit != null && casterUnit.unitData is UnitSupportData supportData && supportData.buffDuration > 0f)
             return supportData.buffDuration;
+        return 0f;
+    }
+    
+    private float GetHealerCooldwon()
+    {
+        if (casterUnit != null && casterUnit.unitData is UnitHealerData healerData)
+            return healerData.healCooldown;
+        return 0f;
+    }
+    
+    private float GetSupportCooldwon()
+    {
+        if (casterUnit != null && casterUnit.unitData is UnitSupportData supportData)
+            return supportData.buffCooldown;
         return 0f;
     }
 
