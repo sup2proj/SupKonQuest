@@ -2851,6 +2851,8 @@ MonoBehaviour:
   circleUnderFeet: {fileID: 2206464339169037478}
   animator: {fileID: 0}
   healthBar: {fileID: 2731449005562521216}
+  currentHealth: 0
+  playerId: 0
 --- !u!65 &2408798326600379559
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2913,7 +2915,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
   animator: {fileID: 0}
   moveSpeed: 1
-  SelectionMarker: {fileID: 2206464339169037478}
 --- !u!114 &-2157145080077796530
 MonoBehaviour:
   m_ObjectHideFlags: 0

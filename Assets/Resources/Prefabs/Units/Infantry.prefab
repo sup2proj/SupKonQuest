@@ -541,7 +541,7 @@ Transform:
   m_GameObject: {fileID: 2615190501803727386}
   serializedVersion: 2
   m_LocalRotation: {x: -0.718869, y: -0, z: -0, w: 0.6951457}
-  m_LocalPosition: {x: 0.002, y: 0, z: 0.037}
+  m_LocalPosition: {x: -0.0283947, y: -0.0010000237, z: 0.08976245}
   m_LocalScale: {x: 0.48736, y: 0.48736027, z: 0.48736027}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1631,8 +1631,8 @@ GameObject:
   - component: {fileID: 584295807139649269}
   - component: {fileID: 7911920561147608704}
   - component: {fileID: -1801458887589098818}
-  - component: {fileID: 5084714448291577116}
-  - component: {fileID: 6169926720487306578}
+  - component: {fileID: 8132909324860242768}
+  - component: {fileID: -7223385642623911744}
   m_Layer: 0
   m_Name: Infantry
   m_TagString: Units
@@ -1693,11 +1693,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitsSoldierInstance
-  unitData: {fileID: 0}
+  unitData: {fileID: 11400000, guid: 886f33ae739a84c94bbc7ae7538d7169, type: 2}
   objectModel: {fileID: 2597432588625706430}
   circleUnderFeet: {fileID: 2615190501803727386}
   animator: {fileID: 0}
   healthBar: {fileID: 2731449005562521216}
+  currentHealth: 0
+  playerId: 0
 --- !u!65 &7911920561147608704
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1746,7 +1748,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 84
   m_CollisionDetection: 0
---- !u!114 &5084714448291577116
+--- !u!114 &8132909324860242768
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1757,11 +1759,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 64cb831562a6bdf41a4a4ca58a11e281, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
+  m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
   animator: {fileID: 0}
   moveSpeed: 1
-  SelectionMarker: {fileID: 2615190501803727386}
---- !u!114 &6169926720487306578
+--- !u!114 &-7223385642623911744
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

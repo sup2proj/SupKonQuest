@@ -1900,8 +1900,9 @@ GameObject:
   - component: {fileID: 7322826043863664852}
   - component: {fileID: 7531569455182867090}
   - component: {fileID: 639291211468168060}
-  - component: {fileID: 6152492798233905363}
-  - component: {fileID: -4892708287907676384}
+  - component: {fileID: 5055404702832634639}
+  - component: {fileID: -3349253672883374585}
+  - component: {fileID: -181731330391160736}
   m_Layer: 0
   m_Name: Healer
   m_TagString: Units
@@ -1939,7 +1940,7 @@ Animator:
   m_GameObject: {fileID: 8817759546670376350}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 240a8a0381738482d9509371c7c98931, type: 3}
-  m_Controller: {fileID: 9100000, guid: ab364d38205cd4b2fac6c796bb400cc7, type: 2}
+  m_Controller: {fileID: 9100000, guid: a12ec44147161fa4b9a0160ac02bb194, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -1963,11 +1964,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitInstance
-  unitData: {fileID: 0}
+  unitData: {fileID: 11400000, guid: 1cde77aca47f64e37a6e150dfe00fade, type: 2}
   objectModel: {fileID: 7535198820806993792}
   circleUnderFeet: {fileID: 5234142702115695861}
   animator: {fileID: 0}
   healthBar: {fileID: 2731449005562521216}
+  currentHealth: 0
+  playerId: 0
 --- !u!65 &7531569455182867090
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2016,7 +2019,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 84
   m_CollisionDetection: 0
---- !u!114 &6152492798233905363
+--- !u!114 &5055404702832634639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8817759546670376350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a172c3567a083c46a520a541297c332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BuffSpell
+  regenTickInterval: 0.25
+--- !u!114 &-3349253672883374585
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2027,11 +2043,10 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 64cb831562a6bdf41a4a4ca58a11e281, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
+  m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
   animator: {fileID: 0}
   moveSpeed: 1
-  SelectionMarker: {fileID: 5234142702115695861}
---- !u!114 &-4892708287907676384
+--- !u!114 &-181731330391160736
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

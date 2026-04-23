@@ -10,7 +10,7 @@ public class SelectableObject : MonoBehaviour
     private Color originalColor;
 
     private SpriteRenderer markerSprite;
-
+    private bool buffIcons = false;
     private void OnEnable()
     {
         if (SelectionManager.Instance != null)
@@ -28,17 +28,32 @@ public class SelectableObject : MonoBehaviour
 
     public void SelectMe()
     {
-        Debug.Log("Selected selectme: " + gameObject.name);
-        IsSelected = true;
-        if (markerSprite != null)
-            markerSprite.color = Color.green;
+        UnitInstance unitInstance = gameObject.GetComponent<UnitInstance>();
+        int playerUnitsId = unitInstance.playerId;
+        int playerId = PlayerManager.Instance.GetActivePlayerId();
+        if (playerId == playerUnitsId)
+        {
+            IsSelected = true;
+            if (markerSprite != null)
+                markerSprite.color = Color.green;
+            if (unitInstance.unitData.type == UnitsType.Support && !Spells.Instance.IsSpellOnCooldown)
+            {
+                InterfaceInstance.Instance.ShowSupportIcons();
+                buffIcons = true;
+            }
+            else if (unitInstance.unitData.type == UnitsType.Healer && !Spells.Instance.IsSpellOnCooldown)
+            {
+                InterfaceInstance.Instance.ShowHealerIcon();
+                buffIcons = true;
+
+            }
+        }
     }
     
     public void DeselectMe()
     {
         Debug.Log("Deselected: " + gameObject.name);
         IsSelected = false;
-
         if (markerSprite != null)
             markerSprite.color = originalColor;
     }
