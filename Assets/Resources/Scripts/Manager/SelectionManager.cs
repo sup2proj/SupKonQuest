@@ -208,14 +208,30 @@ public class SelectionManager : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         if (!Physics.Raycast(ray, out RaycastHit hit))
             return false;
-    
+
         UnitInstance targetUnit = hit.collider != null ? hit.collider.GetComponentInParent<UnitInstance>() : null;
-        if (targetUnit == null)
+        StructureInstance targetStructure = hit.collider != null ? hit.collider.GetComponentInParent<StructureInstance>() : null;
+        if (targetUnit == null && targetStructure == null)
             return false;
     
         int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
-        if (targetUnit.playerId == activePlayerId)
-            return false;
+
+        Transform targetTransform = null;
+        bool isStructureTarget = false;
+
+        if (targetUnit != null)
+        {
+            if (targetUnit.playerId == activePlayerId)
+                return false;
+            targetTransform = targetUnit.transform;
+        }
+        else
+        {
+            if (targetStructure.playerId == activePlayerId)
+                return false;
+            targetTransform = targetStructure.transform;
+            isStructureTarget = true;
+        }
     
         List<UnitInstance> groupUnits = CollectSelectedPlayerUnits(activePlayerId);
         bool hasCombatUnit = false;
@@ -227,19 +243,15 @@ public class SelectionManager : MonoBehaviour
                 hasCombatUnit = true;
         }
     
-        // Si aucune unité du joueur actif => rien à faire, on laisse la sélection se gérer normalement
         if (groupUnits.Count == 0)
             return false;
     
-        // Si aucune unité de combat dans le groupe : sélection uniquement Support/Healer
-        // On consomme l'ordre (retourne true) mais on ne déplace personne.
         if (!hasCombatUnit)
         {
             Debug.Log("Ordre refusé: uniquement des unités support/healer sélectionnées.");
             return true;
         }
     
-        // Ici : on a au moins une unité de combat => on déplace tout le groupe (combat + support + healer)
         foreach (UnitInstance unit in groupUnits)
         {
             if (unit == null || unit.unitData == null)
@@ -253,17 +265,16 @@ public class SelectionManager : MonoBehaviour
 
             if (unit.unitData is UnitCombatData combatData)
             {
-                // Les unités de combat s'arrêtent à leur portée d'attaque
                 stopDistance = Mathf.Max(0f, combatData.attackRange);
-            }
-            else
-            {
-                // Supports/Healers : ils restent un peu plus loin de la cible
-                // pour éviter le corps-à-corps puisqu'ils ne frappent pas.
-                stopDistance = 4f; // distance plus grande qu'avant (2f)
+                if (isStructureTarget)
+                {
+                    UnitsType type = unit.unitData.type;
+                    if (type == UnitsType.AntiBlindage || type == UnitsType.Heavy || type == UnitsType.Infantry)
+                        stopDistance += 1f;
+                }
             }
 
-            mover.MoveToTarget(targetUnit.transform, stopDistance);
+            mover.MoveToTarget(targetTransform, stopDistance);
         }
     
         return true;

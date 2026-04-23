@@ -23,9 +23,10 @@ public class StructureInstance : MonoBehaviour
     public int UnitsProtector;
     public bool isAlive;
 
-    [Header("Statisctics")]
+    [Header("Statistics")]
     public int playerId;
     public int health = 1000;
+    public int currentHealth;
     private Outline outline;
     private Collider structureCollider;
     
@@ -262,5 +263,17 @@ public class StructureInstance : MonoBehaviour
         }
         return null;
     }
+    
+   public void TakeDamage(float amount)
+   {
+       currentHealth -= Mathf.RoundToInt(amount);
+       currentHealth = Mathf.Clamp(currentHealth, 0, health);
+   
+       if (healthBar != null)
+           healthBar.SetHealth(currentHealth);
+   
+       // if (currentHealth <= 0)
+       //     Die();
+   }
 }
 
