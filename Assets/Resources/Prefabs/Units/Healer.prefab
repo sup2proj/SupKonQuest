@@ -1902,6 +1902,7 @@ GameObject:
   - component: {fileID: 639291211468168060}
   - component: {fileID: 6152492798233905363}
   - component: {fileID: -4892708287907676384}
+  - component: {fileID: -625728073357299758}
   m_Layer: 0
   m_Name: Healer
   m_TagString: Units
@@ -1968,6 +1969,8 @@ MonoBehaviour:
   circleUnderFeet: {fileID: 5234142702115695861}
   animator: {fileID: 0}
   healthBar: {fileID: 2731449005562521216}
+  currentHealth: 0
+  playerId: 0
 --- !u!65 &7531569455182867090
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2031,6 +2034,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   moveSpeed: 1
   SelectionMarker: {fileID: 5234142702115695861}
+  agent: {fileID: 0}
 --- !u!114 &-4892708287907676384
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2047,3 +2051,25 @@ MonoBehaviour:
   MyMeshRenderer: {fileID: 0}
   RedMat: {fileID: 0}
   GreenMat: {fileID: 0}
+--- !u!195 &-625728073357299758
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8817759546670376350}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0.1
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 1
+  m_BaseOffset: 0.02
+  m_WalkableMask: 1
+  m_ObstacleAvoidanceType: 4
