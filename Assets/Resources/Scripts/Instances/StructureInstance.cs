@@ -184,8 +184,6 @@ public class StructureInstance : MonoBehaviour
         if (InterfaceInstance.Instance != null)
         {
 			InterfaceInstance.Instance.showInterfaceForStructure();
-
-            // Scan des unités à proximité et affichage des icônes "protectors"
             var nearbyUnits = GetUnitsWithinConfiguredRadius();
             var uniqueTypes = new HashSet<UnitsType>();
             foreach (var unit in nearbyUnits)
@@ -235,7 +233,7 @@ public class StructureInstance : MonoBehaviour
 
         float r2 = radius * radius;
         Vector3 center = transform.position;
-
+        
         foreach (var unit in UnitsRegistry.GetSnapshot())
         {
             if (unit == null) continue;

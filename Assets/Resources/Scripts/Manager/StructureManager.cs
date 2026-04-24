@@ -96,7 +96,7 @@ public class StructureManager : MonoBehaviour
         }
         return true;
     }
-    
+
     private void ApplyColorTint(GameObject unitGO, Color tint)
     {
         var excludedNames = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)
