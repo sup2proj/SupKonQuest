@@ -534,56 +534,21 @@ public class InterfaceInstance : MonoBehaviour
         WireProtectorSlotClicks();
         if (type == UnitsType.Infantry)
         {
-            if (isPoweredUnit) {
-                unitsProtectorSlots[5].gameObject.SetActive(true);
-            }
-            else
-            {
-                unitsProtectorSlots[0].gameObject.SetActive(true);
-            }
-        } else if (type == UnitsType.Archer) {
-            if (isPoweredUnit)
-            {
-                unitsProtectorSlots[8].gameObject.SetActive(true);
-            }
-            else
-            {
-                unitsProtectorSlots[3].gameObject.SetActive(true);
-
-            }
-            
+            unitsProtectorSlots[0].gameObject.SetActive(true);
+            ActionInterface.Instance.ShowUnitProtectorPrice(5, 4);
         } else if (type == UnitsType.Mortar) {
-            if (isPoweredUnit)
-            {
-                unitsProtectorSlots[6].gameObject.SetActive(true);
-            }
-            else
-            {
-                unitsProtectorSlots[3].gameObject.SetActive(true);
-
-            }
-            
-        } else if (type == UnitsType.AntiBlindage) {
-            if (isPoweredUnit)
-            {
-                unitsProtectorSlots[9].gameObject.SetActive(true);
-            }
-            else
-            {
-                unitsProtectorSlots[4].gameObject.SetActive(true);
-
-            }
-
+            unitsProtectorSlots[1].gameObject.SetActive(true);
+            ActionInterface.Instance.ShowUnitProtectorPrice(6, 3);
         } else if (type == UnitsType.Heavy) {
-            if (isPoweredUnit)
-            {
-                unitsProtectorSlots[7].gameObject.SetActive(true);
-            }
-            else
-            {
-                unitsProtectorSlots[2].gameObject.SetActive(true);
-            }
-        }
+            unitsProtectorSlots[2].gameObject.SetActive(true);
+            ActionInterface.Instance.ShowUnitProtectorPrice(4, 2);
+        } else if (type == UnitsType.Archer) {
+            unitsProtectorSlots[3].gameObject.SetActive(true);
+            ActionInterface.Instance.ShowUnitProtectorPrice(1, 1);
+        }  else if (type == UnitsType.AntiBlindage) {
+            unitsProtectorSlots[4].gameObject.SetActive(true);
+            ActionInterface.Instance.ShowUnitProtectorPrice(0, 0);
+        } 
     }
 
     public void hideBuffIcons()
