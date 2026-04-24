@@ -120,11 +120,11 @@ public class ActionInterface : MonoBehaviour
                 bool accepted;
                 if (isPowered)
                 {
-                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, true);
+                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, true, false);
                 }
                 else
                 {
-                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false);
+                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false, false);
                 }
 
                 if (accepted)
@@ -143,7 +143,7 @@ public class ActionInterface : MonoBehaviour
         }
     }
 
-    private GameObject GetClickedUnitsIcon(int buttonNumber, bool isPowered)
+    public GameObject GetClickedUnitsIcon(int buttonNumber, bool isPowered)
     {
         int index = buttonNumber - 1;
         if (isPowered)
