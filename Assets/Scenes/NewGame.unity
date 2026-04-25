@@ -251,6 +251,7 @@ GameObject:
   - component: {fileID: 363535082}
   - component: {fileID: 363535084}
   - component: {fileID: 363535083}
+  - component: {fileID: 363535085}
   m_Layer: 5
   m_Name: TitleText
   m_TagString: Untagged
@@ -377,6 +378,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 363535081}
   m_CullTransparentMesh: 1
+--- !u!114 &363535085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 363535081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: New Game
+  frenchText: Nouvelle Partie
 --- !u!1 &391133370
 GameObject:
   m_ObjectHideFlags: 0
@@ -388,6 +403,7 @@ GameObject:
   - component: {fileID: 391133371}
   - component: {fileID: 391133373}
   - component: {fileID: 391133372}
+  - component: {fileID: 391133374}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -514,6 +530,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 391133370}
   m_CullTransparentMesh: 1
+--- !u!114 &391133374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 391133370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Multiplayer
+  frenchText: Multijoueurs
 --- !u!1 &442358767
 GameObject:
   m_ObjectHideFlags: 0
@@ -720,6 +750,7 @@ GameObject:
   - component: {fileID: 517376170}
   - component: {fileID: 517376172}
   - component: {fileID: 517376171}
+  - component: {fileID: 517376173}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -846,6 +877,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 517376169}
   m_CullTransparentMesh: 1
+--- !u!114 &517376173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517376169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Back
+  frenchText: Retour
 --- !u!1 &597359684
 GameObject:
   m_ObjectHideFlags: 0
@@ -1084,7 +1129,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 300, y: -250}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 200, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &644277190
 MonoBehaviour:
