@@ -637,6 +637,7 @@ GameObject:
   - component: {fileID: 208014428}
   - component: {fileID: 208014430}
   - component: {fileID: 208014429}
+  - component: {fileID: 208014431}
   m_Layer: 5
   m_Name: MapTitleText
   m_TagString: Untagged
@@ -763,6 +764,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 208014427}
   m_CullTransparentMesh: 1
+--- !u!114 &208014431
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 208014427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Map
+  frenchText: Carte
 --- !u!1 &264850669
 GameObject:
   m_ObjectHideFlags: 0
@@ -1032,6 +1047,7 @@ GameObject:
   - component: {fileID: 396678515}
   - component: {fileID: 396678517}
   - component: {fileID: 396678516}
+  - component: {fileID: 396678518}
   m_Layer: 5
   m_Name: BtnStartText
   m_TagString: Untagged
@@ -1158,6 +1174,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 396678514}
   m_CullTransparentMesh: 1
+--- !u!114 &396678518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396678514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Start
+  frenchText: Lancer
 --- !u!1 &434000130
 GameObject:
   m_ObjectHideFlags: 0
@@ -1351,6 +1381,7 @@ GameObject:
   - component: {fileID: 477056277}
   - component: {fileID: 477056279}
   - component: {fileID: 477056278}
+  - component: {fileID: 477056280}
   m_Layer: 5
   m_Name: DiffTitleText
   m_TagString: Untagged
@@ -1477,6 +1508,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 477056276}
   m_CullTransparentMesh: 1
+--- !u!114 &477056280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477056276}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Difficulty
+  frenchText: "Difficult\xE9"
 --- !u!1 &507180567
 GameObject:
   m_ObjectHideFlags: 0
@@ -1567,6 +1612,7 @@ GameObject:
   - component: {fileID: 517376170}
   - component: {fileID: 517376172}
   - component: {fileID: 517376171}
+  - component: {fileID: 517376173}
   m_Layer: 5
   m_Name: BtnBackText
   m_TagString: Untagged
@@ -1693,6 +1739,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 517376169}
   m_CullTransparentMesh: 1
+--- !u!114 &517376173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517376169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Back
+  frenchText: Retour
 --- !u!1 &604398916
 GameObject:
   m_ObjectHideFlags: 0
@@ -1704,6 +1764,7 @@ GameObject:
   - component: {fileID: 604398917}
   - component: {fileID: 604398919}
   - component: {fileID: 604398918}
+  - component: {fileID: 604398920}
   m_Layer: 5
   m_Name: AITitleText
   m_TagString: Untagged
@@ -1830,6 +1891,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 604398916}
   m_CullTransparentMesh: 1
+--- !u!114 &604398920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 604398916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: AI Players
+  frenchText: Nombres d'IA
 --- !u!1 &619718700
 GameObject:
   m_ObjectHideFlags: 0
@@ -3100,7 +3175,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Nom de la carte
+  m_text: Map name
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b39269fd6cb84d64f84c7a599b701e09, type: 2}
   m_sharedMaterial: {fileID: -573867277670008306, guid: b39269fd6cb84d64f84c7a599b701e09, type: 2}

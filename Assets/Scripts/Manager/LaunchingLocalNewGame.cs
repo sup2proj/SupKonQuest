@@ -31,7 +31,8 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
     public TextMeshProUGUI diffDisplay;
     public TextMeshProUGUI diffLeftArrow;
     public TextMeshProUGUI diffRightArrow;
-    private string[] difficulties = { "Easy", "Medium", "Hard" };
+    private string[] difficultiesEn = { "Easy", "Medium", "Hard" };
+    private string[] difficultiesFr = { "Facile", "Moyen", "Difficile" };
     private int currentDiffIndex = 0;
 
     [Header("Arrow Colors")]
@@ -236,20 +237,24 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
     void NextDifficulty()
     {
         currentDiffIndex++;
-        if (currentDiffIndex > difficulties.Length - 1)
+        
+        if (currentDiffIndex > difficultiesEn.Length - 1)
         {
             currentDiffIndex = 0;
         }
+        
         UpdateDisplays();
     }
     
     void PreviousDifficulty()
     {
         currentDiffIndex--;
+        
         if (currentDiffIndex < 0)
         {
-            currentDiffIndex = difficulties.Length - 1;
+            currentDiffIndex = difficultiesEn.Length - 1;
         }
+        
         UpdateDisplays();
     }
 
@@ -260,8 +265,19 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
             mapNameDisplay.text = mapNames[currentMapIndex];
             mapImageDisplay.sprite = mapImages[currentMapIndex];
         }
+        
         aiCountDisplay.text = aiCount.ToString();
-        diffDisplay.text = difficulties[currentDiffIndex];
+        
+        int currentLang = PlayerPrefs.GetInt("Language", 0);
+        
+        if (currentLang == 0)
+        {
+            diffDisplay.text = difficultiesEn[currentDiffIndex];
+        }
+        else if (currentLang == 1)
+        {
+            diffDisplay.text = difficultiesFr[currentDiffIndex];
+        }
     }
 
     void StartGame()
