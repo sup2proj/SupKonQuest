@@ -507,6 +507,7 @@ GameObject:
   - component: {fileID: 1147355097}
   - component: {fileID: 1147355099}
   - component: {fileID: 1147355098}
+  - component: {fileID: 1147355100}
   m_Layer: 5
   m_Name: PressKeyText
   m_TagString: Untagged
@@ -633,6 +634,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1147355096}
   m_CullTransparentMesh: 1
+--- !u!114 &1147355100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1147355096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Press any key to continue
+  frenchText: Appuyer sur une touche pour continuer
 --- !u!1 &1641883920
 GameObject:
   m_ObjectHideFlags: 0
