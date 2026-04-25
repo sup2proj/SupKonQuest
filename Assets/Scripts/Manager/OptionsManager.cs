@@ -164,26 +164,43 @@ public class OptionsManager : MonoBehaviour
     public void NextLanguage()
     {
         currentLanguage = currentLanguage + 1;
+        
         if (currentLanguage > languages.Length - 1)
+        {
             currentLanguage = 0;
+        }
 
         PlayerPrefs.SetInt("Language", currentLanguage);
         UpdateLanguageText();
+        RefreshTranslationsInScene();
     }
 
     public void PreviousLanguage()
     {
         currentLanguage = currentLanguage - 1;
+        
         if (currentLanguage < 0)
+        {
             currentLanguage = languages.Length - 1;
+        }
 
         PlayerPrefs.SetInt("Language", currentLanguage);
         UpdateLanguageText();
+        RefreshTranslationsInScene();
     }
 
     void UpdateLanguageText()
     {
         languageText.text = languages[currentLanguage];
+    }
+
+    void RefreshTranslationsInScene()
+    {
+        LocalizedText[] allLocalizedTexts = FindObjectsOfType<LocalizedText>(); 
+        for (int i = 0; i < allLocalizedTexts.Length; i++)
+        {
+            allLocalizedTexts[i].UpdateText();
+        }
     }
 
     public void NextResolution()

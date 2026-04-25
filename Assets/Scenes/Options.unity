@@ -280,6 +280,7 @@ GameObject:
   - component: {fileID: 40324252}
   - component: {fileID: 40324254}
   - component: {fileID: 40324255}
+  - component: {fileID: 40324256}
   m_Layer: 5
   m_Name: Label
   m_TagString: Untagged
@@ -406,6 +407,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &40324256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 40324251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Fullscreen
+  frenchText: "Plein \xE9cran"
 --- !u!1 &203118961
 GameObject:
   m_ObjectHideFlags: 0
@@ -554,6 +569,7 @@ GameObject:
   - component: {fileID: 468630797}
   - component: {fileID: 468630799}
   - component: {fileID: 468630798}
+  - component: {fileID: 468630800}
   m_Layer: 5
   m_Name: MusicVolText
   m_TagString: Untagged
@@ -680,6 +696,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 468630796}
   m_CullTransparentMesh: 1
+--- !u!114 &468630800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 468630796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Music Volume
+  frenchText: Volume musique
 --- !u!1 &472649344
 GameObject:
   m_ObjectHideFlags: 0
@@ -766,6 +796,7 @@ GameObject:
   - component: {fileID: 473397726}
   - component: {fileID: 473397728}
   - component: {fileID: 473397727}
+  - component: {fileID: 473397729}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -892,6 +923,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 473397725}
   m_CullTransparentMesh: 1
+--- !u!114 &473397729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 473397725}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Back
+  frenchText: Retour
 --- !u!1 &480608791
 GameObject:
   m_ObjectHideFlags: 0
@@ -1978,6 +2023,7 @@ GameObject:
   - component: {fileID: 1203574605}
   - component: {fileID: 1203574607}
   - component: {fileID: 1203574606}
+  - component: {fileID: 1203574608}
   m_Layer: 5
   m_Name: SFXVolText
   m_TagString: Untagged
@@ -2104,6 +2150,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1203574604}
   m_CullTransparentMesh: 1
+--- !u!114 &1203574608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1203574604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: SFX volume
+  frenchText: Volume effets sonore
 --- !u!1 &1243840547
 GameObject:
   m_ObjectHideFlags: 0
