@@ -140,7 +140,7 @@ public class SelectionManager : MonoBehaviour
 
     private void ForceRefreshSelectableObjects()
     {
-        var found = FindObjectsOfType<SelectableObject>();
+        var found = FindObjectsByType<SelectableObject>(FindObjectsSortMode.None);
 
         AllSelectableObjects.Clear();
         AllSelectableObjects.AddRange(found);

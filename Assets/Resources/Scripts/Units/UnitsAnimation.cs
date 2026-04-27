@@ -22,7 +22,6 @@ public class UnitsAnimation : MonoBehaviour
     private UnitInstance cachedUnit;
     private Coroutine attackCoroutine;
     private Coroutine spellAttackResetCoroutine;
-    private bool isCounterAttacking = false;
 
     void Awake()
     {
@@ -118,7 +117,6 @@ public class UnitsAnimation : MonoBehaviour
         if (attacker != null)
         {
             attackTarget = attacker;
-            isCounterAttacking = true;
         }
 
         if (attackTarget == null)
@@ -160,7 +158,6 @@ public class UnitsAnimation : MonoBehaviour
             return;
         }
 
-        isCounterAttacking = false;
         animator.SetBool("isAttacking", true);
 
         if (unit != null && unit.objectModel != null)
@@ -246,7 +243,6 @@ public class UnitsAnimation : MonoBehaviour
         if (unit != null && unit.objectModel != null)
             unit.objectModel.SetActive(false);
         attackTarget = null;
-        isCounterAttacking = false;
     }
 
     void HandleAutoAttack()

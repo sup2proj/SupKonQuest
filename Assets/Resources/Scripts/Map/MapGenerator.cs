@@ -179,11 +179,12 @@ public class MapGenerator : MonoBehaviour
                     if (Random.value < 0.2f)
                     {
                         GameObject treeObj = null;
-                        TreeType tType = TreeType.None;
-
-                        if (tile.groundType == GroundType.Grass) { treeObj = treeGrass; tType = TreeType.Grass; }
-                        else if (tile.groundType == GroundType.Dirt) { treeObj = treeDirt; tType = TreeType.Dirt; }
-                        else if (tile.groundType == GroundType.Snow) { treeObj = treeSnow; tType = TreeType.Snow; }
+                        if (tile.groundType == GroundType.Grass)
+                            treeObj = treeGrass;
+                        else if (tile.groundType == GroundType.Dirt)
+                            treeObj = treeDirt;
+                        else if (tile.groundType == GroundType.Snow)
+                            treeObj = treeSnow;
 
                         if (treeObj != null)
                         {

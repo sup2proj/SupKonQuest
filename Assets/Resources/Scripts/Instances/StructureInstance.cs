@@ -240,7 +240,7 @@ public class StructureInstance : MonoBehaviour
         if (instanceId == -1)
             return null;
 
-        StructureInstance[] structures = FindObjectsOfType<StructureInstance>();
+        StructureInstance[] structures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
         for (int i = 0; i < structures.Length; i++)
         {
             StructureInstance structure = structures[i];

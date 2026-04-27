@@ -10,7 +10,6 @@ public class SelectableObject : MonoBehaviour
     private Color originalColor;
 
     private SpriteRenderer markerSprite;
-    private bool buffIcons = false;
     private void OnEnable()
     {
         if (SelectionManager.Instance != null)
@@ -39,13 +38,10 @@ public class SelectableObject : MonoBehaviour
             if (unitInstance.unitData.type == UnitsType.Support && !Spells.Instance.IsSpellOnCooldown)
             {
                 InterfaceInstance.Instance.ShowSupportIcons();
-                buffIcons = true;
             }
             else if (unitInstance.unitData.type == UnitsType.Healer && !Spells.Instance.IsSpellOnCooldown)
             {
                 InterfaceInstance.Instance.ShowHealerIcon();
-                buffIcons = true;
-
             }
         }
     }
