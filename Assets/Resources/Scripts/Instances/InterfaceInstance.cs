@@ -203,10 +203,11 @@ public class InterfaceInstance : MonoBehaviour
         
         int buildingPlayerId = playerId;
         var selectedStructure = StructureInstance.CurrentlySelected;
-        int sourceStructureId = selectedStructure.GetInstanceID();
+        int sourceStructureId = -1;
         if (selectedStructure != null)
         {
             buildingPlayerId = selectedStructure.playerId;
+            sourceStructureId = selectedStructure.GetInstanceID();
         }
         
         var creationState = GetOrCreateCreationState(sourceStructureId);
@@ -357,13 +358,15 @@ public class InterfaceInstance : MonoBehaviour
             }
             else
             {
+                StructureInstance sourceStructure = StructureInstance.FindByInstanceId(req.sourceStructureId);
                 bool spawned = StructureManager.Instance.SpawnUnitByTypeAtPosition(
                     req.buildingPlayerId,
                     req.type,
                     req.x,
                     req.z,
                     req.isPoweredUnit,
-                    req.isProtector
+                    req.isProtector,
+                    sourceStructure
                 );
             }
 

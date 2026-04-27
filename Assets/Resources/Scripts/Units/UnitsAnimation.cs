@@ -212,7 +212,7 @@ public class UnitsAnimation : MonoBehaviour
             }
             else
             {
-                targetStructure.TakeDamage(attack);
+                targetStructure.TakeDamage(attack, attackerUnit);
             }
 
             yield return new WaitForSeconds(halfDuration);
@@ -337,6 +337,22 @@ public class UnitsAnimation : MonoBehaviour
 
         stoppingDistance = Mathf.Max(0f, stopDistance);
         isMovingToTarget = true;
+    }
+
+    public void EngageTarget(Transform target, float stopDistance)
+    {
+        if (target == null)
+            return;
+
+        float desiredStopDistance = Mathf.Max(0f, stopDistance);
+        bool alreadyMovingToTarget = isMovingToTarget && followTarget == target;
+        bool alreadyAttackingTarget = !isMovingToTarget && attackTarget == target;
+        bool sameStopDistance = Mathf.Abs(stoppingDistance - desiredStopDistance) <= 0.01f;
+
+        if ((alreadyMovingToTarget || alreadyAttackingTarget) && sameStopDistance)
+            return;
+
+        MoveToTarget(target, desiredStopDistance);
     }
 
     public void MoveToPositionAsGroup(Vector3 destination, float stopDistance, int groupMoveId, bool isLeader)

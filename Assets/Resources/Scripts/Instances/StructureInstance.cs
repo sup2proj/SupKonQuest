@@ -19,9 +19,7 @@ public class StructureInstance : MonoBehaviour
     public StructureType structureType;	
 
     [Header("Units")]
-    public List<UnitsType> unitsProtectorTypes = new List<UnitsType>();
-    public int UnitsProtector;
-    public bool isAlive;
+    public List<GameObject> unitsProtectorTypes = new List<GameObject>();
 
     [Header("Statistics")]
     public int playerId;
@@ -76,11 +74,6 @@ public class StructureInstance : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            AddToQueue(UnitsType.Infantry);
-        }
-
         if (healthBar != null && healthBar.isActiveAndEnabled && Camera.main != null)
         {
             Vector3 forward = Camera.main.transform.forward;
@@ -101,15 +94,6 @@ public class StructureInstance : MonoBehaviour
         healthBar.transform.localPosition = (1.1f * Vector3.up);
         healthBar.SetMaxHealth(health);
         healthBar.SetHealth(health);
-    }
-
-    public void AddToQueue(UnitsType type)
-    {
-        UnitData data = StructureManager.Instance.unitData.Find(d => d.type == type);
-        if (data != null)
-        {
-            unitQueue.Enqueue(data);
-        }
     }
 
     public void OnMouseDown()
@@ -227,6 +211,46 @@ public class StructureInstance : MonoBehaviour
         }
     }
 
+    public void AddProtectorUnit(UnitInstance protectorUnit)
+    {
+        if (protectorUnit == null)
+            return;
+
+        CleanupProtectorUnits();
+        GameObject protectorObject = protectorUnit.gameObject;
+        if (!unitsProtectorTypes.Contains(protectorObject))
+            unitsProtectorTypes.Add(protectorObject);
+    }
+
+    public void RemoveProtectorUnit(UnitInstance protectorUnit)
+    {
+        if (protectorUnit == null)
+            return;
+
+        unitsProtectorTypes.Remove(protectorUnit.gameObject);
+    }
+
+    private void CleanupProtectorUnits()
+    {
+        unitsProtectorTypes.RemoveAll(unitObject => unitObject == null);
+    }
+
+    public static StructureInstance FindByInstanceId(int instanceId)
+    {
+        if (instanceId == -1)
+            return null;
+
+        StructureInstance[] structures = FindObjectsOfType<StructureInstance>();
+        for (int i = 0; i < structures.Length; i++)
+        {
+            StructureInstance structure = structures[i];
+            if (structure != null && structure.GetInstanceID() == instanceId)
+                return structure;
+        }
+
+        return null;
+    }
+
     public List<UnitInstance> GetUnitsWithinRadius(float radius)
     {
         var result = new List<UnitInstance>();
@@ -238,6 +262,7 @@ public class StructureInstance : MonoBehaviour
         foreach (var unit in UnitsRegistry.GetSnapshot())
         {
             if (unit == null) continue;
+            if (unit.playerId != playerId) continue;
             Debug.Log($"Checking unit {unit.name} at position {unit.transform.position} against structure {name} at position {center} with radius {radius}.");
             Vector3 d = unit.transform.position - center;
             if (d.sqrMagnitude <= r2)
@@ -263,16 +288,58 @@ public class StructureInstance : MonoBehaviour
         return null;
     }
     
-   public void TakeDamage(float amount)
+   public void TakeDamage(float amount, UnitInstance attacker)
    {
        currentHealth -= Mathf.RoundToInt(amount);
        currentHealth = Mathf.Clamp(currentHealth, 0, health);
    
        if (healthBar != null)
            healthBar.SetHealth(currentHealth);
+
+       TryTriggerProtectorRetaliation(attacker);
    
        // if (currentHealth <= 0)
        //     Die();
+   }
+
+   private void TryTriggerProtectorRetaliation(UnitInstance attacker)
+   {
+       if (attacker == null || attacker.transform == null)
+           return;
+       if (attacker.playerId == playerId)
+           return;
+
+       CleanupProtectorUnits();
+
+       for (int i = unitsProtectorTypes.Count - 1; i >= 0; i--)
+       {
+           GameObject protectorObject = unitsProtectorTypes[i];
+           if (protectorObject == null)
+           {
+               unitsProtectorTypes.RemoveAt(i);
+               continue;
+           }
+
+           UnitInstance protector = protectorObject.GetComponent<UnitInstance>();
+           if (protector == null || protector.unitData == null || !protector.unitData.isProtector)
+           {
+               unitsProtectorTypes.RemoveAt(i);
+               continue;
+           }
+
+           if (protector.playerId != playerId)
+               continue;
+
+           UnitsAnimation protectorAnimation = protectorObject.GetComponent<UnitsAnimation>();
+           if (protectorAnimation == null)
+               continue;
+
+           float stopDistance = 0.1f;
+           if (protector.unitData is UnitCombatData combatData)
+               stopDistance = Mathf.Max(0f, combatData.attackRange);
+
+           protectorAnimation.EngageTarget(attacker.transform, stopDistance);
+       }
    }
 }
 
