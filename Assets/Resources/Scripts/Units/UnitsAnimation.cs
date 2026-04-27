@@ -190,18 +190,30 @@ public class UnitsAnimation : MonoBehaviour
 
             UnitInstance attackerUnit = cachedUnit;
             UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+            StructureInstance targetStructure = null;
 
             if (targetUnit == null)
+                targetStructure = attackTarget.GetComponent<StructureInstance>();
+
+            if (targetUnit == null && targetStructure == null)
                 break;
 
             float attack = 0f;
             if (attackerUnit != null && attackerUnit.unitData is UnitCombatData combatData)
                 attack = combatData.attack;
-            targetUnit.TakeDamage(attack);
 
-            UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
-            if (targetAnimation != null && attackerUnit != null)
-                targetAnimation.AttackTheAttacker(transform);
+            if (targetUnit != null)
+            {
+                targetUnit.TakeDamage(attack);
+
+                UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
+                if (targetAnimation != null && attackerUnit != null)
+                    targetAnimation.AttackTheAttacker(transform);
+            }
+            else
+            {
+                targetStructure.TakeDamage(attack);
+            }
 
             yield return new WaitForSeconds(halfDuration);
         }
@@ -255,7 +267,11 @@ public class UnitsAnimation : MonoBehaviour
         }
 
         UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+        StructureInstance targetStructure = null;
         if (targetUnit == null)
+            targetStructure = attackTarget.GetComponent<StructureInstance>();
+
+        if (targetUnit == null && targetStructure == null)
         {
             StopAttackInternal();
             return;
@@ -265,6 +281,9 @@ public class UnitsAnimation : MonoBehaviour
         Vector3 b = attackTarget.position; b.y = 0f;
         float dist = Vector3.Distance(a, b);
         float currentAttackRange = GetCurrentAttackRange();
+
+        if (targetStructure != null)
+            currentAttackRange = Mathf.Max(currentAttackRange, stoppingDistance);
 
         if (dist > currentAttackRange + 0.1f)
             StopAttackInternal();

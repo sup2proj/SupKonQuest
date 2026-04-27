@@ -61,6 +61,7 @@ public class StructureInstance : MonoBehaviour
     void Start()
     {
         structurePosition = transform.position;
+        currentHealth = health;
         InitHealthBar();
         UnSelected();
     }
