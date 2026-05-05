@@ -35,7 +35,6 @@ public class cameraMouvement : MonoBehaviour
         if (position.y < 10) position.y = 10;
         if (position.z > 20) position.z = 20;
         if (position.z < -10) position.z = -10;
-        Debug.Log("x" + position.x + " y" + position.y + " z" + position.z);
 
         Camera.main.transform.rotation = Quaternion.Euler(30f, 45f, 0f);
         
