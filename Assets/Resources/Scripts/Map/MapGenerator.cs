@@ -101,7 +101,17 @@ public class MapGenerator : MonoBehaviour
                 floor.transform.localScale = new Vector3(0.1f, 1f, 0.1f);
                 floor.name = $"Tile_{x}_{y}";
                 floor.tag = "Ground";
-                Destroy(floor.GetComponent<MeshCollider>());
+                
+                // Ajouter un collider pour le raycasting
+                Collider existingCollider = floor.GetComponent<Collider>();
+                if (existingCollider != null)
+                {
+                    Destroy(existingCollider);
+                }
+                
+                // Ajouter un BoxCollider invisible pour le raycasting
+                BoxCollider boxCollider = floor.AddComponent<BoxCollider>();
+                boxCollider.isTrigger = true;  // Trigger pour ne pas interférer avec la physique
             }
         }
     }

@@ -86,7 +86,97 @@ public class StructureInstance : MonoBehaviour
             healthBar.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
         }
 
-        DetectClickOutside();
+        // Gestion centralisée des clics (une seule fois par frame)
+        if (Instance == this)
+        {
+            HandleGlobalStructureClick();
+        }
+    }
+
+    /// <summary>
+    /// Gestion centralisée des clics sur les structures
+    /// Cette méthode n'est exécutée qu'une fois par frame (par l'Instance principale)
+    /// </summary>
+    private void HandleGlobalStructureClick()
+    {
+        if (!Input.GetMouseButtonDown(0))
+            return;
+
+        // Ignorer les clics sur l'UI
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            return;
+
+        if (Camera.main == null)
+            return;
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        
+        // Utiliser RaycastAll pour trouver TOUS les colliders, y compris les Triggers
+        RaycastHit[] hits = Physics.RaycastAll(ray);
+        
+        Debug.Log($"[StructureClick] Raycasting détecté {hits.Length} colliders");
+
+        StructureInstance closestStructure = null;
+        float closestDistance = float.MaxValue;
+
+        // Parcourir tous les hits et trouver la structure la plus proche
+        for (int i = 0; i < hits.Length; i++)
+        {
+            RaycastHit hit = hits[i];
+            Debug.Log($"[StructureClick] Hit {i}: {hit.collider.gameObject.name} à distance {hit.distance}");
+
+            // Chercher une StructureInstance sur ce collider ou ses parents
+            StructureInstance structure = hit.collider.GetComponent<StructureInstance>();
+            if (structure == null)
+            {
+                structure = hit.collider.GetComponentInParent<StructureInstance>();
+            }
+
+            // Garder la structure la plus proche
+            if (structure != null && hit.distance < closestDistance)
+            {
+                Debug.Log($"[StructureClick] Structure trouvée: {structure.name} à distance {hit.distance}");
+                closestStructure = structure;
+                closestDistance = hit.distance;
+            }
+        }
+
+        if (closestStructure != null)
+        {
+            Debug.Log($"[StructureClick] Sélection: {closestStructure.name}");
+            closestStructure.OnStructureClicked();
+        }
+        else
+        {
+            // Le clic n'a touché aucune structure - désélectionner si une structure est sélectionnée
+            Debug.Log($"[StructureClick] Aucune structure trouvée");
+            if (currentlySelected != null)
+            {
+                currentlySelected.UnSelected();
+                if (ActionInterface.Instance != null)
+                    ActionInterface.Instance.HideAllButtons();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Appelé quand cette structure est cliquée
+    /// </summary>
+    private void OnStructureClicked()
+    {
+        Debug.Log($"[{name}] Structure cliquée (PlayerId: {playerId})");
+        int currentPlayerId = PlayerManager.Instance.GetActivePlayerId();
+        Debug.Log($"[{name}] PlayerActif: {currentPlayerId}");
+        
+        if (playerId == currentPlayerId)
+        {
+            Debug.Log($"[{name}] ✓ Sélection accordée!");
+            Selected();
+        }
+        else
+        {
+            Debug.Log($"[{name}] ✗ Sélection refusée (PlayerId: {playerId} != {currentPlayerId})");
+        }
     }
 
     private void InitHealthBar()
@@ -111,53 +201,6 @@ public class StructureInstance : MonoBehaviour
         }
     }
 
-    public void OnMouseDown()
-    {
-        int currentPlayerId = PlayerManager.Instance.GetActivePlayerId();
-        if (playerId == currentPlayerId)
-            Selected();
-    }
-
-    void DetectClickOutside()
-    {
-        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-            return;
-
-        if (!outline.enabled) return;
-        if (Input.GetMouseButtonDown(0))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
-            {
-                // Vérifie si on a cliqué sur une autre structure
-                StructureInstance otherStructure = hit.collider.GetComponent<StructureInstance>();
-                // Si c'est une autre structure, on ne fait rien
-                // (l'autre structure va se sélectionner via son OnMouseDown)
-                if (otherStructure != null && otherStructure != this)
-                {
-                    // Désélectionne cette structure sans cacher les boutons
-                    // (la nouvelle structure va afficher ses propres boutons)
-                    UnSelected();
-                    return;
-                }
-                
-                // Si le clic n'est pas sur cette structure (ou ses enfants) et pas sur une autre structure
-                if (!hit.collider.transform.IsChildOf(transform) && otherStructure == null)
-                {
-                    UnSelected();
-                    ActionInterface.Instance.HideAllButtons();
-                }
-            }
-            else
-            {
-                // Clic dans le vide → désélection
-                UnSelected();
-                ActionInterface.Instance.HideAllButtons();
-                
-            }
-        }
-    }
 
     public void Selected()
     {
