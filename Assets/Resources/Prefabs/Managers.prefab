@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5442695084418051801}
   m_Layer: 0
-  m_Name: Manager
+  m_Name: Managers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -51,6 +51,78 @@ PrefabInstance:
       propertyPath: playerManager
       value: 
       objectReference: {fileID: 5747761784155818827}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: unitData.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: 'unitData.Array.data[7]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 0326151d8e35fe64fa67cdd46cdd389b, type: 2}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: 'unitData.Array.data[8]'
+      value: 
+      objectReference: {fileID: 11400000, guid: a262659c27c97324bb6582bc96d267af, type: 2}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: 'unitData.Array.data[9]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 0f683595d7857435ba830714e64598df, type: 2}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: boatPrefabMappings.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: unitPrefabMappings.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: boatPrefabMappings.Array.data[0].prefab
+      value: 
+      objectReference: {fileID: 6524080215285962826, guid: fbb7740426ad7ea42891c0222053ab2d, type: 3}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: boatPrefabMappings.Array.data[1].prefab
+      value: 
+      objectReference: {fileID: 7976404171854096219, guid: 8e58bff500151c74f98df05da2b27d8b, type: 3}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: boatPrefabMappings.Array.data[2].prefab
+      value: 
+      objectReference: {fileID: 1700246641722798495, guid: b55d5ca767a58824a8ad2fa2015771b7, type: 3}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: unitPrefabMappings.Array.data[7].prefab
+      value: 
+      objectReference: {fileID: 6524080215285962826, guid: fbb7740426ad7ea42891c0222053ab2d, type: 3}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: unitPrefabMappings.Array.data[8].prefab
+      value: 
+      objectReference: {fileID: 7976404171854096219, guid: 8e58bff500151c74f98df05da2b27d8b, type: 3}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: unitPrefabMappings.Array.data[9].prefab
+      value: 
+      objectReference: {fileID: 1700246641722798495, guid: b55d5ca767a58824a8ad2fa2015771b7, type: 3}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: boatPrefabMappings.Array.data[0].unitType
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: boatPrefabMappings.Array.data[1].unitType
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: boatPrefabMappings.Array.data[2].unitType
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: unitPrefabMappings.Array.data[7].unitType
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: unitPrefabMappings.Array.data[8].unitType
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7283920122824509590, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
+      propertyPath: unitPrefabMappings.Array.data[9].unitType
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 8386511429829669133, guid: af2bb5b0566cb5442a846830fafffd7c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 40.01873

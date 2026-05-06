@@ -18,7 +18,8 @@ public class ActionInterface : MonoBehaviour
     public ActionButton[] unitActionButtons;
     
 	[Header("Prices des unités (ordre identique aux unitDatas))")]
- 	[SerializeField] private TextMeshProUGUI[] unitPriceTexts;
+    [SerializeField] private TextMeshProUGUI[] unitPriceTexts;
+ 	[SerializeField] private TextMeshProUGUI[] boatPriceTexts;
  	[SerializeField] public UnitData[] unitDatas;
 
 	[Header("Image des structures")]
@@ -157,33 +158,44 @@ public class ActionInterface : MonoBehaviour
         }
     }
 
-    public void StructureButtonAction(int buttonNumber) {
-		if (StructureManager.Instance == null)
-		{
-			Debug.LogError("[ActionInterface] StructureManager.Instance est null! Assurez-vous qu'un StructureManager existe dans la scène.");
-			return;
-		}
-		Debug.Log("[ActionInterface] StructureButtonAction() appelé pour le bouton " + buttonNumber);
-    }
-
     public void HarbourButtonAction(int buttonNumber) {
-        switch(buttonNumber)
+        int index = buttonNumber - 1;
+        Debug.Log("[ActionInterface] HarbourButtonAction appelé pour buttonNumber=" + buttonNumber + " (index=" + index + ")");
+        if (index < 0 || unitDatas == null || index >= unitDatas.Length)
         {
-            case 1:
-                Debug.Log("Action 1 pour Harbour exécutée");
-                // Implémentez ici l'action spécifique pour le bouton 1
-                break;
-            case 2:
-                Debug.Log("Action 2 pour Harbour exécutée");
-                // Implémentez ici l'action spécifique pour le bouton 2
-                break;
-            case 3:
-                Debug.Log("Action 3 pour Harbour exécutée");
-                // Implémentez ici l'action spécifique pour le bouton 3
-                break;
-            default:
-                Debug.LogWarning($"Aucune action définie pour le bouton {buttonNumber} du type Harbour");
-                break;
+            Debug.LogWarning($"[ActionInterface] HarbourButtonAction: index invalide {index}");
+            return;
+        }
+
+        GameObject clickedImageGO = null;
+        if (harbourButtons != null && index < harbourButtons.Length && harbourButtons[index] != null)
+            clickedImageGO = harbourButtons[index].gameObject;
+
+        if (clickedImageGO != null)
+        {
+            if (InterfaceInstance.Instance != null)
+            {
+                int unitIndex = index + 7; // Décalage de 7 pour accéder aux unités navales dans unitDatas
+                UnitsType type = unitDatas[unitIndex].type;
+                Debug.Log(type);
+                bool accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false);
+                if (accepted)
+                {
+                    InterfaceInstance.Instance.addUnitToQueue(clickedImageGO);
+                }
+                else
+                {
+                    Debug.Log($"[ActionInterface] Création refusée (pas assez d'or ?) -> icône non ajoutée à la queue. unitIndex={unitIndex}, type={type}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[ActionInterface] InterfaceInstance.Instance est null, impossible d'ajouter à la queue (Harbour)." );
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[ActionInterface] HarbourButtonAction: pas d'icône configurée pour le bouton {buttonNumber}");
         }
     }
     

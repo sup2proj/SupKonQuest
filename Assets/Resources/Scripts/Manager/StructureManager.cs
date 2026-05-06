@@ -39,10 +39,27 @@ public class StructureManager : MonoBehaviour
         {
             return false;
         }
-
         if (!unitPrefabDict.TryGetValue(type, out GameObject prefab) || prefab == null)
         {
-            return false;
+            string resourcePath = $"Prefabs/Boats/{type.ToString()}";
+            GameObject loaded = Resources.Load<GameObject>(resourcePath);
+            if (loaded != null)
+            {
+                prefab = loaded;
+                try
+                {
+                    unitPrefabDict.Add(type, prefab);
+                }
+                catch
+                {
+                    unitPrefabDict[type] = prefab;
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[StructureManager] Aucun prefab trouvé pour {type} ni dans unitPrefabMappings ni dans Resources/{resourcePath}.");
+                return false;
+            }
         }
         UnitData runtimeData = Instantiate(data);
         runtimeData.playerId = playerId;
@@ -68,7 +85,13 @@ public class StructureManager : MonoBehaviour
         {
             runtimeData.isProtector = true;
         }
-        Vector3 position = new Vector3(x, 0, z - 3);
+
+        Vector3 position;
+        // if (type == UnitsType.Fregate || type == UnitsType.Destroyer || type == UnitsType.Transport)
+        // {
+        // }
+        position = new Vector3(x, 0, z - 3);
+
         GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
 
         if (isPoweredUnit)
@@ -80,8 +103,9 @@ public class StructureManager : MonoBehaviour
         UnitInstance instance = unitGO.GetComponent<UnitInstance>();
         if (instance == null)
         {
-            Destroy(unitGO);
-            return false;
+            Debug.LogWarning($"[StructureManager] Le prefab {prefab.name} ne contient pas de UnitInstance component. Tentative d'ajouter dynamiquement.");
+            instance = unitGO.AddComponent<UnitInstance>();
+            // Si UnitInstance attend des données à l'Awake/Start, c'est risqué, on logue.
         }
 
         instance.Initialize(runtimeData);
