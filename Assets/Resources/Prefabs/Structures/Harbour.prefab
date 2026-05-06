@@ -45,14 +45,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6dc3800f24f44f84ad9c6715e1d16f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StructureInstance
-  structureData: {fileID: 0}
-  structureManager: {fileID: 0}
   neutralStructure: 0
   structureType: 2
   unitsProtectorTypes: 
   UnitsProtector: 0
   isAlive: 0
-  player: 0
+  playerId: 0
+  health: 1000
+  unitsFarRadius: 5
 --- !u!1001 &8443833962858812467
 PrefabInstance:
   m_ObjectHideFlags: 0

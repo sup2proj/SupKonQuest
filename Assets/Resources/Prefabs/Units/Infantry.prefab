@@ -541,7 +541,7 @@ Transform:
   m_GameObject: {fileID: 2615190501803727386}
   serializedVersion: 2
   m_LocalRotation: {x: -0.718869, y: -0, z: -0, w: 0.6951457}
-  m_LocalPosition: {x: 0.002, y: 0, z: 0.037}
+  m_LocalPosition: {x: -0.0283947, y: -0.0010000237, z: 0.08976245}
   m_LocalScale: {x: 0.48736, y: 0.48736027, z: 0.48736027}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1630,8 +1630,8 @@ GameObject:
   - component: {fileID: 39464292089507293}
   - component: {fileID: 584295807139649269}
   - component: {fileID: -1801458887589098818}
-  - component: {fileID: 5084714448291577116}
-  - component: {fileID: 6169926720487306578}
+  - component: {fileID: 8132909324860242768}
+  - component: {fileID: -7223385642623911744}
   - component: {fileID: -520817025780228395}
   m_Layer: 0
   m_Name: Infantry
@@ -1693,7 +1693,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitsSoldierInstance
-  unitData: {fileID: 0}
+  unitData: {fileID: 11400000, guid: 886f33ae739a84c94bbc7ae7538d7169, type: 2}
   objectModel: {fileID: 2597432588625706430}
   circleUnderFeet: {fileID: 2615190501803727386}
   animator: {fileID: 0}
@@ -1727,6 +1727,36 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 84
   m_CollisionDetection: 0
+--- !u!114 &8132909324860242768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6712554670935715101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64cb831562a6bdf41a4a4ca58a11e281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
+  animator: {fileID: 0}
+  moveSpeed: 1
+--- !u!114 &-7223385642623911744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6712554670935715101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f458f2bfb879834291da7ef83364c8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectableObject
+  SelectionMarker: {fileID: 2615190501803727386}
+  MyMeshRenderer: {fileID: 0}
+  RedMat: {fileID: 0}
+  GreenMat: {fileID: 0}
 --- !u!114 &5084714448291577116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1743,22 +1773,6 @@ MonoBehaviour:
   moveSpeed: 1
   SelectionMarker: {fileID: 2615190501803727386}
   agent: {fileID: 0}
---- !u!114 &6169926720487306578
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6712554670935715101}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f458f2bfb879834291da7ef83364c8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SelectableObject
-  SelectionMarker: {fileID: 2615190501803727386}
-  MyMeshRenderer: {fileID: 0}
-  RedMat: {fileID: 0}
-  GreenMat: {fileID: 0}
 --- !u!195 &-520817025780228395
 NavMeshAgent:
   m_ObjectHideFlags: 0

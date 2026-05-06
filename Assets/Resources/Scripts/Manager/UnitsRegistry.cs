@@ -13,11 +13,14 @@ public static class UnitsRegistry
         }
     }
 
-    public static void Register(UnitInstance unit)
+    public static void Register(UnitInstance unit, int unitsPlayerId)
     {
-        if (unit == null) return;
-        units.Add(unit);
-        Debug.Log($"Unit registered: {unit.name}. Total units: {units.Count}");
+        int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
+        if (unit != null && unitsPlayerId == activePlayerId)
+        {
+            units.Add(unit);
+            Debug.Log($"Unit registered: {unit.name}. Total units: {units.Count}");
+        }
     }
 
     public static void Unregister(UnitInstance unit)

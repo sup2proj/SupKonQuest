@@ -20,4 +20,4 @@ MonoBehaviour:
   isPoweredUnit: 0
   attack: 30
   attackSpeed: 0.6
-  attackRange: 3
+  attackRange: 1.5

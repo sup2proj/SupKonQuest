@@ -755,8 +755,9 @@ GameObject:
   - component: {fileID: 9175761570452860944}
   - component: {fileID: 1179610145250223055}
   - component: {fileID: 4292567869531471773}
-  - component: {fileID: -1124025764855906926}
-  - component: {fileID: -7675571502969627970}
+  - component: {fileID: 3228416645688727943}
+  - component: {fileID: 1889348772494606766}
+  - component: {fileID: -7168849867650191033}
   - component: {fileID: -6207977715132781863}
   m_Layer: 0
   m_Name: Support
@@ -818,7 +819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitInstance
-  unitData: {fileID: 0}
+  unitData: {fileID: 11400000, guid: c96833603ad4e6e468b4eb140b4da998, type: 2}
   objectModel: {fileID: 7969559920920450612}
   circleUnderFeet: {fileID: 1236961838787046027}
   animator: {fileID: 0}
@@ -852,6 +853,49 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 84
   m_CollisionDetection: 0
+--- !u!114 &3228416645688727943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2521214180397707472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a172c3567a083c46a520a541297c332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SupportSpell
+  regenTickInterval: 0.25
+--- !u!114 &1889348772494606766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2521214180397707472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64cb831562a6bdf41a4a4ca58a11e281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
+  animator: {fileID: 0}
+  moveSpeed: 1
+--- !u!114 &-7168849867650191033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2521214180397707472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f458f2bfb879834291da7ef83364c8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectableObject
+  SelectionMarker: {fileID: 1236961838787046027}
+  MyMeshRenderer: {fileID: 0}
+  RedMat: {fileID: 0}
+  GreenMat: {fileID: 0}
 --- !u!114 &-1124025764855906926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -868,22 +912,6 @@ MonoBehaviour:
   moveSpeed: 1
   SelectionMarker: {fileID: 1236961838787046027}
   agent: {fileID: 0}
---- !u!114 &-7675571502969627970
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2521214180397707472}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6f458f2bfb879834291da7ef83364c8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SelectableObject
-  SelectionMarker: {fileID: 1236961838787046027}
-  MyMeshRenderer: {fileID: 0}
-  RedMat: {fileID: 0}
-  GreenMat: {fileID: 0}
 --- !u!195 &-6207977715132781863
 NavMeshAgent:
   m_ObjectHideFlags: 0

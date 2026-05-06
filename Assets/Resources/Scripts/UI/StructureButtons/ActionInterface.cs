@@ -19,6 +19,7 @@ public class ActionInterface : MonoBehaviour
     
 	[Header("Prices des unités (ordre identique aux unitDatas))")]
  	[SerializeField] private TextMeshProUGUI[] unitPriceTexts;
+    [SerializeField] private TextMeshProUGUI[] unitProtectorPriceTexts;
  	[SerializeField] public UnitData[] unitDatas;
 
 	[Header("Image des structures")]
@@ -56,8 +57,6 @@ public class ActionInterface : MonoBehaviour
 				unitPriceTexts[i].text = "";
 				continue;
 			}
-
-
 			float multiplier = (currentStructureType == StructureType.NeutralStructure) ? 1.20f : 1f;
 			float finalPrice = unitDatas[i].price * multiplier;
 			unitPriceTexts[i].text = finalPrice.ToString();
@@ -121,11 +120,11 @@ public class ActionInterface : MonoBehaviour
                 bool accepted;
                 if (isPowered)
                 {
-                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, true);
+                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, true, false);
                 }
                 else
                 {
-                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false);
+                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false, false);
                 }
 
                 if (accepted)
@@ -144,7 +143,7 @@ public class ActionInterface : MonoBehaviour
         }
     }
 
-    private GameObject GetClickedUnitsIcon(int buttonNumber, bool isPowered)
+    public GameObject GetClickedUnitsIcon(int buttonNumber, bool isPowered)
     {
         int index = buttonNumber - 1;
         if (isPowered)
@@ -236,6 +235,13 @@ public class ActionInterface : MonoBehaviour
                 unitPriceText.gameObject.SetActive(false);
             }
         }
+        foreach (var unitProtectorPriceText in unitProtectorPriceTexts)
+        {
+            if (unitProtectorPriceText != null)
+            {
+                unitProtectorPriceText.gameObject.SetActive(false);
+            }
+        }
     }
 
     void ShowPrices(TextMeshProUGUI[] unitPriceTexts)
@@ -322,5 +328,15 @@ public class ActionInterface : MonoBehaviour
         x = position.x;
         z = position.z;
         Debug.Log($"[ActionInterface] Structure sélectionnée aux coordonnées x={position.x}, z={position.z}");
+    }
+
+    public void ShowUnitProtectorPrice(int unitIndex,  int priceIndex)
+    {
+        if (unitProtectorPriceTexts == null || unitDatas == null) return;
+        
+        float multiplier = (currentStructureType == StructureType.NeutralStructure) ? 1.20f : 1f;
+        float finalPrice = unitDatas[unitIndex].price * multiplier;
+        unitProtectorPriceTexts[priceIndex].text = finalPrice.ToString();
+        unitProtectorPriceTexts[priceIndex].gameObject.SetActive(true);
     }
 }

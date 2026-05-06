@@ -27,7 +27,6 @@ public class UnitInstance : MonoBehaviour
             rb.freezeRotation = true;
         }
 
-        UnitsRegistry.Register(this);
     }
 
     private void OnDestroy()
@@ -38,6 +37,7 @@ public class UnitInstance : MonoBehaviour
     void Start()
     {
         Initialize(unitData);
+        UnitsRegistry.Register(this, playerId);
 
         if (objectModel != null)
             objectModel.SetActive(false);
@@ -48,9 +48,6 @@ public class UnitInstance : MonoBehaviour
 
     void Update()
     {
-        HandleMovement();
-        HandleAttack();
-
         if (healthBar != null && healthBar.isActiveAndEnabled && Camera.main != null)
         {
             Vector3 forward = Camera.main.transform.forward;
@@ -130,54 +127,6 @@ public class UnitInstance : MonoBehaviour
         healthBar.transform.localPosition = (1.1f * Vector3.up);
     }
 
-    void HandleMovement()
-    {
-        if (unitData == null)
-            return;
-
-        if (Keyboard.current == null)
-            return;
-
-        bool isMoving = Keyboard.current.spaceKey.isPressed;
-        if (animator != null)
-            animator.SetBool("isMoving", isMoving);
-
-        if (isMoving)
-        {
-            Rigidbody rb = GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                Vector3 move = transform.forward * unitData.speed * Time.deltaTime;
-                rb.MovePosition(rb.position + move);
-            }
-            else
-            {
-                transform.Translate(Vector3.forward * unitData.speed * Time.deltaTime);
-            }
-        }
-    }
-
-    void HandleAttack()
-    {
-        if (Keyboard.current == null)
-            return;
-
-        bool isAttacking = Keyboard.current.gKey.isPressed;
-
-        if (animator != null)
-        {
-            animator.SetBool("isAttacking", isAttacking);
-        }
-        else
-        {
-            Debug.LogError("Animator est null dans HandleAttack pour " + gameObject.name);
-        }
-        if (objectModel != null)
-        {
-            objectModel.SetActive(isAttacking);
-        }
-    }
-
     public void TakeDamage(float amount)
     {
         if (unitData == null)
@@ -209,23 +158,6 @@ public class UnitInstance : MonoBehaviour
         }
     }
 
-
-    public void Heal(float amount)
-    {
-        if (unitData == null)
-            return;
-
-        if (!(unitData is UnitHealerData))
-            return;
-
-        currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0f, unitData.maxHealth);
-
-        if (healthBar != null)
-            healthBar.SetHealth(currentHealth);
-    }
-
-
     public void ApplyBuff()
     {
         if (unitData == null)
@@ -235,32 +167,6 @@ public class UnitInstance : MonoBehaviour
         Debug.Log("Buff applied to " + unitData.type);
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        // Ignorer les collisions avec le sol (tiles)
-        if (collision.gameObject.CompareTag("Ground"))
-            return;
-
-        // Vérifier si l'objet est une unité valide
-        if (!collision.gameObject.CompareTag("Units"))
-            return;
-
-        Debug.Log("Collision détectée avec : " + collision.gameObject.name);
-
-        // Récupérer le Rigidbody
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb == null)
-            return;
-
-        // Calculer la direction pour repousser l'unité
-        Vector3 pushDirection = transform.position - collision.contacts[0].point;
-        pushDirection.y = 0f;
-        pushDirection.Normalize();
-
-        // Appliquer une force de recul
-        float pushForce = 5f;
-        rb.AddForce(pushDirection * pushForce, ForceMode.Impulse);
-    }
 
     public void SetHealth(float healthChange)
     {

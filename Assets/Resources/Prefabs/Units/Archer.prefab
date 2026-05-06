@@ -2894,7 +2894,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
   animator: {fileID: 0}
   moveSpeed: 1
-  SelectionMarker: {fileID: 2206464339169037478}
   agent: {fileID: 0}
 --- !u!114 &-2157145080077796530
 MonoBehaviour:
