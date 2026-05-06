@@ -131,6 +131,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.103
       objectReference: {fileID: 0}
+    - target: {fileID: 3162618606620390364, guid: 062d120f995e8094fb884219176acf50, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3655096166677649301, guid: 062d120f995e8094fb884219176acf50, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -579,7 +583,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1551490035}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.3
   m_Speed: 3
   m_Acceleration: 8
   avoidancePriority: 50
@@ -637,7 +641,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.06666667
+  m_VoxelSize: 0.1
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 0}
   m_BuildHeightMesh: 0
