@@ -345,7 +345,7 @@ public class StructureInstance : MonoBehaviour
         return null;
     }
     
-   public void TakeDamage(float amount)
+   public void TakeDamage(float amount, UnitInstance attacker)
    {
        currentHealth -= Mathf.RoundToInt(amount);
        currentHealth = Mathf.Clamp(currentHealth, 0, health);

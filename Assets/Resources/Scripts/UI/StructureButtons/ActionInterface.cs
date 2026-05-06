@@ -177,7 +177,7 @@ public class ActionInterface : MonoBehaviour
                 int unitIndex = index + 7; // Décalage de 7 pour accéder aux unités navales dans unitDatas
                 UnitsType type = unitDatas[unitIndex].type;
                 Debug.Log(type);
-                bool accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false);
+                bool accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false, false);
                 if (accepted)
                 {
                     InterfaceInstance.Instance.addUnitToQueue(clickedImageGO);
