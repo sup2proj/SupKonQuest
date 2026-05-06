@@ -83,6 +83,7 @@ public class InterfaceInstance : MonoBehaviour
         public float x;
         public float z;
         public bool isPoweredUnit;
+        public bool isProtector;
         public int playerId;
         public int paidCost;
         public int buildingPlayerId;
@@ -179,7 +180,7 @@ public class InterfaceInstance : MonoBehaviour
         target.sprite = source.sprite;
     }
     
-    public bool InitUnitsCreation(int unitIndex, UnitsType type, float x, float z, bool isPoweredUnit)
+    public bool InitUnitsCreation(int unitIndex, UnitsType type, float x, float z, bool isPoweredUnit, bool isProtector)
     {
         int playerId = GetSelectedPlayerId();
         var actionInterface = ActionInterface.Instance;
@@ -202,10 +203,11 @@ public class InterfaceInstance : MonoBehaviour
         
         int buildingPlayerId = playerId;
         var selectedStructure = StructureInstance.CurrentlySelected;
-        int sourceStructureId = selectedStructure.GetInstanceID();
+        int sourceStructureId = -1;
         if (selectedStructure != null)
         {
             buildingPlayerId = selectedStructure.playerId;
+            sourceStructureId = selectedStructure.GetInstanceID();
         }
         
         var creationState = GetOrCreateCreationState(sourceStructureId);
@@ -216,6 +218,7 @@ public class InterfaceInstance : MonoBehaviour
             x = x,
             z = z,
             isPoweredUnit = isPoweredUnit,
+            isProtector = isProtector,
             playerId = playerId,
             paidCost = cost,
             buildingPlayerId = buildingPlayerId,
@@ -355,13 +358,15 @@ public class InterfaceInstance : MonoBehaviour
             }
             else
             {
+                StructureInstance sourceStructure = StructureInstance.FindByInstanceId(req.sourceStructureId);
                 bool spawned = StructureManager.Instance.SpawnUnitByTypeAtPosition(
                     req.buildingPlayerId,
                     req.type,
                     req.x,
                     req.z,
                     req.isPoweredUnit,
-                    isProtector: false
+                    req.isProtector,
+                    sourceStructure
                 );
             }
 
@@ -526,7 +531,24 @@ public class InterfaceInstance : MonoBehaviour
         var selected = StructureInstance.CurrentlySelected;
         Vector3 pos = selected.StructurePosition;
         int buildingPlayerId = selected != null ? selected.playerId : GetSelectedPlayerId();
-        StructureManager.Instance.SpawnUnitByTypeAtPosition(buildingPlayerId, type, pos.x + 1f, pos.z + 1f, false, true);
+        bool accepted = InitUnitsCreation(slotIndex, type, pos.x + 1f, pos.z + 1f, false, true);
+        // Modification de slotIndex car dans les datas les unités ne sont pas dans le bonne ordre
+        if (slotIndex == 0) {
+            slotIndex = 5;
+        } else if (slotIndex == 1) {
+            slotIndex = 6;
+        } else if (slotIndex == 2) {
+            slotIndex = 4;
+        } else if (slotIndex == 3) {
+            slotIndex = 2;
+        } else if (slotIndex == 4) {
+            slotIndex = 1;
+        }
+        GameObject clickedImageGO = ActionInterface.Instance.GetClickedUnitsIcon(slotIndex, false);
+        if (accepted && clickedImageGO != null)
+        {
+            addUnitToQueue(clickedImageGO);
+        }
     }
 
     public void showUnitsNextToStructure(UnitsType type, bool isPoweredUnit) 
@@ -534,56 +556,21 @@ public class InterfaceInstance : MonoBehaviour
         WireProtectorSlotClicks();
         if (type == UnitsType.Infantry)
         {
-            if (isPoweredUnit) {
-                unitsProtectorSlots[5].gameObject.SetActive(true);
-            }
-            else
-            {
-                unitsProtectorSlots[0].gameObject.SetActive(true);
-            }
-        } else if (type == UnitsType.Archer) {
-            if (isPoweredUnit)
-            {
-                unitsProtectorSlots[8].gameObject.SetActive(true);
-            }
-            else
-            {
-                unitsProtectorSlots[3].gameObject.SetActive(true);
-
-            }
-            
+            unitsProtectorSlots[0].gameObject.SetActive(true);
+            ActionInterface.Instance.ShowUnitProtectorPrice(5, 4);
         } else if (type == UnitsType.Mortar) {
-            if (isPoweredUnit)
-            {
-                unitsProtectorSlots[6].gameObject.SetActive(true);
-            }
-            else
-            {
-                unitsProtectorSlots[3].gameObject.SetActive(true);
-
-            }
-            
-        } else if (type == UnitsType.AntiBlindage) {
-            if (isPoweredUnit)
-            {
-                unitsProtectorSlots[9].gameObject.SetActive(true);
-            }
-            else
-            {
-                unitsProtectorSlots[4].gameObject.SetActive(true);
-
-            }
-
+            unitsProtectorSlots[1].gameObject.SetActive(true);
+            ActionInterface.Instance.ShowUnitProtectorPrice(6, 3);
         } else if (type == UnitsType.Heavy) {
-            if (isPoweredUnit)
-            {
-                unitsProtectorSlots[7].gameObject.SetActive(true);
-            }
-            else
-            {
-                unitsProtectorSlots[2].gameObject.SetActive(true);
-            }
-        }
+            unitsProtectorSlots[2].gameObject.SetActive(true);
+            ActionInterface.Instance.ShowUnitProtectorPrice(4, 2);
+        } else if (type == UnitsType.Archer) {
+            unitsProtectorSlots[3].gameObject.SetActive(true);
+            ActionInterface.Instance.ShowUnitProtectorPrice(1, 1);
+        }  else if (type == UnitsType.AntiBlindage) {
+            unitsProtectorSlots[4].gameObject.SetActive(true);
+            ActionInterface.Instance.ShowUnitProtectorPrice(0, 0);
+        } 
     }
 
     public void hideBuffIcons()

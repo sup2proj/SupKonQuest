@@ -27,7 +27,6 @@ public class UnitInstance : MonoBehaviour
             rb.freezeRotation = true;
         }
 
-        UnitsRegistry.Register(this);
     }
 
     private void OnDestroy()
@@ -38,6 +37,7 @@ public class UnitInstance : MonoBehaviour
     void Start()
     {
         Initialize(unitData);
+        UnitsRegistry.Register(this, playerId);
 
         if (objectModel != null)
             objectModel.SetActive(false);

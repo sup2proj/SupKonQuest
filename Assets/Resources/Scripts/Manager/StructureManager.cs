@@ -32,7 +32,7 @@ public class StructureManager : MonoBehaviour
         }
     }
 
-    public bool SpawnUnitByTypeAtPosition(int playerId, UnitsType type, float x, float z, bool isPoweredUnit, bool isProtector)
+    public bool SpawnUnitByTypeAtPosition(int playerId, UnitsType type, float x, float z, bool isPoweredUnit, bool isProtector, StructureInstance sourceStructure = null)
     {
         UnitData data = unitData.Find(d => d.type == type);
         if (data == null)
@@ -109,6 +109,10 @@ public class StructureManager : MonoBehaviour
         }
 
         instance.Initialize(runtimeData);
+
+        if (isProtector && sourceStructure != null)
+            sourceStructure.AddProtectorUnit(instance);
+
         if (playerManager != null)
         {
             var session = playerManager.GetSession(playerId);
@@ -120,7 +124,7 @@ public class StructureManager : MonoBehaviour
         }
         return true;
     }
-    
+
     private void ApplyColorTint(GameObject unitGO, Color tint)
     {
         var excludedNames = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)

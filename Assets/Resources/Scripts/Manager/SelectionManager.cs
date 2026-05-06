@@ -140,7 +140,7 @@ public class SelectionManager : MonoBehaviour
 
     private void ForceRefreshSelectableObjects()
     {
-        var found = FindObjectsOfType<SelectableObject>();
+        var found = FindObjectsByType<SelectableObject>(FindObjectsSortMode.None);
 
         AllSelectableObjects.Clear();
         AllSelectableObjects.AddRange(found);
@@ -161,6 +161,8 @@ public class SelectionManager : MonoBehaviour
         if (Camera.main == null)
             return;
 
+        int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
+
         for (int i = AllSelectableObjects.Count - 1; i >= 0; i--)
         {
             SelectableObject so = AllSelectableObjects[i];
@@ -176,8 +178,24 @@ public class SelectionManager : MonoBehaviour
             float boxTop = SelectionBox.anchoredPosition.y + (SelectionBox.sizeDelta.y / 2);
             float boxBottom = SelectionBox.anchoredPosition.y - (SelectionBox.sizeDelta.y / 2);
 
+            UnitInstance unit = so.GetComponent<UnitInstance>();
+            bool isProtectorUnit = unit != null && unit.unitData != null && unit.unitData.isProtector;
+
+            if (isProtectorUnit)
+            {
+                if (CurrentlySelectedObjects.Contains(so))
+                {
+                    CurrentlySelectedObjects.Remove(so);
+                    so.DeselectMe();
+                }
+                continue;
+            }
+
             if (screenPos.x > boxLeft && screenPos.x < boxRight && screenPos.y > boxBottom && screenPos.y < boxTop)
             {
+                if (unit != null && unit.playerId != activePlayerId)
+                    continue;
+
                 if (!CurrentlySelectedObjects.Contains(so))
                 {
                     CurrentlySelectedObjects.Add(so);
@@ -294,7 +312,7 @@ public class SelectionManager : MonoBehaviour
                 continue;
 
             UnitInstance unit = so.GetComponent<UnitInstance>();
-            if (unit == null || unit.unitData == null || unit.playerId != activePlayerId)
+            if (unit == null || unit.unitData == null || unit.playerId != activePlayerId || unit.unitData.isProtector)
                 continue;
 
             UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();

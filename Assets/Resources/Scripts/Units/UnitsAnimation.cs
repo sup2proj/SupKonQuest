@@ -22,7 +22,6 @@ public class UnitsAnimation : MonoBehaviour
     private UnitInstance cachedUnit;
     private Coroutine attackCoroutine;
     private Coroutine spellAttackResetCoroutine;
-    private bool isCounterAttacking = false;
 
     void Awake()
     {
@@ -118,7 +117,6 @@ public class UnitsAnimation : MonoBehaviour
         if (attacker != null)
         {
             attackTarget = attacker;
-            isCounterAttacking = true;
         }
 
         if (attackTarget == null)
@@ -160,7 +158,6 @@ public class UnitsAnimation : MonoBehaviour
             return;
         }
 
-        isCounterAttacking = false;
         animator.SetBool("isAttacking", true);
 
         if (unit != null && unit.objectModel != null)
@@ -190,18 +187,30 @@ public class UnitsAnimation : MonoBehaviour
 
             UnitInstance attackerUnit = cachedUnit;
             UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+            StructureInstance targetStructure = null;
 
             if (targetUnit == null)
+                targetStructure = attackTarget.GetComponent<StructureInstance>();
+
+            if (targetUnit == null && targetStructure == null)
                 break;
 
             float attack = 0f;
             if (attackerUnit != null && attackerUnit.unitData is UnitCombatData combatData)
                 attack = combatData.attack;
-            targetUnit.TakeDamage(attack);
 
-            UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
-            if (targetAnimation != null && attackerUnit != null)
-                targetAnimation.AttackTheAttacker(transform);
+            if (targetUnit != null)
+            {
+                targetUnit.TakeDamage(attack);
+
+                UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
+                if (targetAnimation != null && attackerUnit != null)
+                    targetAnimation.AttackTheAttacker(transform);
+            }
+            else
+            {
+                targetStructure.TakeDamage(attack, attackerUnit);
+            }
 
             yield return new WaitForSeconds(halfDuration);
         }
@@ -234,7 +243,6 @@ public class UnitsAnimation : MonoBehaviour
         if (unit != null && unit.objectModel != null)
             unit.objectModel.SetActive(false);
         attackTarget = null;
-        isCounterAttacking = false;
     }
 
     void HandleAutoAttack()
@@ -255,7 +263,11 @@ public class UnitsAnimation : MonoBehaviour
         }
 
         UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+        StructureInstance targetStructure = null;
         if (targetUnit == null)
+            targetStructure = attackTarget.GetComponent<StructureInstance>();
+
+        if (targetUnit == null && targetStructure == null)
         {
             StopAttackInternal();
             return;
@@ -265,6 +277,9 @@ public class UnitsAnimation : MonoBehaviour
         Vector3 b = attackTarget.position; b.y = 0f;
         float dist = Vector3.Distance(a, b);
         float currentAttackRange = GetCurrentAttackRange();
+
+        if (targetStructure != null)
+            currentAttackRange = Mathf.Max(currentAttackRange, stoppingDistance);
 
         if (dist > currentAttackRange + 0.1f)
             StopAttackInternal();
@@ -318,6 +333,22 @@ public class UnitsAnimation : MonoBehaviour
 
         stoppingDistance = Mathf.Max(0f, stopDistance);
         isMovingToTarget = true;
+    }
+
+    public void EngageTarget(Transform target, float stopDistance)
+    {
+        if (target == null)
+            return;
+
+        float desiredStopDistance = Mathf.Max(0f, stopDistance);
+        bool alreadyMovingToTarget = isMovingToTarget && followTarget == target;
+        bool alreadyAttackingTarget = !isMovingToTarget && attackTarget == target;
+        bool sameStopDistance = Mathf.Abs(stoppingDistance - desiredStopDistance) <= 0.01f;
+
+        if ((alreadyMovingToTarget || alreadyAttackingTarget) && sameStopDistance)
+            return;
+
+        MoveToTarget(target, desiredStopDistance);
     }
 
     public void MoveToPositionAsGroup(Vector3 destination, float stopDistance, int groupMoveId, bool isLeader)
