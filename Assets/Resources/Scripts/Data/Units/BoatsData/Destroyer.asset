@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aeba2c6efcba438e93fc22312629f1b, type: 3}
+  m_Name: Destroyer
+  m_EditorClassIdentifier: Assembly-CSharp::UnitBoat
+  price: 0
+  maxHealth: 0
+  speed: 0
+  creationTime: 0
+  type: 0
+  isPoweredUnit: 0
+  isProtector: 0
+  playerId: 0
+  attack: 0
+  attackSpeed: 0
+  attackRange: 0
+  maxTransportCapacity: 0
