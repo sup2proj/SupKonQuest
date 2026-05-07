@@ -179,4 +179,9 @@ public class UnitInstance : MonoBehaviour
         if (healthBar != null)
             healthBar.SetHealth(currentHealth);
     }
+
+    public void ExitAllUnitsInBoat()
+    {
+        return;
+    }
 }

@@ -26,6 +26,9 @@ public class InterfaceInstance : MonoBehaviour
     [Header("Buff (support/healer)")]
     [SerializeField] private Image[] buffSlots;
     
+    [Header("Boat exit button")]
+    [SerializeField] private Image boatExitButton;
+    
 
     [Header("TEMPORAIRE JOUEUR LIST")] 
     [SerializeField] private List<Image> playersList;
@@ -113,6 +116,7 @@ public class InterfaceInstance : MonoBehaviour
             playerManager = FindFirstObjectByType<PlayerManager>();
         HideProgressBarVisual(resetProgress: false);
         hideBuffIcons();
+        WireBoatExitButtonClick();
         WireBuffSlotClicks();
         WirePlayersListClicks();
         WireProtectorSlotClicks();
@@ -498,6 +502,24 @@ public class InterfaceInstance : MonoBehaviour
             btn.onClick.RemoveAllListeners();
             btn.onClick.AddListener(() => SpawnStructProtectorOnInterface(capturedIndex));
         }
+    }
+
+    private void WireBoatExitButtonClick()
+    {
+        if (boatExitButton == null)
+            return;
+
+        var btn = boatExitButton.GetComponent<Button>();
+        btn.onClick.RemoveAllListeners();
+        btn.onClick.AddListener(() => OnBoatExitClicked());
+    }
+    
+    private void OnBoatExitClicked()
+    {
+        if (buffSlots == null)
+            return;
+        UnitsInstance.Instance.ExitAllUnitsInBoat();
+        Debug.Log("[Interface instance] Les unités doivent sortir");
     }
 
     private void WireBuffSlotClicks()
