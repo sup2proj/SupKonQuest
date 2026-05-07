@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class MovementManager : MonoBehaviour
 {
+    public static MovementManager Instance;
+    
     [Header("Movement")]
     public float moveSpeed = 3.5f;
     public float stoppingDistance = 0.2f;
@@ -25,6 +27,8 @@ public class MovementManager : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
+        
         unitInstance = GetComponent<UnitInstance>();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
@@ -52,7 +56,8 @@ public class MovementManager : MonoBehaviour
 
     private void Update()
     {
-        HandleMouseClick();
+        if (SelectionManager.Instance == null)
+            HandleMouseClick();
         HandleMovement();
     }
 
@@ -79,7 +84,7 @@ public class MovementManager : MonoBehaviour
             agent.speed = GetUnitSpeed();
 
         // Version optimisée utilisant NavMeshAgent
-        if (agent != null)
+        if (CanUseNavMeshAgent())
         {
             HandleNavMeshMovement();
         }
@@ -170,7 +175,7 @@ public class MovementManager : MonoBehaviour
         if (animator != null)
         {
             bool isActuallyMoving = false;
-            if (agent != null)
+            if (CanUseNavMeshAgent())
                 isActuallyMoving = isMovingToTarget && agent.velocity.magnitude > 0.1f;
             else
                 isActuallyMoving = isMovingToTarget && movement.sqrMagnitude > 0.0001f;
@@ -183,8 +188,10 @@ public class MovementManager : MonoBehaviour
     {
         if (unitInstance != null && unitInstance.unitData != null)
         {
-            return unitInstance.unitData.speed;
+            if (unitInstance.unitData.speed > 0f)
+                return unitInstance.unitData.speed;
         }
+
         return moveSpeed;
     }
 
@@ -195,7 +202,7 @@ public class MovementManager : MonoBehaviour
         stoppingDistance = Mathf.Max(0f, stopDistance);
         isMovingToTarget = true;
 
-        if (agent != null)
+        if (CanUseNavMeshAgent())
         {
             agent.speed = GetUnitSpeed();
             agent.stoppingDistance = stoppingDistance;
@@ -214,7 +221,7 @@ public class MovementManager : MonoBehaviour
         stoppingDistance = Mathf.Max(0f, GetUnitAttackRange(stopDistance));
         isMovingToTarget = true;
 
-        if (agent != null && target != null)
+        if (CanUseNavMeshAgent() && target != null)
         {
             agent.speed = GetUnitSpeed();
             agent.stoppingDistance = stoppingDistance;
@@ -232,7 +239,7 @@ public class MovementManager : MonoBehaviour
         if (animator != null)
             animator.SetBool("isMoving", false);
 
-        if (agent != null)
+        if (CanUseNavMeshAgent())
             agent.ResetPath();
     }
 
@@ -249,6 +256,11 @@ public class MovementManager : MonoBehaviour
         return fallback;
     }
 
+    private bool CanUseNavMeshAgent()
+    {
+        return agent != null && agent.enabled && agent.isOnNavMesh;
+    }
+
     public Vector3 GetMovementDirection()
     {
         return movement;
@@ -262,5 +274,39 @@ public class MovementManager : MonoBehaviour
         {
             OnMovementComplete(followTarget);
         }
+    }
+    
+    public void MoveBoatsUnitToPositionAsGroup(UnitInstance unit, Vector3 destination, float stopDistance, int groupMoveId, bool isLeader)
+    {
+        if (unit == null)
+            return;
+
+        UnitsAnimation animatedMover = unit.GetComponent<UnitsAnimation>();
+        if (animatedMover != null)
+        {
+            animatedMover.MoveToPositionAsGroup(destination, stopDistance, groupMoveId, isLeader);
+            return;
+        }
+
+        MovementManager movement = unit.GetComponent<MovementManager>();
+        if (movement != null)
+            movement.MoveToPosition(destination, stopDistance);
+    }
+
+    public void MoveBoatsUnitToTarget(UnitInstance unit, Transform target, float stopDistance)
+    {
+        if (unit == null || target == null)
+            return;
+
+        UnitsAnimation animatedMover = unit.GetComponent<UnitsAnimation>();
+        if (animatedMover != null)
+        {
+            animatedMover.MoveToTarget(target, stopDistance);
+            return;
+        }
+
+        MovementManager movement = unit.GetComponent<MovementManager>();
+        if (movement != null)
+            movement.MoveToTarget(target, stopDistance);
     }
 }

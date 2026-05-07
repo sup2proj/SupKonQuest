@@ -106,12 +106,8 @@ public class SelectionManager : MonoBehaviour
         for (int i = 0; i < groupUnits.Count; i++)
         {
             UnitInstance unit = groupUnits[i];
-            UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
-            if (mover == null)
-                continue;
-
             bool isLeader = (unit == leader);
-            mover.MoveToPositionAsGroup(hit.point, groupMoveStoppingDistance, groupMoveId, isLeader);
+            MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, hit.point, groupMoveStoppingDistance, groupMoveId, isLeader);
         }
     }
 
@@ -255,12 +251,8 @@ public class SelectionManager : MonoBehaviour
             if (unit == null || unit.unitData == null)
                 continue;
 
-            UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
-            if (mover == null)
-                continue;
-
             float stopDistance = GetAttackStopDistance(unit);
-            mover.MoveToTarget(targetUnit.transform, stopDistance);
+            MovementManager.Instance.MoveBoatsUnitToTarget(unit, targetUnit.transform, stopDistance);
             Debug.Log($"[SelectionManager] Ordre d'attaque unite: {unit.name} -> {targetUnit.name}");
         }
 
@@ -284,12 +276,8 @@ public class SelectionManager : MonoBehaviour
             if (unit == null || unit.unitData == null)
                 continue;
 
-            UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
-            if (mover == null)
-                continue;
-
             float stopDistance = GetAttackStopDistance(unit);
-            mover.MoveToTarget(targetStructure.transform, stopDistance);
+            MovementManager.Instance.MoveBoatsUnitToTarget(unit, targetStructure.transform, stopDistance);
             Debug.Log($"[SelectionManager] Ordre d'attaque structure: {unit.name} -> {targetStructure.name}");
         }
 
@@ -447,8 +435,8 @@ public class SelectionManager : MonoBehaviour
             if (unit == null || unit.unitData == null || unit.playerId != activePlayerId || unit.unitData.isProtector)
                 continue;
 
-            UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
-            if (mover == null)
+            MovementManager movement = unit.GetComponent<MovementManager>();
+            if (movement == null)
                 continue;
 
             units.Add(unit);
