@@ -1629,10 +1629,12 @@ GameObject:
   - component: {fileID: 6227379065120323495}
   - component: {fileID: 39464292089507293}
   - component: {fileID: 584295807139649269}
-  - component: {fileID: 7911920561147608704}
   - component: {fileID: -1801458887589098818}
   - component: {fileID: 8132909324860242768}
   - component: {fileID: -7223385642623911744}
+  - component: {fileID: -520817025780228395}
+  - component: {fileID: 5084714448291577116}
+  - component: {fileID: 3449588668785832655}
   m_Layer: 0
   m_Name: Infantry
   m_TagString: Units
@@ -1700,27 +1702,6 @@ MonoBehaviour:
   healthBar: {fileID: 2731449005562521216}
   currentHealth: 0
   playerId: 0
---- !u!65 &7911920561147608704
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6712554670935715101}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &-1801458887589098818
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1778,6 +1759,57 @@ MonoBehaviour:
   MyMeshRenderer: {fileID: 0}
   RedMat: {fileID: 0}
   GreenMat: {fileID: 0}
+--- !u!195 &-520817025780228395
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6712554670935715101}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.3
+  m_Speed: 3
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0.3
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 1
+  m_BaseOffset: 0.02
+  m_WalkableMask: 1
+  m_ObstacleAvoidanceType: 4
+--- !u!114 &5084714448291577116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6712554670935715101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64cb831562a6bdf41a4a4ca58a11e281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
+  animator: {fileID: 0}
+  moveSpeed: 1
+--- !u!114 &3449588668785832655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6712554670935715101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d40990706b6cdd144bc3fd249b44a5dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MovementManager
+  moveSpeed: 3.5
+  stoppingDistance: 0.2
+  rotationSpeed: 12
 --- !u!1 &6837486392623418950
 GameObject:
   m_ObjectHideFlags: 0
