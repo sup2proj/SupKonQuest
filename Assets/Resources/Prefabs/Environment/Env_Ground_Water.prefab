@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4325985210129433836}
   - component: {fileID: 2703007352608921362}
   - component: {fileID: 7834612596117352382}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Env_Ground_Water
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,5 +133,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 10, y: -14, z: 10}
-  m_Center: {x: 0, y: -0.5, z: 0}
+  m_Size: {x: 10, y: 2.220446e-16, z: 10}
+  m_Center: {x: 0, y: 0, z: 0}

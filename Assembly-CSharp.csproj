@@ -43,12 +43,13 @@
     <UnityVersion>6000.3.0f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="C:\Users\kaliq\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.2.1\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="C:\Users\kaliq\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.2.2\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Resources\Scripts\Manager\PlayerManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\Resources\Scripts\Map\MapGenerator.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\StructureButtons\ActionButton.cs" />
@@ -59,10 +60,9 @@
     <Compile Include="Assets\Resources\Scripts\Map\MapJsonData.cs" />
     <Compile Include="Assets\QuickOutline\Scripts\Outline.cs" />
     <Compile Include="Assets\Resources\Scripts\Enums\GroundType.cs" />
-    <Compile Include="Assets\Resources\Scripts\Manager\OverlayManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\StructureManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\Data\Player\PlayerSO\PlayerData.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\RessourceManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Enums\StructureType.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
@@ -79,12 +79,16 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
     <Compile Include="Assets\Resources\Scripts\Instances\InterfaceInstance.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
+    <Compile Include="Assets\Resources\Scripts\Controller\SelectableObjectController.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
     <Compile Include="Assets\Resources\Scripts\Enums\UnitsType.cs" />
     <Compile Include="Assets\Resources\Scripts\Enums\PlayerNumber.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\PlayerSession.cs" />
+    <Compile Include="Assets\Resources\Scripts\PlayerMovement\UnitsAnimation.cs" />
     <Compile Include="Assets\Resources\Scripts\Map\TileData.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\SelectionManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
@@ -95,26 +99,25 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\Enums\BuildingType.cs" />
+    <Compile Include="Assets\Resources\Scripts\UI\StatisticsInterface.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitHealerData.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\DeplacementManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\HealthBar\HealthBar.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitData.cs" />
-    <Compile Include="Assets\Resources\Scripts\PlayerMovement\SelectableObject.cs" />
-    <Compile Include="Assets\Resources\Scripts\Data\Structure\StructureSO\StructureData.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
-    <Compile Include="Assets\Resources\Scripts\PlayerMovement\chevalierAnimation.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
     <Compile Include="Assets\Resources\Scripts\Camera\cameraMouvement.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\ManagerController.cs" />
     <Compile Include="Assets\Resources\Scripts\Instances\StructureInstance.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
-    <Compile Include="Assets\Resources\Scripts\PlayerMovement\SelectionManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
+    <Compile Include="Assets\Resources\Scripts\Instances\PlayerInstance.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\ProgressBar\ProgressBar.cs" />
   </ItemGroup>
   <ItemGroup>
