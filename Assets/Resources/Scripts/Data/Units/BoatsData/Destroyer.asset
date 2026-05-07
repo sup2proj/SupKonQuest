@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6aeba2c6efcba438e93fc22312629f1b, type: 3}
   m_Name: Destroyer
   m_EditorClassIdentifier: Assembly-CSharp::UnitBoat
-  price: 0
-  maxHealth: 0
-  speed: 0
-  creationTime: 0
-  type: 0
+  price: 150
+  maxHealth: 300
+  speed: 1.2
+  creationTime: 18
+  type: 8
   isPoweredUnit: 0
   isProtector: 0
   playerId: 0
-  attack: 0
-  attackSpeed: 0
-  attackRange: 0
-  maxTransportCapacity: 0
+  attack: 30
+  attackSpeed: 0.6
+  attackRange: 2
+  maxTransportCapacity: 7
