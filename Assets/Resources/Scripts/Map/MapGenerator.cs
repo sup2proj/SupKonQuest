@@ -4,9 +4,12 @@ using Enums.Structure;
 using UnityEngine;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
+using UnityEngine.AI;
 
 public class MapGenerator : MonoBehaviour
 {
+    public static MapGenerator Instance { get; private set; }
+
     private readonly Color32 _colorGrass = new Color32(10, 170, 0, 255);
     private readonly Color32 _colorDirt = new Color32(170, 160, 0, 255);
     private readonly Color32 _colorSnow = new Color32(255, 255, 255, 255);
@@ -45,6 +48,17 @@ public class MapGenerator : MonoBehaviour
     private Transform groundFolder;
     private Transform structuresFolder;
     private Transform natureFolder;
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
 
     void Start()
     {
@@ -131,6 +145,7 @@ public class MapGenerator : MonoBehaviour
                 floor.transform.localScale = new Vector3(0.1f, 1f, 0.1f);
                 floor.name = $"Tile_{x}_{y}";
                 floor.tag = "Ground";
+                ConfigureTileNavigation(floor, gData.type);
 
                 // FIX : ne pas détruire le MeshCollider — il est nécessaire pour les raycasts
                 // (clic de déplacement des unités) et pour NavMeshSurface en mode PhysicsColliders.
@@ -138,6 +153,50 @@ public class MapGenerator : MonoBehaviour
                 // Destroy(floor.GetComponent<MeshCollider>()); // ← ligne supprimée
             }
         }
+    }
+
+    public bool TryGetTileAtWorldPosition(Vector3 worldPosition, out TileData tile)
+    {
+        tile = null;
+
+        if (allTiles == null || tileSize <= 0f)
+            return false;
+
+        int x = Mathf.RoundToInt(worldPosition.x / tileSize);
+        int y = Mathf.RoundToInt(worldPosition.z / tileSize);
+
+        if (x < 0 || y < 0 || x >= allTiles.GetLength(0) || y >= allTiles.GetLength(1))
+            return false;
+
+        tile = allTiles[x, y];
+        return tile != null;
+    }
+
+    private void ConfigureTileNavigation(GameObject tileObject, GroundType type)
+    {
+        if (tileObject == null)
+            return;
+
+        int layer = LayerMask.NameToLayer(type == GroundType.Water ? "Water" : "ground");
+        if (layer >= 0)
+            SetLayerRecursively(tileObject, layer);
+
+        NavMeshModifier modifier = tileObject.GetComponent<NavMeshModifier>();
+        if (modifier == null)
+            modifier = tileObject.AddComponent<NavMeshModifier>();
+
+        modifier.overrideArea = true;
+        int area = type == GroundType.Water ? NavMesh.GetAreaFromName("Water") : NavMesh.GetAreaFromName("Walkable");
+        if (area >= 0)
+            modifier.area = area;
+    }
+
+    private void SetLayerRecursively(GameObject target, int layer)
+    {
+        target.layer = layer;
+
+        foreach (Transform child in target.transform)
+            SetLayerRecursively(child.gameObject, layer);
     }
 
     void PlaceStructures(MapJsonData data)
