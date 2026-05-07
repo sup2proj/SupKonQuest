@@ -2786,6 +2786,7 @@ GameObject:
   - component: {fileID: 4952922655432693671}
   - component: {fileID: -2157145080077796530}
   - component: {fileID: -4284300664662573684}
+  - component: {fileID: 9194618896179432977}
   m_Layer: 0
   m_Name: Archer
   m_TagString: Units
@@ -2893,8 +2894,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
   animator: {fileID: 0}
-  moveSpeed: 1
-  agent: {fileID: 0}
 --- !u!114 &-2157145080077796530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2933,6 +2932,21 @@ NavMeshAgent:
   m_BaseOffset: 0.02
   m_WalkableMask: 1
   m_ObstacleAvoidanceType: 4
+--- !u!114 &9194618896179432977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5309705829977175993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d40990706b6cdd144bc3fd249b44a5dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MovementManager
+  moveSpeed: 3.5
+  stoppingDistance: 0.2
+  rotationSpeed: 12
 --- !u!1 &5318343401952282283
 GameObject:
   m_ObjectHideFlags: 0

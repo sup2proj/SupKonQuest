@@ -1839,6 +1839,7 @@ GameObject:
   - component: {fileID: 7881555108746137697}
   - component: {fileID: 8938103991001808169}
   - component: {fileID: 4731122525451841440}
+  - component: {fileID: 3162469250407722913}
   m_Layer: 0
   m_Name: Antiblindage
   m_TagString: Units
@@ -1946,8 +1947,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
   animator: {fileID: 0}
-  moveSpeed: 1
-  agent: {fileID: 0}
 --- !u!114 &8938103991001808169
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1986,6 +1985,21 @@ NavMeshAgent:
   m_BaseOffset: 0.02
   m_WalkableMask: 1
   m_ObstacleAvoidanceType: 4
+--- !u!114 &3162469250407722913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8523093793290564380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d40990706b6cdd144bc3fd249b44a5dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MovementManager
+  moveSpeed: 3.5
+  stoppingDistance: 0.2
+  rotationSpeed: 12
 --- !u!1 &8689228255493868555
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,6 +11,7 @@ public class SelectionManager : MonoBehaviour
     public List<SelectableObject> CurrentlySelectedObjects;
     [SerializeField, Min(0.05f)] private float selectableRefreshInterval = 0.25f;
     [SerializeField, Min(0.01f)] private float groupMoveStoppingDistance = 0.1f;
+    [SerializeField, Min(1f)] private float enemyUnitClickScreenRadius = 45f;
 
     bool isMouseDown, isDragging = false;
     float selectableRefreshTimer;
@@ -31,21 +32,29 @@ public class SelectionManager : MonoBehaviour
         AnalyzeSelectableObjectsContinuously();
 
         if (Mouse.current.rightButton.wasPressedThisFrame)
-            TryIssueGroupMoveOrder();
-
-        if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             bool attackOrderIssued = TryIssueAttackMoveOrder();
             if (!attackOrderIssued)
+                TryIssueGroupMoveOrder();
+        }
+
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            if (TryIssueAttackMoveOrder())
             {
-                isMouseDown = true;
-                mouseStartPos = Mouse.current.position.ReadValue();
-                foreach (SelectableObject so in CurrentlySelectedObjects)
-                {
-                    so.DeselectMe();
-                }
-                CurrentlySelectedObjects.Clear();
+                isMouseDown = false;
+                isDragging = false;
+                SelectionBox.gameObject.SetActive(false);
+                return;
             }
+
+            isMouseDown = true;
+            mouseStartPos = Mouse.current.position.ReadValue();
+            foreach (SelectableObject so in CurrentlySelectedObjects)
+            {
+                so.DeselectMe();
+            }
+            CurrentlySelectedObjects.Clear();
         }
     
         if (isMouseDown)
@@ -222,56 +231,27 @@ public class SelectionManager : MonoBehaviour
     {
         if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0 || Camera.main == null)
             return false;
-    
-        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-        if (!Physics.Raycast(ray, out RaycastHit hit))
-            return false;
 
-        UnitInstance targetUnit = hit.collider != null ? hit.collider.GetComponentInParent<UnitInstance>() : null;
-        StructureInstance targetStructure = hit.collider != null ? hit.collider.GetComponentInParent<StructureInstance>() : null;
-        if (targetUnit == null && targetStructure == null)
-            return false;
-    
+        if (TryIssueUnitAttackOrder())
+            return true;
+
+        return TryIssueStructureAttackOrder();
+    }
+
+    private bool TryIssueUnitAttackOrder()
+    {
         int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
+        UnitInstance targetUnit = GetEnemyUnitUnderMouse(activePlayerId);
+        if (targetUnit == null)
+            return false;
 
-        Transform targetTransform = null;
-        bool isStructureTarget = false;
-
-        if (targetUnit != null)
-        {
-            if (targetUnit.playerId == activePlayerId)
-                return false;
-            targetTransform = targetUnit.transform;
-        }
-        else
-        {
-            if (targetStructure.playerId == activePlayerId)
-                return false;
-            targetTransform = targetStructure.transform;
-            isStructureTarget = true;
-        }
-    
         List<UnitInstance> groupUnits = CollectSelectedPlayerUnits(activePlayerId);
-        bool hasCombatUnit = false;
+        if (!SelectionHasCombatUnit(groupUnits))
+            return groupUnits.Count > 0;
 
         for (int i = 0; i < groupUnits.Count; i++)
         {
             UnitInstance unit = groupUnits[i];
-            if (unit != null && unit.unitData is UnitCombatData)
-                hasCombatUnit = true;
-        }
-    
-        if (groupUnits.Count == 0)
-            return false;
-    
-        if (!hasCombatUnit)
-        {
-            Debug.Log("Ordre refusé: uniquement des unités support/healer sélectionnées.");
-            return true;
-        }
-    
-        foreach (UnitInstance unit in groupUnits)
-        {
             if (unit == null || unit.unitData == null)
                 continue;
 
@@ -279,23 +259,175 @@ public class SelectionManager : MonoBehaviour
             if (mover == null)
                 continue;
 
-            float stopDistance = 0.1f;
+            float stopDistance = GetAttackStopDistance(unit);
+            mover.MoveToTarget(targetUnit.transform, stopDistance);
+            Debug.Log($"[SelectionManager] Ordre d'attaque unite: {unit.name} -> {targetUnit.name}");
+        }
 
-            if (unit.unitData is UnitCombatData combatData)
+        return true;
+    }
+
+    private bool TryIssueStructureAttackOrder()
+    {
+        int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
+        StructureInstance targetStructure = GetEnemyStructureUnderMouse(activePlayerId);
+        if (targetStructure == null)
+            return false;
+
+        List<UnitInstance> groupUnits = CollectSelectedPlayerUnits(activePlayerId);
+        if (!SelectionHasCombatUnit(groupUnits))
+            return groupUnits.Count > 0;
+
+        for (int i = 0; i < groupUnits.Count; i++)
+        {
+            UnitInstance unit = groupUnits[i];
+            if (unit == null || unit.unitData == null)
+                continue;
+
+            UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
+            if (mover == null)
+                continue;
+
+            float stopDistance = GetAttackStopDistance(unit);
+            mover.MoveToTarget(targetStructure.transform, stopDistance);
+            Debug.Log($"[SelectionManager] Ordre d'attaque structure: {unit.name} -> {targetStructure.name}");
+        }
+
+        return true;
+    }
+
+    private UnitInstance GetEnemyUnitUnderMouse(int activePlayerId)
+    {
+        RaycastHit[] hits = GetMouseRaycastHits();
+        UnitInstance bestUnit = null;
+        float bestDistance = float.MaxValue;
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Collider hitCollider = hits[i].collider;
+            if (hitCollider == null)
+                continue;
+
+            UnitInstance unit = hitCollider.GetComponentInParent<UnitInstance>();
+            if (unit == null)
+                unit = hitCollider.GetComponent<UnitInstance>();
+            if (unit == null)
+                unit = hitCollider.GetComponentInChildren<UnitInstance>();
+
+            if (unit == null || unit.playerId == activePlayerId)
+                continue;
+
+            if (hits[i].distance < bestDistance)
             {
-                stopDistance = Mathf.Max(0f, combatData.attackRange);
-                if (isStructureTarget)
-                {
-                    UnitsType type = unit.unitData.type;
-                    if (type == UnitsType.AntiBlindage || type == UnitsType.Heavy || type == UnitsType.Infantry)
-                        stopDistance += 1f;
-                }
+                bestDistance = hits[i].distance;
+                bestUnit = unit;
+            }
+        }
+
+        if (bestUnit != null)
+            return bestUnit;
+
+        return GetEnemyUnitNearMouseOnScreen(activePlayerId);
+    }
+
+    private UnitInstance GetEnemyUnitNearMouseOnScreen(int activePlayerId)
+    {
+        if (AllSelectableObjects == null || Camera.main == null || Mouse.current == null)
+            return null;
+
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        float bestDistanceSq = enemyUnitClickScreenRadius * enemyUnitClickScreenRadius;
+        UnitInstance bestUnit = null;
+
+        for (int i = AllSelectableObjects.Count - 1; i >= 0; i--)
+        {
+            SelectableObject selectable = AllSelectableObjects[i];
+            if (selectable == null)
+            {
+                AllSelectableObjects.RemoveAt(i);
+                continue;
             }
 
-            mover.MoveToTarget(targetTransform, stopDistance);
+            UnitInstance unit = selectable.GetComponent<UnitInstance>();
+            if (unit == null || unit.playerId == activePlayerId)
+                continue;
+
+            Vector3 screenPosition = Camera.main.WorldToScreenPoint(unit.transform.position);
+            if (screenPosition.z < 0f)
+                continue;
+
+            float distanceSq = ((Vector2)screenPosition - mousePosition).sqrMagnitude;
+            if (distanceSq <= bestDistanceSq)
+            {
+                bestDistanceSq = distanceSq;
+                bestUnit = unit;
+            }
         }
-    
-        return true;
+
+        return bestUnit;
+    }
+
+    private StructureInstance GetEnemyStructureUnderMouse(int activePlayerId)
+    {
+        RaycastHit[] hits = GetMouseRaycastHits();
+        StructureInstance bestStructure = null;
+        float bestDistance = float.MaxValue;
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            Collider hitCollider = hits[i].collider;
+            if (hitCollider == null)
+                continue;
+
+            StructureInstance structure = hitCollider.GetComponentInParent<StructureInstance>();
+            if (structure == null)
+                structure = hitCollider.GetComponent<StructureInstance>();
+            if (structure == null)
+                structure = hitCollider.GetComponentInChildren<StructureInstance>();
+
+            if (structure == null || structure.playerId == activePlayerId)
+                continue;
+
+            if (hits[i].distance < bestDistance)
+            {
+                bestDistance = hits[i].distance;
+                bestStructure = structure;
+            }
+        }
+
+        return bestStructure;
+    }
+
+    private RaycastHit[] GetMouseRaycastHits()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        return Physics.RaycastAll(ray);
+    }
+
+    private bool SelectionHasCombatUnit(List<UnitInstance> units)
+    {
+        if (units == null || units.Count == 0)
+            return false;
+
+        for (int i = 0; i < units.Count; i++)
+        {
+            UnitInstance unit = units[i];
+            if (unit != null && unit.unitData is UnitCombatData)
+                return true;
+        }
+
+        Debug.Log("Ordre refuse: uniquement des unites support/healer selectionnees.");
+        return false;
+    }
+
+    private float GetAttackStopDistance(UnitInstance unit)
+    {
+        if (unit != null && unit.unitData is UnitCombatData combatData)
+        {
+            return Mathf.Max(0f, combatData.attackRange);
+        }
+
+        return 0.1f;
     }
 
     private List<UnitInstance> CollectSelectedPlayerUnits(int activePlayerId)

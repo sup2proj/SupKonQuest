@@ -972,6 +972,8 @@ GameObject:
   - component: {fileID: 5433607748396430942}
   - component: {fileID: -687919191579478647}
   - component: {fileID: -6092569345684780878}
+  - component: {fileID: 9091774199971976476}
+  - component: {fileID: 8092764966278607261}
   m_Layer: 0
   m_Name: Mortar
   m_TagString: Units
@@ -1080,7 +1082,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
   animator: {fileID: 0}
-  moveSpeed: 1
 --- !u!114 &-687919191579478647
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1097,22 +1098,6 @@ MonoBehaviour:
   MyMeshRenderer: {fileID: 0}
   RedMat: {fileID: 0}
   GreenMat: {fileID: 0}
---- !u!114 &9091774199971976476
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3649038373308825015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64cb831562a6bdf41a4a4ca58a11e281, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
-  animator: {fileID: 0}
-  moveSpeed: 1
-  SelectionMarker: {fileID: 293232517203662005}
-  agent: {fileID: 0}
 --- !u!195 &-6092569345684780878
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1135,6 +1120,34 @@ NavMeshAgent:
   m_BaseOffset: 0.02
   m_WalkableMask: 1
   m_ObstacleAvoidanceType: 4
+--- !u!114 &9091774199971976476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3649038373308825015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64cb831562a6bdf41a4a4ca58a11e281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
+  animator: {fileID: 0}
+--- !u!114 &8092764966278607261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3649038373308825015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d40990706b6cdd144bc3fd249b44a5dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MovementManager
+  moveSpeed: 3.5
+  stoppingDistance: 0.2
+  rotationSpeed: 12
 --- !u!1 &3734395858838237890
 GameObject:
   m_ObjectHideFlags: 0

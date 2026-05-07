@@ -1,17 +1,11 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.AI;
 
 public class UnitsAnimation : MonoBehaviour
 {
     public Animator animator;
-    public float moveSpeed = 1f;
-
-    private Vector3 movement;
-    private Vector3 targetPosition;
-    private bool isMovingToTarget = false;
-    private float stoppingDistance = 0.1f;
-    private Transform followTarget;
 
     private Transform attackTarget;
     private int activeGroupMoveId = -1;
@@ -22,92 +16,46 @@ public class UnitsAnimation : MonoBehaviour
     private UnitInstance cachedUnit;
     private Coroutine attackCoroutine;
     private Coroutine spellAttackResetCoroutine;
+    private Coroutine ensureAttackAnimationCoroutine;
+    private bool isRetaliating;
+
+    private MovementManager movementManager;
 
     void Awake()
     {
         if (animator == null)
             animator = GetComponent<Animator>();
         cachedUnit = GetComponent<UnitInstance>();
+        movementManager = GetComponent<MovementManager>();
+
+        // Connecter le callback de fin de mouvement
+        if (movementManager != null)
+        {
+            movementManager.OnMovementComplete += OnMovementCompleted;
+        }
+    }
+
+    void Start()
+    {
+        // Le MovementManager gère maintenant l'initialisation du NavMeshAgent
     }
 
     void Update()
     {
-        HandleMovement();
         HandleAutoAttack();
 
-        if (animator != null)
+        // L'animation de mouvement est maintenant gérée par MovementManager
+        // On ne gère plus que l'animation spécifique aux archers
+        if (animator != null && movementManager != null)
         {
-            animator.SetBool("isMoving", isMovingToTarget);
             UnitInstance unit = cachedUnit;
             if (unit != null && unit.objectModel != null && unit.unitData != null)
             {
-                if (unit.unitData.type == UnitsType.Archer && isMovingToTarget)
+                if (unit.unitData.type == UnitsType.Archer && movementManager.IsMoving())
                 {
                     unit.objectModel.SetActive(true);
                 }
             }
-        }
-    }
-
-    void HandleMovement()
-    {
-        if (!isMovingToTarget)
-        {
-            movement = Vector3.zero;
-            return;
-        }
-        if (!isGroupLeader && activeGroupMoveId >= 0 && completedGroupMoves.Contains(activeGroupMoveId))
-        {
-            StopMovementInternal();
-            return;
-        }
-
-        if (followTarget != null)
-            targetPosition = followTarget.position;
-
-        Vector3 flatCurrent = transform.position;
-        Vector3 flatTarget = targetPosition;
-        flatCurrent.y = 0f;
-        flatTarget.y = 0f;
-
-        float distance = Vector3.Distance(flatCurrent, flatTarget);
-
-        if (distance <= stoppingDistance)
-        {
-            StopMovementInternal();
-
-            if (isGroupLeader && activeGroupMoveId >= 0)
-                completedGroupMoves.Add(activeGroupMoveId);
-
-            if (followTarget != null)
-            {
-                attackTarget = followTarget;
-
-                UnitInstance unit = cachedUnit;
-                if (unit != null && unit.unitData != null)
-                {
-                    if (unit.unitData.type != UnitsType.Healer &&
-                        unit.unitData.type != UnitsType.Support)
-                    {
-                        AttackTheAttacker();
-                        StartAttackWithDamage();
-                    }
-                }
-            }
-
-            followTarget = null;
-            return;
-        }
-
-        Vector3 direction = (flatTarget - flatCurrent).normalized;
-        movement = new Vector3(direction.x, 0f, direction.z);
-
-        transform.position += movement * moveSpeed * Time.deltaTime;
-
-        if (movement.sqrMagnitude > 0.0001f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(movement);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }
     }
 
@@ -118,7 +66,6 @@ public class UnitsAnimation : MonoBehaviour
         {
             attackTarget = attacker;
         }
-
         if (attackTarget == null)
             return;
 
@@ -134,13 +81,11 @@ public class UnitsAnimation : MonoBehaviour
                 return;
             }
         }
-
         if (animator != null && selfUnit != null && selfUnit.objectModel != null)
         {
             animator.SetBool("isAttacking", true);
             selfUnit.objectModel.SetActive(true);
         }
-            
         if (attackCoroutine != null)
         {
             StopCoroutine(attackCoroutine);
@@ -148,7 +93,7 @@ public class UnitsAnimation : MonoBehaviour
         }
         attackCoroutine = StartCoroutine(AttackLoopCoroutine());
     }
-    
+
     public void StartAttackWithDamage()
     {
         UnitInstance unit = cachedUnit;
@@ -158,7 +103,9 @@ public class UnitsAnimation : MonoBehaviour
             return;
         }
 
-        animator.SetBool("isAttacking", true);
+        Debug.Log($"[UnitsAnimation] {gameObject.name} commence l'attaque contre {attackTarget.name}");
+        isRetaliating = false;
+        SetAttackAnimationState(true);
 
         if (unit != null && unit.objectModel != null)
             unit.objectModel.SetActive(true);
@@ -178,26 +125,39 @@ public class UnitsAnimation : MonoBehaviour
             if (attackTarget == null)
                 break;
 
-            AnimationClip attackClip = GetAttackClip();
-            if (attackClip == null)
+            UnitInstance attackerUnit = cachedUnit;
+            if (attackerUnit == null || attackerUnit.currentHealth <= 0)
                 break;
 
-            float halfDuration = attackClip.length * 0.5f;
+            if (!isRetaliating && !IsTargetWithinAttackRange())
+                break;
+
+            AnimationClip attackClip = GetAttackClip();
+            float attackDuration = attackClip != null ? attackClip.length : 1f;
+            float halfDuration = Mathf.Max(0.05f, attackDuration * 0.5f);
+            SetAttackAnimationState(true);
             yield return new WaitForSeconds(halfDuration);
 
-            UnitInstance attackerUnit = cachedUnit;
+            if (!isRetaliating && !IsTargetWithinAttackRange())
+                break;
+
             UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
             StructureInstance targetStructure = null;
 
             if (targetUnit == null)
                 targetStructure = attackTarget.GetComponent<StructureInstance>();
 
+            // Vérifier si la cible existe et est encore en vie
             if (targetUnit == null && targetStructure == null)
                 break;
 
-            float attack = 0f;
-            if (attackerUnit != null && attackerUnit.unitData is UnitCombatData combatData)
-                attack = combatData.attack;
+            // Vérifier si la cible est encore en vie
+            if (targetUnit != null && targetUnit.currentHealth <= 0)
+                break;
+            if (targetStructure != null && targetStructure.currentHealth <= 0)
+                break;
+
+            float attack = GetAttackDamage();
 
             if (targetUnit != null)
             {
@@ -232,6 +192,36 @@ public class UnitsAnimation : MonoBehaviour
         return null;
     }
 
+    private void EnsureAttackAnimationStateAfterCoroutineStart()
+    {
+        if (ensureAttackAnimationCoroutine != null)
+            StopCoroutine(ensureAttackAnimationCoroutine);
+
+        ensureAttackAnimationCoroutine = StartCoroutine(EnsureAttackAnimationStateNextFrame());
+    }
+
+    private IEnumerator EnsureAttackAnimationStateNextFrame()
+    {
+        yield return null;
+
+        if (attackCoroutine != null && attackTarget != null)
+        {
+            SetAttackAnimationState(true);
+
+            UnitInstance unit = cachedUnit;
+            if (unit != null && unit.objectModel != null)
+                unit.objectModel.SetActive(true);
+        }
+
+        ensureAttackAnimationCoroutine = null;
+    }
+
+    private void SetAttackAnimationState(bool isAttacking)
+    {
+        if (animator != null)
+            animator.SetBool("isAttacking", isAttacking);
+    }
+
     private void StopAttackInternal()
     {
         if (attackCoroutine != null)
@@ -239,6 +229,15 @@ public class UnitsAnimation : MonoBehaviour
             StopCoroutine(attackCoroutine);
             attackCoroutine = null;
         }
+        SetAttackAnimationState(false);
+        isRetaliating = false;
+
+        if (ensureAttackAnimationCoroutine != null)
+        {
+            StopCoroutine(ensureAttackAnimationCoroutine);
+            ensureAttackAnimationCoroutine = null;
+        }
+
         UnitInstance unit = cachedUnit;
         if (unit != null && unit.objectModel != null)
             unit.objectModel.SetActive(false);
@@ -255,8 +254,7 @@ public class UnitsAnimation : MonoBehaviour
 
         if (attackTarget == null)
         {
-            if (animator != null)
-                animator.SetBool("isAttacking", false);
+            SetAttackAnimationState(false);
             if (unit != null && unit.objectModel != null)
                 unit.objectModel.SetActive(false);
             return;
@@ -267,22 +265,38 @@ public class UnitsAnimation : MonoBehaviour
         if (targetUnit == null)
             targetStructure = attackTarget.GetComponent<StructureInstance>();
 
+        // Vérifier si la cible existe et est encore en vie
         if (targetUnit == null && targetStructure == null)
         {
             StopAttackInternal();
             return;
         }
 
-        Vector3 a = transform.position; a.y = 0f;
-        Vector3 b = attackTarget.position; b.y = 0f;
-        float dist = Vector3.Distance(a, b);
-        float currentAttackRange = GetCurrentAttackRange();
-
-        if (targetStructure != null)
-            currentAttackRange = Mathf.Max(currentAttackRange, stoppingDistance);
-
-        if (dist > currentAttackRange + 0.1f)
+        // Vérifier si la cible est encore en vie
+        if (targetUnit != null && targetUnit.currentHealth <= 0)
+        {
             StopAttackInternal();
+            return;
+        }
+        if (targetStructure != null && targetStructure.currentHealth <= 0)
+        {
+            StopAttackInternal();
+            return;
+        }
+
+        if (!isRetaliating && !IsTargetWithinAttackRange())
+        {
+            StopAttackInternal();
+            return;
+        }
+
+        if (attackCoroutine != null)
+        {
+            SetAttackAnimationState(true);
+
+            if (unit != null && unit.objectModel != null)
+                unit.objectModel.SetActive(true);
+        }
     }
 
     private float GetCurrentAttackRange()
@@ -290,17 +304,78 @@ public class UnitsAnimation : MonoBehaviour
         UnitInstance unit = cachedUnit;
         if (unit != null && unit.unitData is UnitCombatData combatData)
             return Mathf.Max(0f, combatData.attackRange);
-
-        return Mathf.Max(0f, stoppingDistance);
+        return 0.1f;
     }
 
-    private void StopMovementInternal()
+    private bool IsTargetWithinAttackRange()
     {
-        isMovingToTarget = false;
-        movement = Vector3.zero;
+        if (attackTarget == null)
+            return false;
 
-        if (animator != null)
-            animator.SetBool("isMoving", false);
+        float attackRange = GetCurrentAttackRange();
+        float allowedRange = attackRange + 0.05f;
+        return GetFlatDistanceSqToAttackTarget() <= allowedRange * allowedRange;
+    }
+
+    private float GetFlatDistanceSqToAttackTarget()
+    {
+        Vector3 selfPosition = transform.position;
+        float bestDistanceSq = float.MaxValue;
+
+        Collider[] targetColliders = attackTarget.GetComponentsInChildren<Collider>();
+        for (int i = 0; i < targetColliders.Length; i++)
+        {
+            Collider targetCollider = targetColliders[i];
+            if (targetCollider == null || targetCollider.isTrigger)
+                continue;
+
+            Vector3 closestPoint = targetCollider.ClosestPoint(selfPosition);
+            Vector3 toPoint = closestPoint - selfPosition;
+            toPoint.y = 0f;
+
+            float distanceSq = toPoint.sqrMagnitude;
+            if (distanceSq < bestDistanceSq)
+                bestDistanceSq = distanceSq;
+        }
+
+        if (bestDistanceSq < float.MaxValue)
+            return bestDistanceSq;
+
+        Vector3 toTarget = attackTarget.position - selfPosition;
+        toTarget.y = 0f;
+        return toTarget.sqrMagnitude;
+    }
+
+    private float GetAttackDamage()
+    {
+        UnitInstance unit = cachedUnit;
+        if (unit != null && unit.unitData is UnitCombatData combatData)
+		{
+			Debug.Log(Mathf.Max(0f, combatData.attack));
+            return Mathf.Max(0f, combatData.attack);
+		}		
+        return 0f;
+    }
+
+    private void OnMovementCompleted(Transform target)
+    {
+        if (isGroupLeader && activeGroupMoveId >= 0)
+            completedGroupMoves.Add(activeGroupMoveId);
+
+        if (target != null)
+        {
+            attackTarget = target;
+
+            UnitInstance unit = cachedUnit;
+            if (unit != null && unit.unitData != null)
+            {
+                if (unit.unitData.type != UnitsType.Healer &&
+                    unit.unitData.type != UnitsType.Support)
+                {
+                    StartAttackWithDamage();
+                }
+            }
+        }
     }
 
     private void ClearGroupMoveState()
@@ -311,41 +386,38 @@ public class UnitsAnimation : MonoBehaviour
 
     public void MoveToPosition(Vector3 destination, float stopDistance)
     {
-        followTarget = null;
         attackTarget = null;
         StopAttackInternal();
         ClearGroupMoveState();
 
-        targetPosition = destination;
-        stoppingDistance = Mathf.Max(0f, stopDistance);
-        isMovingToTarget = true;
+        if (movementManager != null)
+        {
+            movementManager.MoveToPosition(destination, stopDistance);
+        }
     }
 
     public void MoveToTarget(Transform target, float stopDistance)
     {
-        followTarget = target;
         attackTarget = null;
         StopAttackInternal();
         ClearGroupMoveState();
 
-        if (target != null)
-            targetPosition = target.position;
-
-        stoppingDistance = Mathf.Max(0f, stopDistance);
-        isMovingToTarget = true;
+        if (movementManager != null)
+        {
+            movementManager.MoveToTarget(target, GetCurrentAttackRange());
+        }
     }
 
     public void EngageTarget(Transform target, float stopDistance)
     {
-        if (target == null)
+        if (target == null || movementManager == null)
             return;
 
         float desiredStopDistance = Mathf.Max(0f, stopDistance);
-        bool alreadyMovingToTarget = isMovingToTarget && followTarget == target;
-        bool alreadyAttackingTarget = !isMovingToTarget && attackTarget == target;
-        bool sameStopDistance = Mathf.Abs(stoppingDistance - desiredStopDistance) <= 0.01f;
+        bool alreadyMovingToTarget = movementManager.IsMoving();
+        bool alreadyAttackingTarget = attackTarget == target;
 
-        if ((alreadyMovingToTarget || alreadyAttackingTarget) && sameStopDistance)
+        if ((alreadyMovingToTarget || alreadyAttackingTarget))
             return;
 
         MoveToTarget(target, desiredStopDistance);
@@ -355,13 +427,13 @@ public class UnitsAnimation : MonoBehaviour
     {
         activeGroupMoveId = groupMoveId;
         isGroupLeader = isLeader;
-        followTarget = null;
         attackTarget = null;
         StopAttackInternal();
 
-        targetPosition = destination;
-        stoppingDistance = Mathf.Max(0f, stopDistance);
-        isMovingToTarget = true;
+        if (movementManager != null)
+        {
+            movementManager.MoveToPosition(destination, stopDistance);
+        }
     }
 
     public void StartAttackAnimationFromSpell()
