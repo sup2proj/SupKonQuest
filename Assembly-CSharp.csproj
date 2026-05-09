@@ -49,6 +49,7 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Audio\SceneMusicChanger.cs" />
     <Compile Include="Assets\Scripts\Manager\OptionsManager.cs" />
     <Compile Include="Assets\Scripts\Data\LandUntisData\LandUnitsSO\UnitData.cs" />
     <Compile Include="Assets\Scripts\Enums\Environment\GroundType.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Assets\Scripts\camera\cameraMouvement.cs" />
     <Compile Include="Assets\Scripts\Data\LandUntisData\LandUnitsSO\UnitCombatData.cs" />
     <Compile Include="Assets\Scripts\Data\StructureData\StructureSO\StructureData.cs" />
+    <Compile Include="Assets\Scripts\Audio\PersistentAudio.cs" />
     <Compile Include="Assets\Scripts\Enums\Nature\TreeType.cs" />
     <Compile Include="Assets\Scripts\Manager\StartScreenManager.cs" />
     <Compile Include="Assets\Scripts\Manager\UnitsManager.cs" />
