@@ -4,7 +4,7 @@ public class OverlayManager : MonoBehaviour
 {
     void Start()
     {
-        initializePermanentOverlay();
+        //initializePermanentOverlay();
     }
 
     void Update()
@@ -15,10 +15,10 @@ public class OverlayManager : MonoBehaviour
     public static void initializePermanentOverlay()
     {
         GameObject permanentOverlay = Resources.Load<GameObject>("Sprites/UI/StructureInterface/GameInterface");
-        initializeEventSystem();
+        //initializeEventSystem();
         if (permanentOverlay != null)
         {
-            Instantiate(permanentOverlay);
+            //Instantiate(permanentOverlay);
         }
         else
         {

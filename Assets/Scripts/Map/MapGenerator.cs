@@ -54,9 +54,9 @@ public class MapGenerator : MonoBehaviour
 
         if (mapLayout != null && jsonData != null)
         {
-            GenerateWorld();      
-            PlaceBuildings(jsonData); 
-            AddNature();     
+            //GenerateWorld();      
+            //PlaceBuildings(jsonData); 
+            //AddNature();     
             Debug.Log($"Monde '{folderName}' généré avec succès !");
         }
         else
