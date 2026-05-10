@@ -12,7 +12,7 @@ public class InterfaceInstance : MonoBehaviour
     [Header("UI")]
     [SerializeField] public GameObject unitsQueue;
     [SerializeField] public GameObject unitsProtector;
-// HIDE LE PRIX DES BOATS ET CJHANCER LE TEXMESHRPOr
+    
     [Header("Queue item")]
     [SerializeField] private Vector3 queuedItemLocalScale = new Vector3(0.75f, 0.35f, 1f);
     [SerializeField] private Image[] queueSlots;

@@ -42,6 +42,7 @@ public class ActionInterface : MonoBehaviour
     {
         SetupAllButtons();
 		SetupUnitPrices();	
+        SetupBoatPrices();
     }
 
 	public void SetupUnitPrices()
@@ -63,6 +64,25 @@ public class ActionInterface : MonoBehaviour
 			unitPriceTexts[i].text = finalPrice.ToString();
 		}
 	}
+
+    public void SetupBoatPrices()
+    {
+        if (boatPriceTexts == null || unitDatas == null) return;
+
+        int count = Mathf.Min(unitPriceTexts.Length, unitDatas.Length);
+        for (int i = 0; i < count; i++)
+        {
+            if (boatPriceTexts[i] == null) continue;
+
+            if (unitDatas[i] == null)
+            {
+                boatPriceTexts[i].text = "";
+                continue;
+            }
+            float finalPrice = unitDatas[i].price;
+            boatPriceTexts[i].text = finalPrice.ToString();
+        }
+    }
 
     void SetupAllButtons()
     {
