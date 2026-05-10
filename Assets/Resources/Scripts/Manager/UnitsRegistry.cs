@@ -15,8 +15,7 @@ public static class UnitsRegistry
 
     public static void Register(UnitInstance unit, int unitsPlayerId)
     {
-        int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
-        if (unit != null && unitsPlayerId == activePlayerId)
+        if (unit != null)
         {
             units.Add(unit);
             Debug.Log($"Unit registered: {unit.name}. Total units: {units.Count}");

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class StructureManager : MonoBehaviour
@@ -41,25 +42,8 @@ public class StructureManager : MonoBehaviour
         }
         if (!unitPrefabDict.TryGetValue(type, out GameObject prefab) || prefab == null)
         {
-            string resourcePath = $"Prefabs/Boats/{type.ToString()}";
-            GameObject loaded = Resources.Load<GameObject>(resourcePath);
-            if (loaded != null)
-            {
-                prefab = loaded;
-                try
-                {
-                    unitPrefabDict.Add(type, prefab);
-                }
-                catch
-                {
-                    unitPrefabDict[type] = prefab;
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"[StructureManager] Aucun prefab trouvé pour {type} ni dans unitPrefabMappings ni dans Resources/{resourcePath}.");
-                return false;
-            }
+            Debug.LogWarning($"[StructureManager] Aucun prefab configuré dans l'inspecteur pour {type}.");
+            return false;
         }
         UnitData runtimeData = Instantiate(data);
         runtimeData.playerId = playerId;
@@ -87,9 +71,6 @@ public class StructureManager : MonoBehaviour
         }
 
         Vector3 position;
-        // if (type == UnitsType.Fregate || type == UnitsType.Destroyer || type == UnitsType.Transport)
-        // {
-        // }
         position = new Vector3(x, 0, z - 3);
 
         GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
@@ -109,6 +90,7 @@ public class StructureManager : MonoBehaviour
         }
 
         instance.Initialize(runtimeData);
+        BoatTransport.GetOrAdd(instance);
 
         if (isProtector && sourceStructure != null)
             sourceStructure.AddProtectorUnit(instance);
@@ -123,6 +105,11 @@ public class StructureManager : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public bool TryGetUnitPrefab(UnitsType type, out GameObject prefab)
+    {
+        return unitPrefabDict.TryGetValue(type, out prefab) && prefab != null;
     }
 
     private void ApplyColorTint(GameObject unitGO, Color tint)

@@ -353,7 +353,7 @@ public class UnitsAnimation : MonoBehaviour
 		{
 			Debug.Log(Mathf.Max(0f, combatData.attack));
             return Mathf.Max(0f, combatData.attack);
-		}		
+		}
         return 0f;
     }
 

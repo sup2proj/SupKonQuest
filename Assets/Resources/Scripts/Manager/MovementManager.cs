@@ -207,6 +207,8 @@ public class MovementManager : MonoBehaviour
         if (!CanMoveOnWorldPosition(destination))
             return;
 
+        BoatTransport.ClearPendingBoarding(unitInstance);
+
         followTarget = null;
         targetPosition = destination;
         stoppingDistance = Mathf.Max(0f, stopDistance);
@@ -226,6 +228,8 @@ public class MovementManager : MonoBehaviour
     {
         if (target != null && !CanMoveOnWorldPosition(target.position))
             return;
+
+        BoatTransport.ClearPendingBoarding(unitInstance);
 
         followTarget = target;
 
@@ -247,6 +251,8 @@ public class MovementManager : MonoBehaviour
 
     public void StopMovement()
     {
+        BoatTransport.ClearPendingBoarding(unitInstance);
+
         isMovingToTarget = false;
         movement = Vector3.zero;
         followTarget = null;
