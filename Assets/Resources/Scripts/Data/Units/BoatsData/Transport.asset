@@ -10,5 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6aeba2c6efcba438e93fc22312629f1b, type: 3}
-  m_Name: UnitBoat
+  m_Name: Transport
   m_EditorClassIdentifier: Assembly-CSharp::UnitBoat
+  price: 50
+  maxHealth: 120
+  speed: 1.5
+  creationTime: 8
+  type: 9
+  isPoweredUnit: 0
+  isProtector: 0
+  playerId: 0
+  attack: 0
+  attackSpeed: 0
+  attackRange: 0
+  maxTransportCapacity: 15

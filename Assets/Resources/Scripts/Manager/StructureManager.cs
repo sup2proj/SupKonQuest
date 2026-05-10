@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class StructureManager : MonoBehaviour
@@ -39,9 +40,9 @@ public class StructureManager : MonoBehaviour
         {
             return false;
         }
-
         if (!unitPrefabDict.TryGetValue(type, out GameObject prefab) || prefab == null)
         {
+            Debug.LogWarning($"[StructureManager] Aucun prefab configuré dans l'inspecteur pour {type}.");
             return false;
         }
         UnitData runtimeData = Instantiate(data);
@@ -68,7 +69,10 @@ public class StructureManager : MonoBehaviour
         {
             runtimeData.isProtector = true;
         }
-        Vector3 position = new Vector3(x, 0, z - 3);
+
+        Vector3 position;
+        position = new Vector3(x, 0, z - 3);
+
         GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
 
         if (isPoweredUnit)
@@ -80,11 +84,13 @@ public class StructureManager : MonoBehaviour
         UnitInstance instance = unitGO.GetComponent<UnitInstance>();
         if (instance == null)
         {
-            Destroy(unitGO);
-            return false;
+            Debug.LogWarning($"[StructureManager] Le prefab {prefab.name} ne contient pas de UnitInstance component. Tentative d'ajouter dynamiquement.");
+            instance = unitGO.AddComponent<UnitInstance>();
+            // Si UnitInstance attend des données à l'Awake/Start, c'est risqué, on logue.
         }
 
         instance.Initialize(runtimeData);
+        BoatTransport.GetOrAdd(instance);
 
         if (isProtector && sourceStructure != null)
             sourceStructure.AddProtectorUnit(instance);
@@ -99,6 +105,11 @@ public class StructureManager : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public bool TryGetUnitPrefab(UnitsType type, out GameObject prefab)
+    {
+        return unitPrefabDict.TryGetValue(type, out prefab) && prefab != null;
     }
 
     private void ApplyColorTint(GameObject unitGO, Color tint)

@@ -42,6 +42,10 @@ public class SelectableObject : MonoBehaviour
             else if (unitInstance.unitData.type == UnitsType.Healer && !Spells.Instance.IsSpellOnCooldown)
             {
                 InterfaceInstance.Instance.ShowHealerIcon();
+            } 
+            else if (unitInstance.unitData.type == UnitsType.Destroyer || unitInstance.unitData.type == UnitsType.Fregate || unitInstance.unitData.type == UnitsType.Transport)
+            {
+                InterfaceInstance.Instance.ShowBoatExitIcons();
             }
         }
     }
@@ -52,5 +56,7 @@ public class SelectableObject : MonoBehaviour
         IsSelected = false;
         if (markerSprite != null)
             markerSprite.color = originalColor;
+        InterfaceInstance.Instance.hideBuffIcons();
+        InterfaceInstance.Instance.HideBoatExitIcons();
     }
 }

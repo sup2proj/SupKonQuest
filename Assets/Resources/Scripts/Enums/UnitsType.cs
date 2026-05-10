@@ -7,5 +7,8 @@ public enum UnitsType
     Heavy,
     AntiBlindage,
     Healer,
-    Support
+    Support,
+    Fregate,
+    Destroyer,
+    Transport
 }

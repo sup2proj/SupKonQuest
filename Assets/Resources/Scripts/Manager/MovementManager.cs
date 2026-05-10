@@ -1,3 +1,4 @@
+using Enums.Environment;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.AI;
@@ -5,6 +6,8 @@ using System.Collections.Generic;
 
 public class MovementManager : MonoBehaviour
 {
+    public static MovementManager Instance;
+    
     [Header("Movement")]
     public float moveSpeed = 3.5f;
     public float stoppingDistance = 0.2f;
@@ -20,11 +23,14 @@ public class MovementManager : MonoBehaviour
     private NavMeshAgent agent;
     private Animator animator;
     private SelectableObject selectable;
+    private MapGenerator mapGenerator;
 
     private static int priorityCounter = 0;
 
     private void Awake()
     {
+        Instance = this;
+        
         unitInstance = GetComponent<UnitInstance>();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
@@ -33,6 +39,7 @@ public class MovementManager : MonoBehaviour
         if (agent != null)
         {
             agent.speed = GetUnitSpeed();
+            agent.areaMask = GetAllowedNavMeshAreaMask();
             agent.avoidancePriority = Mathf.Clamp(priorityCounter % 99, 1, 99);
             priorityCounter++;
         }
@@ -43,7 +50,8 @@ public class MovementManager : MonoBehaviour
         if (agent != null)
         {
             agent.speed = GetUnitSpeed();
-            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2.0f, NavMesh.AllAreas))
+            agent.areaMask = GetAllowedNavMeshAreaMask();
+            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2.0f, agent.areaMask))
             {
                 agent.Warp(hit.position);
             }
@@ -52,7 +60,8 @@ public class MovementManager : MonoBehaviour
 
     private void Update()
     {
-        HandleMouseClick();
+        if (SelectionManager.Instance == null)
+            HandleMouseClick();
         HandleMovement();
     }
 
@@ -66,9 +75,9 @@ public class MovementManager : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                targetPosition = hit.point;
-                targetPosition.y = transform.position.y;
-                isMovingToTarget = true;
+                Vector3 destination = hit.point;
+                destination.y = transform.position.y;
+                MoveToPosition(destination, stoppingDistance);
             }
         }
     }
@@ -76,10 +85,13 @@ public class MovementManager : MonoBehaviour
     private void HandleMovement()
     {
         if (agent != null)
+        {
             agent.speed = GetUnitSpeed();
+            agent.areaMask = GetAllowedNavMeshAreaMask();
+        }
 
         // Version optimisée utilisant NavMeshAgent
-        if (agent != null)
+        if (CanUseNavMeshAgent())
         {
             HandleNavMeshMovement();
         }
@@ -170,7 +182,7 @@ public class MovementManager : MonoBehaviour
         if (animator != null)
         {
             bool isActuallyMoving = false;
-            if (agent != null)
+            if (CanUseNavMeshAgent())
                 isActuallyMoving = isMovingToTarget && agent.velocity.magnitude > 0.1f;
             else
                 isActuallyMoving = isMovingToTarget && movement.sqrMagnitude > 0.0001f;
@@ -183,21 +195,29 @@ public class MovementManager : MonoBehaviour
     {
         if (unitInstance != null && unitInstance.unitData != null)
         {
-            return unitInstance.unitData.speed;
+            if (unitInstance.unitData.speed > 0f)
+                return unitInstance.unitData.speed;
         }
+
         return moveSpeed;
     }
 
     public void MoveToPosition(Vector3 destination, float stopDistance)
     {
+        if (!CanMoveOnWorldPosition(destination))
+            return;
+
+        BoatTransport.ClearPendingBoarding(unitInstance);
+
         followTarget = null;
         targetPosition = destination;
         stoppingDistance = Mathf.Max(0f, stopDistance);
         isMovingToTarget = true;
 
-        if (agent != null)
+        if (CanUseNavMeshAgent())
         {
             agent.speed = GetUnitSpeed();
+            agent.areaMask = GetAllowedNavMeshAreaMask();
             agent.stoppingDistance = stoppingDistance;
             agent.ResetPath();
             agent.SetDestination(destination);
@@ -206,6 +226,11 @@ public class MovementManager : MonoBehaviour
 
     public void MoveToTarget(Transform target, float stopDistance)
     {
+        if (target != null && !CanMoveOnWorldPosition(target.position))
+            return;
+
+        BoatTransport.ClearPendingBoarding(unitInstance);
+
         followTarget = target;
 
         if (target != null)
@@ -214,9 +239,10 @@ public class MovementManager : MonoBehaviour
         stoppingDistance = Mathf.Max(0f, GetUnitAttackRange(stopDistance));
         isMovingToTarget = true;
 
-        if (agent != null && target != null)
+        if (CanUseNavMeshAgent() && target != null)
         {
             agent.speed = GetUnitSpeed();
+            agent.areaMask = GetAllowedNavMeshAreaMask();
             agent.stoppingDistance = stoppingDistance;
             agent.ResetPath();
             agent.SetDestination(target.position);
@@ -225,6 +251,8 @@ public class MovementManager : MonoBehaviour
 
     public void StopMovement()
     {
+        BoatTransport.ClearPendingBoarding(unitInstance);
+
         isMovingToTarget = false;
         movement = Vector3.zero;
         followTarget = null;
@@ -232,7 +260,7 @@ public class MovementManager : MonoBehaviour
         if (animator != null)
             animator.SetBool("isMoving", false);
 
-        if (agent != null)
+        if (CanUseNavMeshAgent())
             agent.ResetPath();
     }
 
@@ -249,6 +277,71 @@ public class MovementManager : MonoBehaviour
         return fallback;
     }
 
+    public bool CanMoveOnWorldPosition(Vector3 worldPosition)
+    {
+        MapGenerator map = GetMapGenerator();
+        if (map == null)
+            return true;
+
+        if (!map.TryGetTileAtWorldPosition(worldPosition, out TileData tile))
+            return false;
+
+        bool allowed = IsBoatUnit() ? tile.groundType == GroundType.Water : tile.groundType != GroundType.Water;
+        if (!allowed)
+        {
+            string unitType = unitInstance != null && unitInstance.unitData != null
+                ? unitInstance.unitData.type.ToString()
+                : "Unknown";
+            Debug.Log($"[MovementManager] Destination refusée: unit={unitType}, tile={tile.groundType}, position={worldPosition}.", this);
+        }
+
+        return allowed;
+    }
+
+    private MapGenerator GetMapGenerator()
+    {
+        if (mapGenerator == null)
+            mapGenerator = MapGenerator.Instance != null ? MapGenerator.Instance : FindFirstObjectByType<MapGenerator>();
+
+        return mapGenerator;
+    }
+
+    private int GetAllowedNavMeshAreaMask()
+    {
+        if (IsBoatUnit())
+        {
+            int waterArea = NavMesh.GetAreaFromName("Water");
+            return waterArea >= 0 ? 1 << waterArea : NavMesh.AllAreas;
+        }
+
+        int walkableArea = NavMesh.GetAreaFromName("Walkable");
+        return walkableArea >= 0 ? 1 << walkableArea : NavMesh.AllAreas;
+    }
+
+    private bool IsBoatUnit()
+    {
+        if (unitInstance == null || unitInstance.unitData == null)
+            return false;
+
+        if (unitInstance.unitData is UnitBoat)
+            return true;
+
+        switch (unitInstance.unitData.type)
+        {
+            case UnitsType.Fregate:
+            case UnitsType.Destroyer:
+            case UnitsType.Transport:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private bool CanUseNavMeshAgent()
+    {
+        return agent != null && agent.enabled && agent.isOnNavMesh;
+    }
+
     public Vector3 GetMovementDirection()
     {
         return movement;
@@ -262,5 +355,43 @@ public class MovementManager : MonoBehaviour
         {
             OnMovementComplete(followTarget);
         }
+    }
+    
+    public void MoveBoatsUnitToPositionAsGroup(UnitInstance unit, Vector3 destination, float stopDistance, int groupMoveId, bool isLeader)
+    {
+        if (unit == null)
+            return;
+
+        MovementManager movement = unit.GetComponent<MovementManager>();
+        if (movement == null || !movement.CanMoveOnWorldPosition(destination))
+            return;
+
+        UnitsAnimation animatedMover = unit.GetComponent<UnitsAnimation>();
+        if (animatedMover != null)
+        {
+            animatedMover.MoveToPositionAsGroup(destination, stopDistance, groupMoveId, isLeader);
+            return;
+        }
+
+        movement.MoveToPosition(destination, stopDistance);
+    }
+
+    public void MoveBoatsUnitToTarget(UnitInstance unit, Transform target, float stopDistance)
+    {
+        if (unit == null || target == null)
+            return;
+
+        MovementManager movement = unit.GetComponent<MovementManager>();
+        if (movement == null || !movement.CanMoveOnWorldPosition(target.position))
+            return;
+
+        UnitsAnimation animatedMover = unit.GetComponent<UnitsAnimation>();
+        if (animatedMover != null)
+        {
+            animatedMover.MoveToTarget(target, stopDistance);
+            return;
+        }
+
+        movement.MoveToTarget(target, stopDistance);
     }
 }

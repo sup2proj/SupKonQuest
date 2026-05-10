@@ -12,7 +12,7 @@ public class InterfaceInstance : MonoBehaviour
     [Header("UI")]
     [SerializeField] public GameObject unitsQueue;
     [SerializeField] public GameObject unitsProtector;
-
+// HIDE LE PRIX DES BOATS ET CJHANCER LE TEXMESHRPOr
     [Header("Queue item")]
     [SerializeField] private Vector3 queuedItemLocalScale = new Vector3(0.75f, 0.35f, 1f);
     [SerializeField] private Image[] queueSlots;
@@ -25,6 +25,9 @@ public class InterfaceInstance : MonoBehaviour
     
     [Header("Buff (support/healer)")]
     [SerializeField] private Image[] buffSlots;
+    
+    [Header("Boat exit button")]
+    [SerializeField] private Image boatExitButton;
     
 
     [Header("TEMPORAIRE JOUEUR LIST")] 
@@ -113,6 +116,8 @@ public class InterfaceInstance : MonoBehaviour
             playerManager = FindFirstObjectByType<PlayerManager>();
         HideProgressBarVisual(resetProgress: false);
         hideBuffIcons();
+        HideBoatExitIcons();
+        WireBoatExitButtonClick();
         WireBuffSlotClicks();
         WirePlayersListClicks();
         WireProtectorSlotClicks();
@@ -500,6 +505,41 @@ public class InterfaceInstance : MonoBehaviour
         }
     }
 
+    private void WireBoatExitButtonClick()
+    {
+        if (boatExitButton == null)
+            return;
+
+        var btn = boatExitButton.GetComponent<Button>();
+        btn.onClick.RemoveAllListeners();
+        btn.onClick.AddListener(() => OnBoatExitClicked());
+    }
+    
+    private void OnBoatExitClicked()
+    {
+        int activePlayerId = PlayerManager.Instance != null ? PlayerManager.Instance.GetActivePlayerId() : GetSelectedPlayerId();
+        int unloadedBoats = 0;
+
+        if (SelectionManager.Instance != null && SelectionManager.Instance.CurrentlySelectedObjects != null)
+        {
+            for (int i = 0; i < SelectionManager.Instance.CurrentlySelectedObjects.Count; i++)
+            {
+                SelectableObject selectable = SelectionManager.Instance.CurrentlySelectedObjects[i];
+                if (selectable == null)
+                    continue;
+
+                UnitInstance unit = selectable.GetComponent<UnitInstance>();
+                if (unit == null || unit.playerId != activePlayerId)
+                    continue;
+
+                if (BoatTransport.ExitAllUnits(unit))
+                    unloadedBoats++;
+            }
+        }
+
+        Debug.Log($"[InterfaceInstance] BoatExit: {unloadedBoats} bateau(x) ont debarque leurs unites.");
+    }
+
     private void WireBuffSlotClicks()
     {
         if (buffSlots == null || buffSlots.Length == 0)
@@ -594,6 +634,7 @@ public class InterfaceInstance : MonoBehaviour
             buffSlots[i].gameObject.SetActive(true);
         }
     }
+    
     public void ShowHealerIcon()
     {
         int healerIndex = buffSlots.Length - 1;
@@ -603,6 +644,16 @@ public class InterfaceInstance : MonoBehaviour
         buffSlots[healerIndex].gameObject.SetActive(true);
     }
 
+    public void ShowBoatExitIcons()
+    {
+        boatExitButton.gameObject.SetActive(true);
+    }
+    
+    public void HideBoatExitIcons()
+    {
+        boatExitButton.gameObject.SetActive(false);
+    }
+    
     public void HideBuffIconForCooldown(int slotIndex, float cooldown)
     {
         Image slot = buffSlots[slotIndex];

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Enums.Environment;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
@@ -41,6 +42,14 @@ public class SelectionManager : MonoBehaviour
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             if (TryIssueAttackMoveOrder())
+            {
+                isMouseDown = false;
+                isDragging = false;
+                SelectionBox.gameObject.SetActive(false);
+                return;
+            }
+
+            if (TryIssueBoatShoreOrder())
             {
                 isMouseDown = false;
                 isDragging = false;
@@ -106,12 +115,8 @@ public class SelectionManager : MonoBehaviour
         for (int i = 0; i < groupUnits.Count; i++)
         {
             UnitInstance unit = groupUnits[i];
-            UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
-            if (mover == null)
-                continue;
-
             bool isLeader = (unit == leader);
-            mover.MoveToPositionAsGroup(hit.point, groupMoveStoppingDistance, groupMoveId, isLeader);
+            MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, hit.point, groupMoveStoppingDistance, groupMoveId, isLeader);
         }
     }
 
@@ -136,7 +141,260 @@ public class SelectionManager : MonoBehaviour
 
         return closest;
     }
-    
+
+    private bool TryIssueBoatShoreOrder()
+    {
+        if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0 || Camera.main == null)
+            return false;
+
+        int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
+        UnitInstance targetBoat = GetFriendlyBoatUnderMouse(activePlayerId);
+        if (targetBoat == null)
+            return false;
+
+        List<UnitInstance> selectedUnits = CollectSelectedPlayerUnits(activePlayerId);
+        List<UnitInstance> landUnits = new List<UnitInstance>();
+
+        for (int i = 0; i < selectedUnits.Count; i++)
+        {
+            UnitInstance unit = selectedUnits[i];
+            if (unit == null || unit == targetBoat || BoatTransport.IsBoatUnit(unit))
+                continue;
+
+            landUnits.Add(unit);
+        }
+
+        if (landUnits.Count == 0)
+        {
+            Debug.Log("[SelectionManager] Ordre bateau ignore: aucune unite terrestre selectionnee.");
+            return false;
+        }
+
+        int availableCapacity = BoatTransport.GetAvailableCapacity(targetBoat);
+        if (availableCapacity <= 0)
+        {
+            Debug.Log($"[SelectionManager] Ordre bateau refuse: {targetBoat.name} est plein.");
+            return true;
+        }
+
+        List<UnitInstance> boardingUnits = new List<UnitInstance>();
+        for (int i = 0; i < landUnits.Count && boardingUnits.Count < availableCapacity; i++)
+            boardingUnits.Add(landUnits[i]);
+
+        if (boardingUnits.Count < landUnits.Count)
+        {
+            Debug.Log($"[SelectionManager] Capacite limitee: {boardingUnits.Count}/{landUnits.Count} unite(s) vont embarquer dans {targetBoat.name}.");
+        }
+
+        if (!TryFindBestShoreRendezvous(boardingUnits, targetBoat, out Vector3 landDestination, out Vector3 waterDestination))
+        {
+            Debug.LogWarning("[SelectionManager] Impossible de trouver une rive valide pour rapprocher le bateau de la terre.");
+            return true;
+        }
+
+        int groupMoveId = nextGroupMoveId++;
+        UnitInstance leader = GetClosestUnitToPoint(boardingUnits, landDestination);
+
+        for (int i = 0; i < boardingUnits.Count; i++)
+        {
+            UnitInstance unit = boardingUnits[i];
+            bool isLeader = unit == leader;
+            MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, landDestination, groupMoveStoppingDistance, groupMoveId, isLeader);
+            BoatTransport.PrepareBoarding(unit, targetBoat);
+        }
+
+        MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(targetBoat, waterDestination, groupMoveStoppingDistance, groupMoveId, false);
+
+        Debug.Log($"[SelectionManager] Ordre rive bateau: {boardingUnits.Count} unite(s) -> {landDestination}, bateau {targetBoat.name} -> {waterDestination}.");
+        return true;
+    }
+
+    private UnitInstance GetFriendlyBoatUnderMouse(int activePlayerId)
+    {
+        RaycastHit[] hits = GetMouseRaycastHits();
+        UnitInstance bestBoat = null;
+        float bestDistance = float.MaxValue;
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            UnitInstance unit = GetUnitFromCollider(hits[i].collider);
+            if (unit == null || unit.playerId != activePlayerId || !BoatTransport.IsBoatUnit(unit))
+                continue;
+
+            if (hits[i].distance < bestDistance)
+            {
+                bestDistance = hits[i].distance;
+                bestBoat = unit;
+            }
+        }
+
+        if (bestBoat != null)
+            return bestBoat;
+
+        return GetFriendlyBoatNearMouseOnScreen(activePlayerId);
+    }
+
+    private UnitInstance GetFriendlyBoatNearMouseOnScreen(int activePlayerId)
+    {
+        if (AllSelectableObjects == null || Camera.main == null || Mouse.current == null)
+            return null;
+
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        float bestDistanceSq = enemyUnitClickScreenRadius * enemyUnitClickScreenRadius;
+        UnitInstance bestBoat = null;
+
+        for (int i = AllSelectableObjects.Count - 1; i >= 0; i--)
+        {
+            SelectableObject selectable = AllSelectableObjects[i];
+            if (selectable == null)
+            {
+                AllSelectableObjects.RemoveAt(i);
+                continue;
+            }
+
+            UnitInstance unit = selectable.GetComponent<UnitInstance>();
+            if (unit == null || unit.playerId != activePlayerId || !BoatTransport.IsBoatUnit(unit))
+                continue;
+
+            Vector3 screenPosition = Camera.main.WorldToScreenPoint(unit.transform.position);
+            if (screenPosition.z < 0f)
+                continue;
+
+            float distanceSq = ((Vector2)screenPosition - mousePosition).sqrMagnitude;
+            if (distanceSq <= bestDistanceSq)
+            {
+                bestDistanceSq = distanceSq;
+                bestBoat = unit;
+            }
+        }
+
+        return bestBoat;
+    }
+
+    private UnitInstance GetUnitFromCollider(Collider hitCollider)
+    {
+        if (hitCollider == null)
+            return null;
+
+        UnitInstance unit = hitCollider.GetComponentInParent<UnitInstance>();
+        if (unit == null)
+            unit = hitCollider.GetComponent<UnitInstance>();
+        if (unit == null)
+            unit = hitCollider.GetComponentInChildren<UnitInstance>();
+
+        return unit;
+    }
+
+    private bool TryFindBestShoreRendezvous(List<UnitInstance> landUnits, UnitInstance targetBoat, out Vector3 landDestination, out Vector3 waterDestination)
+    {
+        landDestination = Vector3.zero;
+        waterDestination = Vector3.zero;
+
+        MapGenerator map = MapGenerator.Instance != null ? MapGenerator.Instance : FindFirstObjectByType<MapGenerator>();
+        if (map == null || map.allTiles == null || targetBoat == null)
+            return false;
+
+        Vector3 landAnchor = GetUnitsCenter(landUnits);
+        Vector3 boatPosition = targetBoat.transform.position;
+        float bestScore = float.MaxValue;
+        bool found = false;
+
+        int width = map.allTiles.GetLength(0);
+        int height = map.allTiles.GetLength(1);
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                TileData waterTile = map.allTiles[x, y];
+                if (!IsWaterTile(waterTile))
+                    continue;
+
+                TryEvaluateShorePair(map, waterTile, x + 1, y, landAnchor, boatPosition, ref landDestination, ref waterDestination, ref bestScore, ref found);
+                TryEvaluateShorePair(map, waterTile, x - 1, y, landAnchor, boatPosition, ref landDestination, ref waterDestination, ref bestScore, ref found);
+                TryEvaluateShorePair(map, waterTile, x, y + 1, landAnchor, boatPosition, ref landDestination, ref waterDestination, ref bestScore, ref found);
+                TryEvaluateShorePair(map, waterTile, x, y - 1, landAnchor, boatPosition, ref landDestination, ref waterDestination, ref bestScore, ref found);
+            }
+        }
+
+        return found;
+    }
+
+    private void TryEvaluateShorePair(
+        MapGenerator map,
+        TileData waterTile,
+        int landX,
+        int landY,
+        Vector3 landAnchor,
+        Vector3 boatPosition,
+        ref Vector3 bestLandDestination,
+        ref Vector3 bestWaterDestination,
+        ref float bestScore,
+        ref bool found)
+    {
+        if (landX < 0 || landY < 0 || landX >= map.allTiles.GetLength(0) || landY >= map.allTiles.GetLength(1))
+            return;
+
+        TileData landTile = map.allTiles[landX, landY];
+        if (!IsLandShoreTile(landTile))
+            return;
+
+        Vector3 candidateLand = TileToWorldPosition(map, landTile);
+        Vector3 candidateWater = TileToWorldPosition(map, waterTile);
+        float score = FlatDistanceSq(landAnchor, candidateLand) + FlatDistanceSq(boatPosition, candidateWater);
+
+        if (score >= bestScore)
+            return;
+
+        bestScore = score;
+        bestLandDestination = candidateLand;
+        bestWaterDestination = candidateWater;
+        found = true;
+    }
+
+    private Vector3 GetUnitsCenter(List<UnitInstance> units)
+    {
+        if (units == null || units.Count == 0)
+            return Vector3.zero;
+
+        Vector3 sum = Vector3.zero;
+        int count = 0;
+
+        for (int i = 0; i < units.Count; i++)
+        {
+            UnitInstance unit = units[i];
+            if (unit == null)
+                continue;
+
+            sum += unit.transform.position;
+            count++;
+        }
+
+        return count > 0 ? sum / count : Vector3.zero;
+    }
+
+    private Vector3 TileToWorldPosition(MapGenerator map, TileData tile)
+    {
+        return new Vector3(tile.coordX * map.tileSize, 0f, tile.coordY * map.tileSize);
+    }
+
+    private float FlatDistanceSq(Vector3 a, Vector3 b)
+    {
+        float dx = a.x - b.x;
+        float dz = a.z - b.z;
+        return dx * dx + dz * dz;
+    }
+
+    private bool IsWaterTile(TileData tile)
+    {
+        return tile != null && tile.groundType == GroundType.Water && tile.isNavigable;
+    }
+
+    private bool IsLandShoreTile(TileData tile)
+    {
+        return tile != null && tile.groundType != GroundType.Water && tile.isWalkable;
+    }
+
     private void AnalyzeSelectableObjectsContinuously()
     {
         selectableRefreshTimer += Time.deltaTime;
@@ -255,12 +513,8 @@ public class SelectionManager : MonoBehaviour
             if (unit == null || unit.unitData == null)
                 continue;
 
-            UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
-            if (mover == null)
-                continue;
-
             float stopDistance = GetAttackStopDistance(unit);
-            mover.MoveToTarget(targetUnit.transform, stopDistance);
+            MovementManager.Instance.MoveBoatsUnitToTarget(unit, targetUnit.transform, stopDistance);
             Debug.Log($"[SelectionManager] Ordre d'attaque unite: {unit.name} -> {targetUnit.name}");
         }
 
@@ -284,12 +538,8 @@ public class SelectionManager : MonoBehaviour
             if (unit == null || unit.unitData == null)
                 continue;
 
-            UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
-            if (mover == null)
-                continue;
-
             float stopDistance = GetAttackStopDistance(unit);
-            mover.MoveToTarget(targetStructure.transform, stopDistance);
+            MovementManager.Instance.MoveBoatsUnitToTarget(unit, targetStructure.transform, stopDistance);
             Debug.Log($"[SelectionManager] Ordre d'attaque structure: {unit.name} -> {targetStructure.name}");
         }
 
@@ -447,8 +697,8 @@ public class SelectionManager : MonoBehaviour
             if (unit == null || unit.unitData == null || unit.playerId != activePlayerId || unit.unitData.isProtector)
                 continue;
 
-            UnitsAnimation mover = unit.GetComponent<UnitsAnimation>();
-            if (mover == null)
+            MovementManager movement = unit.GetComponent<MovementManager>();
+            if (movement == null)
                 continue;
 
             units.Add(unit);
