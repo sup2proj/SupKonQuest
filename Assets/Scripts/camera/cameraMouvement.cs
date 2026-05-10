@@ -50,17 +50,17 @@ public class cameraMouvement : MonoBehaviour
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();
 
-        if (mousePos.x > screenBoundsWidth - boundary || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
-            position.x += speed * Time.deltaTime;
+        // if (mousePos.x > screenBoundsWidth - boundary || Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        //     position.x += speed * Time.deltaTime;
 
-        if (mousePos.x < boundary || Input.GetKey(isAZERTY ? KeyCode.Q : KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
-            position.x -= speed * Time.deltaTime;
+        // if (mousePos.x < boundary || Input.GetKey(isAZERTY ? KeyCode.Q : KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        //     position.x -= speed * Time.deltaTime;
 
-        if (mousePos.y > screenBoundsHeight - boundary || Input.GetKey(isAZERTY ? KeyCode.Z : KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
-            position.y += speed * Time.deltaTime;
+        // if (mousePos.y > screenBoundsHeight - boundary || Input.GetKey(isAZERTY ? KeyCode.Z : KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        //     position.y += speed * Time.deltaTime;
 
-        if (mousePos.y < boundary || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
-            position.y -= speed * Time.deltaTime;
+        // if (mousePos.y < boundary || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+        //     position.y -= speed * Time.deltaTime;
 
     }
     void CameraZoom()
