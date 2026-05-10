@@ -3,7 +3,7 @@ using Unity.Netcode;
 
 public class PlayerMovement : NetworkBehaviour
 {
-    [Header("Réglages")]
+    [Header("Settings")]
     public float moveSpeed = 5f;
 
     void Update()
