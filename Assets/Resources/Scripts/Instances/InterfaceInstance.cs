@@ -12,7 +12,7 @@ public class InterfaceInstance : MonoBehaviour
     [Header("UI")]
     [SerializeField] public GameObject unitsQueue;
     [SerializeField] public GameObject unitsProtector;
-
+// HIDE LE PRIX DES BOATS ET CJHANCER LE TEXMESHRPOr
     [Header("Queue item")]
     [SerializeField] private Vector3 queuedItemLocalScale = new Vector3(0.75f, 0.35f, 1f);
     [SerializeField] private Image[] queueSlots;
@@ -116,6 +116,7 @@ public class InterfaceInstance : MonoBehaviour
             playerManager = FindFirstObjectByType<PlayerManager>();
         HideProgressBarVisual(resetProgress: false);
         hideBuffIcons();
+        HideBoatExitIcons();
         WireBoatExitButtonClick();
         WireBuffSlotClicks();
         WirePlayersListClicks();
@@ -633,6 +634,7 @@ public class InterfaceInstance : MonoBehaviour
             buffSlots[i].gameObject.SetActive(true);
         }
     }
+    
     public void ShowHealerIcon()
     {
         int healerIndex = buffSlots.Length - 1;
@@ -642,6 +644,16 @@ public class InterfaceInstance : MonoBehaviour
         buffSlots[healerIndex].gameObject.SetActive(true);
     }
 
+    public void ShowBoatExitIcons()
+    {
+        boatExitButton.gameObject.SetActive(true);
+    }
+    
+    public void HideBoatExitIcons()
+    {
+        boatExitButton.gameObject.SetActive(false);
+    }
+    
     public void HideBuffIconForCooldown(int slotIndex, float cooldown)
     {
         Image slot = buffSlots[slotIndex];

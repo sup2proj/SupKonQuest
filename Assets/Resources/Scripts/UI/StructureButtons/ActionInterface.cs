@@ -254,6 +254,14 @@ public class ActionInterface : MonoBehaviour
                 unitProtectorPriceText.gameObject.SetActive(false);
             }
         }
+
+        foreach (var boatPriceText in boatPriceTexts)
+        {
+            if (boatPriceText != null)
+            {
+                boatPriceText.gameObject.SetActive(false);
+            }
+        }
     }
 
     void ShowPrices(TextMeshProUGUI[] unitPriceTexts)
@@ -266,6 +274,20 @@ public class ActionInterface : MonoBehaviour
             {
                 unitPriceText.gameObject.SetActive(true);
                 unitPriceText.transform.SetAsLastSibling();
+            }
+        }
+    }
+    
+    void ShowBoatPrices(TextMeshProUGUI[] boatPriceTexts)
+    {
+        if (boatPriceTexts == null) return;
+        
+        foreach (var boatPriceText in boatPriceTexts)
+        {
+            if (boatPriceText != null)
+            {
+                boatPriceText.gameObject.SetActive(true);
+                boatPriceText.transform.SetAsLastSibling();
             }
         }
     }
@@ -323,6 +345,7 @@ public class ActionInterface : MonoBehaviour
 				Debug.Log("[ActionInterface] Affichage des boutons pour Harbour");
 				Instance.ShowButtonArray(Instance.harbourButtons);
 				Instance.ShowImage(Instance.structureImage, structureType);
+                Instance.ShowBoatPrices(Instance.boatPriceTexts);
 				break;
 
 			case StructureType.NeutralStructure:
