@@ -201,7 +201,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 207674089}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1008551695}
+        m_TargetAssemblyTypeName: MultiplayerMenuManager, Assembly-CSharp
+        m_MethodName: GoToCreateLobby
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &207674089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -946,7 +958,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 882798236}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1008551695}
+        m_TargetAssemblyTypeName: MultiplayerMenuManager, Assembly-CSharp
+        m_MethodName: BackToLogin
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &882798236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -996,7 +1020,7 @@ GameObject:
   - component: {fileID: 1008551694}
   - component: {fileID: 1008551695}
   m_Layer: 0
-  m_Name: AuthManager
+  m_Name: MultiManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1026,12 +1050,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1008551692}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f8e14e5bd554d241905f1f4de97363d, type: 3}
+  m_Script: {fileID: 11500000, guid: 0e50a4b705256c8498a5ced6217891aa, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AuthManager
-  usernameInput: {fileID: 0}
-  passwordInput: {fileID: 0}
-  statusText: {fileID: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::MultiplayerMenuManager
 --- !u!1 &1247562019
 GameObject:
   m_ObjectHideFlags: 0
@@ -1114,7 +1135,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1247562022}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1008551692}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1247562022
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1646,7 +1679,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2008233975}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1008551695}
+        m_TargetAssemblyTypeName: MultiplayerMenuManager, Assembly-CSharp
+        m_MethodName: GoToJoinLobby
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2008233975
 MonoBehaviour:
   m_ObjectHideFlags: 0
