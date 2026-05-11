@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 161725980}
   - component: {fileID: 161725979}
   m_Layer: 5
-  m_Name: BtnContinue
+  m_Name: BtnMulti
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -587,7 +587,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Continue
+  m_text: Multiplayer
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b39269fd6cb84d64f84c7a599b701e09, type: 2}
   m_sharedMaterial: {fileID: -573867277670008306, guid: b39269fd6cb84d64f84c7a599b701e09, type: 2}
@@ -679,8 +679,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
-  englishText: Continue
-  frenchText: Continuer
+  englishText: Multiplayer
+  frenchText: Multijoueur
 --- !u!1 &442358767
 GameObject:
   m_ObjectHideFlags: 0

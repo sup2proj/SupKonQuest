@@ -282,11 +282,11 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
 
     void StartGame()
     {
-        SceneManager.LoadScene("NewGame"); 
+        SceneManager.LoadScene("MainMenu"); 
     }
 
     void Back()
     {
-        SceneManager.LoadScene("NewGame"); 
+        SceneManager.LoadScene("MainMenu"); 
     }
 }

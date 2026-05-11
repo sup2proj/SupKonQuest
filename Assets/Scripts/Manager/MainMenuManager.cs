@@ -54,13 +54,13 @@ public class MainMenuManager : MonoBehaviour
     void Confirm()
     {
         if (currentIndex == 0) NewGame();
-        if (currentIndex == 1) Continue();
+        if (currentIndex == 1) Multi();
         if (currentIndex == 2) Options();
         if (currentIndex == 3) Quit();
     }
 
-    public void NewGame()  { SceneManager.LoadScene("NewGame"); }
-    public void Continue() { SceneManager.LoadScene("GameScene"); }
+    public void NewGame()  { SceneManager.LoadScene("LaunchingLocalNewGame"); }
+    public void Multi() { SceneManager.LoadScene("LoginScene"); }
     public void Options()  { SceneManager.LoadScene("Options");   }
     public void Quit()     { Application.Quit();                  }
 }
