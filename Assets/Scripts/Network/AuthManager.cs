@@ -34,6 +34,7 @@ public class AuthManager : MonoBehaviour
             await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(usernameInput.text, passwordInput.text);
             
             statusText.text = "Compte créé et connecté avec succès !";
+            SceneManager.LoadScene("MultiplayerScene");
             Debug.Log("Compte créé. ID Unique du joueur : " + AuthenticationService.Instance.PlayerId);
         }
         catch (AuthenticationException ex)
@@ -56,6 +57,7 @@ public class AuthManager : MonoBehaviour
             await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(usernameInput.text, passwordInput.text);
             
             statusText.text = "Connecté ! Bienvenue.";
+            SceneManager.LoadScene("MultiplayerScene");
             Debug.Log("Connexion réussie. ID Unique : " + AuthenticationService.Instance.PlayerId);
             
         }
