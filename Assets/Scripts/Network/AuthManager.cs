@@ -3,6 +3,7 @@ using Unity.Services.Core;
 using Unity.Services.Authentication;
 using TMPro;
 using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
 
 public class AuthManager : MonoBehaviour
 {
@@ -68,5 +69,10 @@ public class AuthManager : MonoBehaviour
             statusText.text = "Erreur réseau.";
             Debug.LogError(ex);
         }
+    }
+
+    public void Back()
+    {
+        SceneManager.LoadScene("MainMenu"); 
     }
 }
