@@ -10,7 +10,7 @@ public class MovementManager : MonoBehaviour
     
     [Header("Movement")]
     public float moveSpeed = 3.5f;
-    public float stoppingDistance = 0.2f;
+    public float stoppingDistance = 0.3f;
     public float rotationSpeed = 12f;
 	
     private Vector3 movement;
@@ -30,7 +30,6 @@ public class MovementManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        
         unitInstance = GetComponent<UnitInstance>();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
@@ -108,6 +107,7 @@ public class MovementManager : MonoBehaviour
     {
         if (isMovingToTarget)
         {
+            
             // Si on suit une cible, mettre à jour la destination
             if (followTarget != null)
             {
@@ -115,6 +115,8 @@ public class MovementManager : MonoBehaviour
             }
 
             float dynamicStoppingDistance = Mathf.Max(agent.stoppingDistance, agent.speed * 0.1f);
+            //Debug.Log($"Agent stopping distance: {agent.stoppingDistance:F3} | Speed: {agent.speed:F3}");
+            //Debug.Log($"Distance restante: {agent.remainingDistance:F3} | StoppingDistance: {dynamicStoppingDistance:F3} | Manque: {(agent.remainingDistance - dynamicStoppingDistance):F3}");
 
             if (!agent.pathPending
                 && agent.remainingDistance <= dynamicStoppingDistance
@@ -131,9 +133,9 @@ public class MovementManager : MonoBehaviour
                 if (stuckTimer > 1.5f)
                 {
                     isMovingToTarget = false;
+                    agent.velocity = Vector3.zero;
                     agent.ResetPath();
                     stuckTimer = 0f;
-                    NotifyMovementComplete();
                 }
             }
             else
@@ -204,6 +206,7 @@ public class MovementManager : MonoBehaviour
 
     public void MoveToPosition(Vector3 destination, float stopDistance)
     {
+        Debug.Log($"MoveToPosition | stopDistance reçu: {stopDistance} | agent.stoppingDistance avant: {agent.stoppingDistance}");
         if (!CanMoveOnWorldPosition(destination))
             return;
 
@@ -219,6 +222,7 @@ public class MovementManager : MonoBehaviour
             agent.speed = GetUnitSpeed();
             agent.areaMask = GetAllowedNavMeshAreaMask();
             agent.stoppingDistance = stoppingDistance;
+            Debug.Log($"MoveToPosition | agent.stoppingDistance après: {agent.stoppingDistance}");
             agent.ResetPath();
             agent.SetDestination(destination);
         }
