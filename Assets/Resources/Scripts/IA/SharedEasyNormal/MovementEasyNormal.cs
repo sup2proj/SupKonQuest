@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(UnitInstance))]
-public class EasyMovement : MonoBehaviour
+public class MovementEasyNormal : MonoBehaviour
 {
     [Header("Easy Movement")]
     [SerializeField, Min(1f)] private float moveDurationMin = 2f;

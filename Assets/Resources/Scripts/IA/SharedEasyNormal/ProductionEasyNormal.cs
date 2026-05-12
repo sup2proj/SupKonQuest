@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class EasyProduction : MonoBehaviour
+public class ProductionEasyNormal : MonoBehaviour
 {
     [Header("Production")]
     [SerializeField, Min(0.1f)] private float productionCheckInterval = 0.25f;
@@ -18,8 +18,9 @@ public class EasyProduction : MonoBehaviour
     private float nextProductionReadyTime;
     private bool mapReady;
     private bool loggedWaitingForMap;
+    private int currentDifficultyIA;
 
-    public void Initialize(PlayerManager pm, StructureManager sm, MapGenerator mg, int id)
+    public void Initialize(PlayerManager pm, StructureManager sm, MapGenerator mg, int id, int difficultyIA)
     {
         if (playerManager == null) 
             playerManager = pm;
@@ -27,6 +28,7 @@ public class EasyProduction : MonoBehaviour
             structureManager = sm;
         if (mapGenerator == null) 
             mapGenerator = mg;
+        currentDifficultyIA = difficultyIA;
         playerId = id;
     }
 
