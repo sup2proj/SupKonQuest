@@ -91,6 +91,13 @@ public class StructureManager : MonoBehaviour
 
         instance.Initialize(runtimeData);
         BoatTransport.GetOrAdd(instance);
+        
+        //TEMPORAIRRRRRRRRRRRRRRRRRRRRRRE
+        // Ajout automatique du système de déplacement IA pour le joueur IA
+        if (playerId == 1 && unitGO.GetComponent<EasyMovement>() == null)
+        {
+            unitGO.AddComponent<EasyMovement>();
+        }
 
         if (isProtector && sourceStructure != null)
             sourceStructure.AddProtectorUnit(instance);

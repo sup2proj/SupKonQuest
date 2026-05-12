@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -30,7 +31,35 @@ public class PlayerManager : MonoBehaviour
             if (!sessionsById.ContainsKey(i))
                 CreateSessionForPlayer(i, autoStartGold, startUnitCount: 0, startStructureCount: 2);
         }
+        //TEMPORAIRRRREEEE
+        if (!sessionsById.ContainsKey(1))
+            CreateSessionForPlayer(1, autoStartGold, startUnitCount: 0, startStructureCount: 2);
+
+        SetActivePlayer(1);
+
+        // Instancier l'IA via reflection pour éviter une dépendance forte au type AIEasy
+        Type aiType = FindTypeInAssemblies("AIEasy");
+        if (aiType != null)
+        {
+            // Vérifier s'il existe déjà une instance
+            var existing = FindObjectOfType(aiType);
+            if (existing == null)
+            {
+                GameObject aiGO = new GameObject("AIEasy_Player1");
+                aiGO.AddComponent(aiType);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerManager] Type 'AIEasy' introuvable dans les assemblies — l'IA ne sera pas instanciée automatiquement.");
+        }
     }
+
+    private void Start()
+    {
+        SetActivePlayer(1);
+    }
+        //TEMPORAIRRRREEEE
 
     private void Update()
     {
@@ -100,6 +129,33 @@ public class PlayerManager : MonoBehaviour
                 StatisticsInterface.Instance.Refresh();
             }
         }
+    }
+
+    // Recherche par nom de type dans tous les assemblies chargés
+    private Type FindTypeInAssemblies(string typeName)
+    {
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        foreach (var asm in assemblies)
+        {
+            try
+            {
+                var t = asm.GetType(typeName);
+                if (t != null)
+                    return t;
+
+                // essayer de retrouver par nom simple
+                foreach (var tp in asm.GetTypes())
+                {
+                    if (tp.Name == typeName)
+                        return tp;
+                }
+            }
+            catch
+            {
+                // ignorer les assemblys qui posent problème
+            }
+        }
+        return null;
     }
 
 }
