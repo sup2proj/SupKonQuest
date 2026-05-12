@@ -29,6 +29,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/TestNetwork/MultiplayerScene.unity
     guid: e424bcd4c127abc4d8acb5046c999cea
+  - enabled: 1
+    path: Assets/TestNetwork/CreateLobbyScene.unity
+    guid: 9170f7f901935fd4396ed09c0bd06594
+  - enabled: 1
+    path: Assets/TestNetwork/JoinLobbyScene.unity
+    guid: 40f87980d8cb3374a98a80a83b498981
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
