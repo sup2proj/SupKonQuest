@@ -94,9 +94,9 @@ public class StructureManager : MonoBehaviour
         
         //TEMPORAIRRRRRRRRRRRRRRRRRRRRRRE
         // Ajout automatique du système de déplacement IA pour le joueur IA
-        if (playerId == 1 && unitGO.GetComponent<MovementEasyNormal>() == null)
+        if (playerId == 1 && unitGO.GetComponent<EasyMovement>() == null)
         {
-            unitGO.AddComponent<MovementEasyNormal>();
+            unitGO.AddComponent<EasyMovement>();
         }
 
         if (isProtector && sourceStructure != null)

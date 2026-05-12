@@ -4,42 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f255f268-479c-4f68-8fb9-1c81ce841df1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Hard/ArmyManager.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Hard/CombatManager.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Hard/EconomyManager.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Hard/PathManager.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalAttack.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalAttack.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/SharedEasyNormal.meta" afterDir="false" />
+    <list default="true" id="f255f268-479c-4f68-8fb9-1c81ce841df1" name="Changes" comment="Easy IA BOT with random deplacement &amp; random creation (powered and normal)&#10;- no attack&#10;- no protection&#10;&#10;dumb ia who cant win a game&#10;&#10;# Conflicts:&#10;#&#9;.idea/.idea.SupKonQuest.sln/.idea/workspace.xml&#10;#&#9;Assets/Resources/Scripts/IA/Easy/AIEasy.cs&#10;#&#9;Assets/Resources/Scripts/IA/Easy/EasyMovement.cs&#10;#&#9;Assets/Resources/Scripts/IA/Easy/EasyProduction.cs&#10;#&#9;Assets/Resources/Scripts/Manager/StructureManager.cs">
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Base.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/AIEasy.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/AIEasy.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/EasyMovement.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/EasyMovement.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/EasyProduction.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/EasyProduction.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Base.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Base/AIController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Hard/ArmyManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Base/AIController.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Base/AIDecision.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Hard/CombatManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Base/AIDecision.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Base/AIState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Hard/EconomyManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Base/AIState.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Base/AITargetFinder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Hard/PathManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Base/AITargetFinder.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/AIEasy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Shared/IAInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/AIEasy.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Shared/IAInstance.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/EasyMovement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/SharedEasyNormal/MovementEasyNormal.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/EasyMovement.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/SharedEasyNormal/MovementEasyNormal.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/EasyProduction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/SharedEasyNormal/ProductionEasyNormal.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Easy/EasyProduction.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/SharedEasyNormal/ProductionEasyNormal.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Hard/AIHard.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Hard/AIHard.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/AINormal.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/AINormal.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalDefense.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalDefense.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalMovement.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalMovement.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalProduction.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalProduction.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Shared/AIUnitManager.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Shared/AIUnitManager.cs.meta" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StructureManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StructureManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -80,7 +54,6 @@
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Data/Units/UnitsData/Heavy.asset" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Data/Units/UnitsData/Infantry.asset" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Data/Units/UnitsData/Mortar.asset" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/IA/Shared/AIArmyManager.cs.meta" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Manager/MovementManager.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Units/BoatTransport.cs.meta" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitsAnimation.cs" root0="SKIP_HIGHLIGHTING" />
@@ -107,24 +80,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;ia&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.agents.accounts&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "git-widget-placeholder": "Cherry-picking in ia",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "ml.llm.agents.accounts",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="f255f268-479c-4f68-8fb9-1c81ce841df1" name="Changes" comment="" />
@@ -139,7 +112,7 @@
       <workItem from="1778141237589" duration="9415000" />
       <workItem from="1778315775613" duration="1334000" />
       <workItem from="1778402571118" duration="5306000" />
-      <workItem from="1778586377021" duration="13216000" />
+      <workItem from="1778586377021" duration="8311000" />
     </task>
     <task id="LOCAL-00001" summary="test">
       <option name="closed" value="true" />
@@ -189,15 +162,7 @@
       <option name="project" value="LOCAL" />
       <updated>1778183357306</updated>
     </task>
-    <task id="LOCAL-00007" summary="Easy IA BOT with random deplacement &amp; random creation (powered and normal) &#10;- no attack &#10;- no protection&#10;&#10;dumb ia who cant win a game">
-      <option name="closed" value="true" />
-      <created>1778595181359</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1778595181359</updated>
-    </task>
-    <option name="localTasksCounter" value="8" />
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -217,8 +182,7 @@
     <MESSAGE value="add deplacement for boat" />
     <MESSAGE value="swin on water &amp; walk on ground" />
     <MESSAGE value="start units in boat" />
-    <MESSAGE value="Easy IA BOT with random deplacement &amp; random creation (powered and normal) &#10;- no attack &#10;- no protection&#10;&#10;dumb ia who cant win a game" />
-    <option name="LAST_COMMIT_MESSAGE" value="Easy IA BOT with random deplacement &amp; random creation (powered and normal) &#10;- no attack &#10;- no protection&#10;&#10;dumb ia who cant win a game" />
+    <option name="LAST_COMMIT_MESSAGE" value="start units in boat" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
