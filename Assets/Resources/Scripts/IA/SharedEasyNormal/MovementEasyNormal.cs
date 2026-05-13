@@ -21,12 +21,16 @@ public class MovementEasyNormal : MonoBehaviour
     private bool isPaused = false;
     private bool isInCombat = false;
     private Transform lastAttackTarget = null;
+    private float nextStructureScanTime = 0f;
+
+    private NormalAttack normalAttackComponent;
 
     private void Awake()
     {
         unitInstance = GetComponent<UnitInstance>();
         movementManager = GetComponent<MovementManager>();
         unitsAnimation = GetComponent<UnitsAnimation>();
+        normalAttackComponent = GetComponent<NormalAttack>();
         if (mapGenerator == null)
             mapGenerator = MapGenerator.Instance != null ? MapGenerator.Instance : FindFirstObjectByType<MapGenerator>();
     }
@@ -34,14 +38,35 @@ public class MovementEasyNormal : MonoBehaviour
     private void OnEnable()
     {
         ScheduleNextMove(0f);
+
+        IAInstance iaInstance = FindFirstObjectByType<IAInstance>();
+        int difficulty = iaInstance != null ? iaInstance.DifficultyIA : 1;
+
+        if (difficulty == 2)
+        {
+            if (normalAttackComponent == null)
+                normalAttackComponent = gameObject.AddComponent<NormalAttack>();
+
+            if (normalAttackComponent != null && unitInstance != null)
+            {
+                normalAttackComponent.SetOwnerPlayerId(unitInstance.playerId);
+                Debug.Log($"[MovementEasyNormal] {gameObject.name} NormalAttack added/configured for owner={unitInstance.playerId}");
+            }
+        }
+
+        if (movementManager != null && !movementManager.IsMoving())
+        {
+            StartRandomMove();
+        }
     }
 
     private void Update()
     {
         if (unitInstance == null || movementManager == null || unitInstance.unitData == null)
             return;
+
         UpdateCombatStatus();
-        // Si l'unité est en combat, on suspend le cycle de mouvement aléatoire
+
         if (isInCombat)
             return;
 
@@ -75,49 +100,36 @@ public class MovementEasyNormal : MonoBehaviour
 
     private void UpdateCombatStatus()
     {
-        // Vérifier si l'unité a un ennemi à attaquer
         bool isCurrentlyInCombat = false;
         Transform currentAttackTarget = null;
 
         if (unitsAnimation != null)
         {
-            // On vérifie si UnitsAnimation a un attackTarget via réflexion ou via une méthode publique
-            // Pour l'instant, on utilise la propriété d'accès qu'on peut créer
             currentAttackTarget = GetAttackTargetFromAnimation();
             isCurrentlyInCombat = currentAttackTarget != null;
         }
 
-        // Si on entre en combat (transition de non-combat à combat)
         if (!isInCombat && isCurrentlyInCombat)
         {
-            Debug.Log($"[EasyMovement] {gameObject.name} entre en combat contre {currentAttackTarget.name}");
             isInCombat = true;
             movementManager.StopMovement();
             lastAttackTarget = currentAttackTarget;
         }
-        // Si on quitte le combat
         else if (isInCombat && !isCurrentlyInCombat)
         {
-            // Vérifier si la cible est toujours vivante
             if (lastAttackTarget != null)
             {
                 UnitInstance targetUnit = lastAttackTarget.GetComponent<UnitInstance>();
                 StructureInstance targetStructure = lastAttackTarget.GetComponent<StructureInstance>();
-
-                // Si la cible est morte, on sort du combat
                 if ((targetUnit != null && targetUnit.currentHealth <= 0) || (targetStructure != null && targetStructure.currentHealth <= 0))
                 {
-                    Debug.Log($"[EasyMovement] {gameObject.name} sort du combat (cible morte)");
                     isInCombat = false;
                     lastAttackTarget = null;
-                    // Relancer le cycle de mouvement aléatoire
                     ScheduleNextMove(0f);
                 }
             }
             else
             {
-                // Si plus de cible, on sort du combat
-                Debug.Log($"[EasyMovement] {gameObject.name} sort du combat (plus de cible)");
                 isInCombat = false;
                 lastAttackTarget = null;
                 ScheduleNextMove(0f);
@@ -129,10 +141,10 @@ public class MovementEasyNormal : MonoBehaviour
     {
         if (unitsAnimation == null)
             return null;
-    
+
         return unitsAnimation.AttackTarget;
     }
-    
+
     private void SchedulePause()
     {
         float pause = Random.Range(pauseDurationMin, pauseDurationMax);
@@ -152,11 +164,36 @@ public class MovementEasyNormal : MonoBehaviour
             float moveDuration = Random.Range(moveDurationMin, moveDurationMax);
             nextStateChangeTime = Time.time + moveDuration;
             movementManager.MoveToPosition(destination, stopDistance);
+            return;
         }
-        else
+
+        if (TryGetLocalFallbackDestination(out Vector3 fallback))
         {
-            ScheduleNextMove(1f);
+            float moveDuration = Random.Range(moveDurationMin, moveDurationMax);
+            nextStateChangeTime = Time.time + moveDuration;
+            movementManager.ForceMoveToPosition(fallback, stopDistance);
+            return;
         }
+
+        ScheduleNextMove(1f);
+    }
+
+    private bool TryGetLocalFallbackDestination(out Vector3 destination)
+    {
+        destination = transform.position;
+
+        for (int i = 0; i < 8; i++)
+        {
+            Vector3 cand = transform.position + (Vector3)(Random.insideUnitCircle * 3f);
+            cand.y = transform.position.y;
+            if (movementManager.CanMoveOnWorldPosition(cand))
+            {
+                destination = cand;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private bool TryGetRandomDestination(out Vector3 destination)

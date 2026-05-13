@@ -38,20 +38,21 @@ public class PlayerManager : MonoBehaviour
         SetActivePlayer(1);
 
         // Instancier l'IA via reflection pour éviter une dépendance forte au type AIEasy
-        Type aiType = FindTypeInAssemblies("AIEasy");
+        Type aiType = FindTypeInAssemblies("IAInstance");
         if (aiType != null)
         {
             // Vérifier s'il existe déjà une instance
-            var existing = FindObjectOfType(aiType);
+            var existing = FindFirstObjectByType(aiType, FindObjectsInactive.Include);
             if (existing == null)
             {
-                GameObject aiGO = new GameObject("AIEasy_Player1");
-                aiGO.AddComponent(aiType);
+                GameObject aiGO = new GameObject("IAInstance_Player2");
+                var comp = aiGO.AddComponent(aiType);
+                Debug.Log("[PlayerManager] IAInstance créée automatiquement pour le joueur IA (difficulty=2).");
             }
         }
         else
         {
-            Debug.LogWarning("[PlayerManager] Type 'AIEasy' introuvable dans les assemblies — l'IA ne sera pas instanciée automatiquement.");
+            Debug.LogWarning("[PlayerManager] Type 'IAInstance' introuvable dans les assemblies — l'IA ne sera pas instanciée automatiquement.");
         }
     }
 

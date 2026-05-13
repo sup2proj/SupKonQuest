@@ -14,6 +14,13 @@ public class IAInstance : MonoBehaviour
     [SerializeField] private ProductionEasyNormal productionEasyNormal;
     [SerializeField] private int difficultyIA = 2;
 
+    // Propriété publique pour exposer la difficulté (lecture/écriture)
+    public int DifficultyIA
+    {
+        get => difficultyIA;
+        set => difficultyIA = value;
+    }
+
     private float decisionTimer;
     private int playerId = -1;
 
@@ -42,9 +49,13 @@ public class IAInstance : MonoBehaviour
     private void Start()
     {
         if (playerManager != null)
-            playerId = playerManager.GetActivePlayerId();
+        {
+            // L'IA est toujours le joueur 2, le joueur humain est le joueur 1
+            playerId = 1;
+            playerManager.CreateSessionForPlayer(playerId, 500, startUnitCount: 0, startStructureCount: 2);
+        }
 
-        if (difficultyIA == 1)
+        if (difficultyIA == 1 || difficultyIA == 2)
         {
             if (productionEasyNormal != null)
                 productionEasyNormal.Initialize(playerManager, structureManager, mapGenerator, playerId, difficultyIA);
@@ -67,10 +78,7 @@ public class IAInstance : MonoBehaviour
         if (playerManager == null || structureManager == null)
             return;
 
-        if (playerId < 0)
-            playerId = playerManager.GetActivePlayerId();
-
-        if (difficultyIA == 1)
+        if (difficultyIA == 1 || difficultyIA == 2)
         {
             if (productionEasyNormal == null)
                 productionEasyNormal = GetComponent<ProductionEasyNormal>();
@@ -85,7 +93,7 @@ public class IAInstance : MonoBehaviour
 
             decisionTimer += Time.deltaTime;
             if (decisionTimer >= decisionInterval)
-                decisionTimer =0f;
+                decisionTimer = 0f;
         }
     }
 }
