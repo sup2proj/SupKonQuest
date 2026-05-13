@@ -6,11 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f255f268-479c-4f68-8fb9-1c81ce841df1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalAttack.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalAttack.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Shared/IAInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Shared/IAInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/SharedEasyNormal/MovementEasyNormal.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/SharedEasyNormal/MovementEasyNormal.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/MovementManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/MovementManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/PlayerManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/PlayerManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Base.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalDefense.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalDefense.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StructureManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StructureManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -176,7 +173,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778671838483</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="target structure for IA 2">
+      <option name="closed" value="true" />
+      <created>1778677206928</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1778677206928</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -196,7 +201,8 @@
     <MESSAGE value="add deplacement for boat" />
     <MESSAGE value="swin on water &amp; walk on ground" />
     <MESSAGE value="start units in boat" />
-    <option name="LAST_COMMIT_MESSAGE" value="start units in boat" />
+    <MESSAGE value="target structure for IA 2" />
+    <option name="LAST_COMMIT_MESSAGE" value="target structure for IA 2" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
