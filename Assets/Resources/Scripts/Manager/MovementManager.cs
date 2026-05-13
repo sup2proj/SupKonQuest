@@ -394,4 +394,21 @@ public class MovementManager : MonoBehaviour
 
         movement.MoveToTarget(target, stopDistance);
     }
+
+    public void ForceMoveToPosition(Vector3 destination, float stopDistance)
+    {
+        followTarget = null;
+        targetPosition = destination;
+        stoppingDistance = Mathf.Max(0f, stopDistance);
+        isMovingToTarget = true;
+
+        if (CanUseNavMeshAgent())
+        {
+            agent.speed = GetUnitSpeed();
+            agent.areaMask = GetAllowedNavMeshAreaMask();
+            agent.stoppingDistance = stoppingDistance;
+            agent.ResetPath();
+            agent.SetDestination(destination);
+        }
+    }
 }

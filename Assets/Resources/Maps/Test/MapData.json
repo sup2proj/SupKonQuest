@@ -1,18 +1,15 @@
 {
     "startPoints": [
       { "x": 8, "y": 8, "owner": 1 },
-      { "x": 24, "y": 24, "owner": 2 },
-      { "x": 18, "y": 24, "owner": 2 }
+      { "x": 24, "y": 24, "owner": 2 }
     ],
     "castles": [
       { "x": 24, "y": 8, "owner": 1 }
     ],
     "harbours": [
-      { "x": 15, "y": 16, "owner": 2 },
-      { "x": 5, "y": 12, "owner": 1 },
-      { "x": 5, "y": 5, "owner": 1 }
+      { "x": 15, "y": 16, "owner": 2 }
     ],
     "special": [
-      { "x": 30, "y": 1, "owner": 2 }
+      { "x": 30, "y": 1, "owner": 1 }
     ]
   }

@@ -21,6 +21,8 @@ public class UnitsAnimation : MonoBehaviour
 
     private MovementManager movementManager;
 
+    public Transform AttackTarget => attackTarget;
+    
     void Awake()
     {
         if (animator == null)
