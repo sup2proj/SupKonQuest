@@ -280,15 +280,29 @@ public class ActionInterface : MonoBehaviour
     
     void ShowBoatPrices(TextMeshProUGUI[] boatPriceTexts)
     {
-        if (boatPriceTexts == null) return;
-        
-        foreach (var boatPriceText in boatPriceTexts)
+        if (boatPriceTexts == null || unitDatas == null)
+            return;
+
+        int firstBoatIndex = 7;
+        int count = Mathf.Min(boatPriceTexts.Length, Mathf.Max(0, unitDatas.Length - firstBoatIndex));
+
+        for (int i = 0; i < count; i++)
         {
-            if (boatPriceText != null)
+            var boatPriceText = boatPriceTexts[i];
+            if (boatPriceText == null)
+                continue;
+
+            int unitIndex = firstBoatIndex + i;
+            if (unitIndex < 0 || unitIndex >= unitDatas.Length || unitDatas[unitIndex] == null)
             {
-                boatPriceText.gameObject.SetActive(true);
-                boatPriceText.transform.SetAsLastSibling();
+                boatPriceText.text = "";
+                continue;
             }
+
+            float finalPrice = unitDatas[unitIndex].price;
+            boatPriceText.text = finalPrice.ToString();
+            boatPriceText.gameObject.SetActive(true);
+            boatPriceText.transform.SetAsLastSibling();
         }
     }
 
