@@ -531,9 +531,15 @@ public class InterfaceInstance : MonoBehaviour
                 UnitInstance unit = selectable.GetComponent<UnitInstance>();
                 if (unit == null || unit.playerId != activePlayerId)
                     continue;
+                
+                if (!BoatTransport.IsBoatUnit(unit))
+                    continue;
 
                 if (BoatTransport.ExitAllUnits(unit))
-                    unloadedBoats++;
+                {
+                    unloadedBoats = 1;
+                    break;
+                }
             }
         }
 

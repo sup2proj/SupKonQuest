@@ -25,11 +25,6 @@ public class NormalAttack : MonoBehaviour
             movementManager = GetComponent<MovementManager>();
 
         bool isMoving = movementManager != null && movementManager.IsMoving();
-        if (scanTimer == 0f)
-        {
-            Debug.Log($"[NormalAttack] {name} scanning enabled (moving={isMoving}) every {scanInterval}s (baseRadius={scanRadius}) owner={ownerPlayerId}");
-        }
-
         scanTimer += Time.deltaTime;
         if (scanTimer < scanInterval)
             return;
@@ -57,15 +52,12 @@ public class NormalAttack : MonoBehaviour
     {
         if (!CanTargetStructures())
         {
-            Debug.Log($"[NormalAttack] {name} is Support/Healer -> structure targeting disabled");
             return;
         }
 
         float effectiveRadius = scanRadius;
         float attackRange = GetUnitAttackRange();
         effectiveRadius = Mathf.Max(effectiveRadius, attackRange + 0.6f);
-
-        Debug.Log($"[NormalAttack] {name} scanning for structures. effectiveRadius={effectiveRadius:F2}, attackRange={attackRange:F2}, owner={ownerPlayerId}");
 
         StructureInstance chosen = null;
         float bestDistSqr = float.MaxValue;
@@ -94,12 +86,10 @@ public class NormalAttack : MonoBehaviour
 
         if (chosen == null)
         {
-            Debug.Log($"[NormalAttack] {name} no enemy non-harbour structure found within {effectiveRadius:F2}");
             return;
         }
 
         float dist = Vector3.Distance(transform.position, chosen.StructurePosition);
-        Debug.Log($"[NormalAttack] {name} found enemy structure '{chosen.name}' at distance={dist:F2} -> ordering move");
 
         currentTarget = chosen;
         SendAttackOrder(currentTarget);
@@ -113,10 +103,8 @@ public class NormalAttack : MonoBehaviour
         MovementManager movement = GetComponent<MovementManager>();
         if (movement != null)
         {
-            Debug.Log($"[NormalAttack] {name} sending MoveToTarget order to structure {target.name} at {target.StructurePosition}");
             if (!movement.CanMoveOnWorldPosition(target.StructurePosition))
             {
-                Debug.Log($"[NormalAttack] {name} target position not allowed by CanMoveOnWorldPosition, forcing move to {target.StructurePosition}");
                 movement.ForceMoveToPosition(target.StructurePosition, stopDistance);
                 return;
             }
@@ -124,13 +112,10 @@ public class NormalAttack : MonoBehaviour
             movement.MoveToTarget(target.transform, stopDistance);
             return;
         }
-
-        Debug.Log($"[NormalAttack] {name} cible {target.name} mais aucun MovementManager trouvé.");
     }
 
     public void SetOwnerPlayerId(int playerId)
     {
         ownerPlayerId = playerId;
-        Debug.Log($"[NormalAttack] {name} ownerPlayerId set to {ownerPlayerId}");
     }
 }
