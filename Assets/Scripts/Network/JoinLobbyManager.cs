@@ -78,9 +78,9 @@ public class JoinLobbyManager : MonoBehaviour
             Lobby joinedLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
             Debug.Log("Lobby rejoint avec succès : " + joinedLobby.Name);
             
-            // Plus tard, on chargera la scène de la salle d'attente ici !
-            // SceneManager.LoadScene("LobbyRoomScene"); 
-            statusText.text = "Succès ! Vous êtes dans le lobby.";
+            LobbyRoomManager.IsHost = false;
+            LobbyRoomManager.JoinedLobby = joinedLobby;
+            SceneManager.LoadScene("LobbyRoomScene");
         }
         catch (LobbyServiceException e)
         {

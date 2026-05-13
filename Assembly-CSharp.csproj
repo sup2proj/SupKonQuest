@@ -80,6 +80,7 @@
     <Compile Include="Assets\Scripts\Manager\LocalizedText.cs" />
     <Compile Include="Assets\Scripts\camera\cameraMouvement.cs" />
     <Compile Include="Assets\Scripts\Data\LandUntisData\LandUnitsSO\UnitCombatData.cs" />
+    <Compile Include="Assets\Scripts\Network\LobbyRoomManager.cs" />
     <Compile Include="Assets\Scripts\Network\RelayManager.cs" />
     <Compile Include="Assets\Scripts\Network\JoinLobbyManager.cs" />
     <Compile Include="Assets\Scripts\Data\StructureData\StructureSO\StructureData.cs" />

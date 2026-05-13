@@ -419,13 +419,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 252891415}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1387175646}
-  m_Father: {fileID: 442358772}
+  m_Father: {fileID: 1968633341}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -477,7 +477,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1008551695}
-        m_TargetAssemblyTypeName: HostLobbyManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: LobbyRoomManager, Assembly-CSharp
         m_MethodName: ChangeMaxPlayers
         m_Mode: 3
         m_Arguments:
@@ -552,13 +552,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 255461799}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1362490035}
-  m_Father: {fileID: 442358772}
+  m_Father: {fileID: 1968633341}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -610,7 +610,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1008551695}
-        m_TargetAssemblyTypeName: HostLobbyManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: LobbyRoomManager, Assembly-CSharp
         m_MethodName: ChangeMap
         m_Mode: 5
         m_Arguments:
@@ -1198,10 +1198,7 @@ RectTransform:
   - {fileID: 700285893}
   - {fileID: 400941644}
   - {fileID: 429213155}
-  - {fileID: 255461800}
-  - {fileID: 866439595}
-  - {fileID: 252891416}
-  - {fileID: 1540549535}
+  - {fileID: 1968633341}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1588,13 +1585,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 866439594}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 172577746}
-  m_Father: {fileID: 442358772}
+  m_Father: {fileID: 1968633341}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1646,7 +1643,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1008551695}
-        m_TargetAssemblyTypeName: HostLobbyManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: LobbyRoomManager, Assembly-CSharp
         m_MethodName: ChangeMap
         m_Mode: 5
         m_Arguments:
@@ -1779,7 +1776,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1008551695}
-        m_TargetAssemblyTypeName: HostLobbyManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: LobbyRoomManager, Assembly-CSharp
         m_MethodName: LeaveLobby
         m_Mode: 1
         m_Arguments:
@@ -1976,7 +1973,7 @@ GameObject:
   - component: {fileID: 1008551694}
   - component: {fileID: 1008551695}
   m_Layer: 0
-  m_Name: HostLobbyManager
+  m_Name: LobbyRoomManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2006,13 +2003,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1008551692}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4159905332710242af4045be6f8ea11, type: 3}
+  m_Script: {fileID: 11500000, guid: 04b51b78ea50cb3468ac89283081a5b2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HostLobbyManager
+  m_EditorClassIdentifier: Assembly-CSharp::LobbyRoomManager
   lobbyStatusText: {fileID: 943641019}
   playerListText: {fileID: 429213156}
   mapNameText: {fileID: 700285894}
   maxPlayersText: {fileID: 400941645}
+  hostControlsPanel: {fileID: 1968633340}
 --- !u!1 &1362490034
 GameObject:
   m_ObjectHideFlags: 0
@@ -2313,13 +2311,13 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1540549534}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 123654356}
-  m_Father: {fileID: 442358772}
+  m_Father: {fileID: 1968633341}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2371,7 +2369,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1008551695}
-        m_TargetAssemblyTypeName: HostLobbyManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: LobbyRoomManager, Assembly-CSharp
         m_MethodName: ChangeMaxPlayers
         m_Mode: 3
         m_Arguments:
@@ -2557,6 +2555,85 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1968633340
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1968633341}
+  - component: {fileID: 1968633343}
+  - component: {fileID: 1968633342}
+  m_Layer: 5
+  m_Name: HostControlsPanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1968633341
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1968633340}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 255461800}
+  - {fileID: 866439595}
+  - {fileID: 252891416}
+  - {fileID: 1540549535}
+  m_Father: {fileID: 442358772}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1968633342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1968633340}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1968633343
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1968633340}
+  m_CullTransparentMesh: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -5,7 +5,8 @@ public class MultiplayerMenuManager : MonoBehaviour
 {
     public void GoToCreateLobby()
     {
-        SceneManager.LoadScene("CreateLobbyScene");
+        LobbyRoomManager.IsHost = true;
+        SceneManager.LoadScene("LobbyRoomScene");
     }
 
     public void GoToJoinLobby()
