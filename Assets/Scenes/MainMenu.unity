@@ -201,7 +201,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 161725980}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1008551695}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: Multi
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &161725980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1313,7 +1325,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 644277191}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1008551695}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: Options
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &644277191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1434,7 +1458,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 846414643}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1008551695}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: NewGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &846414643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1555,7 +1591,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 958724403}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1008551695}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: Quit
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &958724403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1638,13 +1686,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5486c7a1d19c5d4283a348517089adc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuManager
-  buttons:
-  - {fileID: 597359686}
-  - {fileID: 391133372}
-  - {fileID: 517376171}
-  - {fileID: 298063996}
-  normalSize: 24
-  selectedSize: 36
 --- !u!1 &1641883920
 GameObject:
   m_ObjectHideFlags: 0

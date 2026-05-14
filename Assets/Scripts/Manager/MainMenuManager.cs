@@ -1,66 +1,25 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro;
 
 public class MainMenuManager : MonoBehaviour
 {
-    public TextMeshProUGUI[] buttons;
-
-    public float normalSize   = 24f;
-    public float selectedSize = 36f;
-
-    private int currentIndex = 0;
-
-    void Start()
-    {
-        UpdateSizes();
+    public void NewGame()  
+    { 
+        SceneManager.LoadScene("LaunchingLocalNewGame"); 
     }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            currentIndex = currentIndex + 1;
-            if (currentIndex > buttons.Length - 1)
-                currentIndex = 0;
-            UpdateSizes();
-        }
-
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            currentIndex = currentIndex - 1;
-            if (currentIndex < 0)
-                currentIndex = buttons.Length - 1;
-            UpdateSizes();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            Confirm();
-        }
+    
+    public void Multi() 
+    { 
+        SceneManager.LoadScene("LoginScene"); 
     }
-
-    void UpdateSizes()
-    {
-        for (int i = 0; i < buttons.Length; i++)
-        {
-            if (i == currentIndex)
-                buttons[i].fontSize = selectedSize;
-            else
-                buttons[i].fontSize = normalSize;
-        }
+    
+    public void Options()  
+    { 
+        SceneManager.LoadScene("Options");   
     }
-
-    void Confirm()
-    {
-        if (currentIndex == 0) NewGame();
-        if (currentIndex == 1) Multi();
-        if (currentIndex == 2) Options();
-        if (currentIndex == 3) Quit();
+    
+    public void Quit()     
+    { 
+        Application.Quit();                  
     }
-
-    public void NewGame()  { SceneManager.LoadScene("LaunchingLocalNewGame"); }
-    public void Multi() { SceneManager.LoadScene("LoginScene"); }
-    public void Options()  { SceneManager.LoadScene("Options");   }
-    public void Quit()     { Application.Quit();                  }
 }
