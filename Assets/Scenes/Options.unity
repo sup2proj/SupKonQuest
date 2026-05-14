@@ -1614,12 +1614,6 @@ MonoBehaviour:
   resRightArrow: {fileID: 1722503917}
   fullscreenToggle: {fileID: 1586552376}
   fullscreenText: {fileID: 40324255}
-  normalColor: {r: 0.83137256, g: 0.6431373, b: 0.21568628, a: 1}
-  selectedColor: {r: 1, g: 1, b: 1, a: 1}
-  btnBack: {fileID: 1667928906}
-  btnBackText: {fileID: 473397727}
-  normalSize: 25
-  selectedSize: 35
 --- !u!4 &805134574
 Transform:
   m_ObjectHideFlags: 0
@@ -2416,7 +2410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Slider
   m_Navigation:
-    m_Mode: 4
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 1833934514}
     m_SelectOnDown: {fileID: 551540549}
@@ -3498,7 +3492,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Slider
   m_Navigation:
-    m_Mode: 4
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 1667928908}
     m_SelectOnDown: {fileID: 1450023125}
