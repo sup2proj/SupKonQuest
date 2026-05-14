@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Enums.Environment;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 public class SelectionManager : MonoBehaviour
@@ -11,7 +12,7 @@ public class SelectionManager : MonoBehaviour
     public List<SelectableObject> AllSelectableObjects;
     public List<SelectableObject> CurrentlySelectedObjects;
     [SerializeField, Min(0.05f)] private float selectableRefreshInterval = 0.25f;
-    [SerializeField, Min(0.01f)] private float groupMoveStoppingDistance = 0.1f;
+    private float groupMoveStoppingDistance = 0.3f;
     [SerializeField, Min(1f)] private float enemyUnitClickScreenRadius = 45f;
 
     bool isMouseDown, isDragging = false;
@@ -95,30 +96,78 @@ public class SelectionManager : MonoBehaviour
     }
 
     private void TryIssueGroupMoveOrder()
+{
+    if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0 || Camera.main == null)
+        return;
+
+    Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+    if (!Physics.Raycast(ray, out RaycastHit hit))
+        return;
+
+    int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
+    List<UnitInstance> groupUnits = CollectSelectedPlayerUnits(activePlayerId);
+
+    if (groupUnits.Count == 0)
+        return;
+
+    int groupMoveId = nextGroupMoveId++;
+    UnitInstance leader = GetClosestUnitToPoint(groupUnits, hit.point);
+    List<Vector3> slots = GetFormationPositions(hit.point, groupUnits.Count);
+
+    for (int i = 0; i < groupUnits.Count; i++)
     {
-        if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0 || Camera.main == null)
-            return;
-
-        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-        if (!Physics.Raycast(ray, out RaycastHit hit))
-            return;
-
-        int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
-        List<UnitInstance> groupUnits = CollectSelectedPlayerUnits(activePlayerId);
-
-        if (groupUnits.Count == 0)
-            return;
-
-        int groupMoveId = nextGroupMoveId++;
-        UnitInstance leader = GetClosestUnitToPoint(groupUnits, hit.point);
-
-        for (int i = 0; i < groupUnits.Count; i++)
-        {
-            UnitInstance unit = groupUnits[i];
-            bool isLeader = (unit == leader);
-            MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, hit.point, groupMoveStoppingDistance, groupMoveId, isLeader);
-        }
+        UnitInstance unit = groupUnits[i];
+        bool isLeader = (unit == leader);
+        Vector3 destination = slots[i];
+        destination.y = unit.transform.position.y;
+        MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, destination, groupMoveStoppingDistance, groupMoveId, isLeader);
     }
+}
+
+private List<Vector3> GetFormationPositions(Vector3 center, int total)
+{
+    List<Vector3> slots = new List<Vector3>();
+
+    if (total == 1)
+    {
+        slots.Add(SampleNavMesh(center));
+        return slots;
+    }
+
+    float unitSpacing = 1f; // distance entre deux unités voisines
+
+    // Cercle 0 : le centre lui-même
+    slots.Add(SampleNavMesh(center));
+    if (slots.Count >= total) return slots;
+
+    // Cercles concentriques
+    int ring = 1;
+    while (slots.Count < total)
+    {
+        float radius = ring * unitSpacing;
+        // Nombre d'unités qui tiennent sur ce cercle (circonférence / espacement)
+        int unitsOnRing = Mathf.Max(1, Mathf.RoundToInt(2f * Mathf.PI * radius / unitSpacing));
+        int toPlace = Mathf.Min(unitsOnRing, total - slots.Count);
+
+        for (int i = 0; i < toPlace; i++)
+        {
+            float angle = i * (360f / unitsOnRing) * Mathf.Deg2Rad;
+            Vector3 candidate = center + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+            slots.Add(SampleNavMesh(candidate));
+        }
+
+        ring++;
+    }
+
+    return slots;
+}
+
+private Vector3 SampleNavMesh(Vector3 candidate)
+{
+    if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+        return hit.position;
+    return candidate;
+}
 
     private UnitInstance GetClosestUnitToPoint(List<UnitInstance> units, Vector3 point)
     {

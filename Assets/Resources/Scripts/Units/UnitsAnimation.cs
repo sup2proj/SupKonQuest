@@ -18,6 +18,7 @@ public class UnitsAnimation : MonoBehaviour
     private Coroutine spellAttackResetCoroutine;
     private Coroutine ensureAttackAnimationCoroutine;
     private bool isRetaliating;
+    private DamageTable damageTable;
 
     private MovementManager movementManager;
 
@@ -27,6 +28,12 @@ public class UnitsAnimation : MonoBehaviour
             animator = GetComponent<Animator>();
         cachedUnit = GetComponent<UnitInstance>();
         movementManager = GetComponent<MovementManager>();
+
+        damageTable = Resources.Load<DamageTable>("Scripts/Data/Units/UnitsSO/DamageTable");
+        if (damageTable == null)
+        {
+            Debug.LogError("Impossible de charger DamageTable !");
+        }
 
         // Connecter le callback de fin de mouvement
         if (movementManager != null)
@@ -347,15 +354,48 @@ public class UnitsAnimation : MonoBehaviour
     }
 
     private float GetAttackDamage()
+{
+    UnitInstance attacker = cachedUnit;
+    UnitInstance target = attackTarget != null ? attackTarget.GetComponent<UnitInstance>() : null;
+
+    if (attacker != null && attacker.unitData is UnitCombatData combatData)
     {
-        UnitInstance unit = cachedUnit;
-        if (unit != null && unit.unitData is UnitCombatData combatData)
-		{
-			Debug.Log(Mathf.Max(0f, combatData.attack));
-            return Mathf.Max(0f, combatData.attack);
-		}
-        return 0f;
+        Debug.Log($"[Attaque] {attacker.name} frappe {(target != null ? target.name : "structure")} pour {combatData.attack} dégâts");
+        if (attacker == null)
+    {
+        Debug.LogError("attacker NULL");
+        return 0;
     }
+
+    if (target == null)
+    {
+        Debug.LogError("target NULL");
+        return 0;
+    }
+
+    if (attacker.unitData == null)
+    {
+        Debug.LogError("attacker.unitData NULL");
+        return 0;
+    }
+
+    if (target.unitData == null)
+    {
+        Debug.LogError("target.unitData NULL");
+        return 0;
+    }
+
+    if (damageTable == null)
+    {
+        Debug.LogError("damageTable NULL");
+        return 0;
+    }
+
+        return Mathf.Max(0f, combatData.attack * damageTable.GetMultiplier(attacker, target));
+    }
+
+    return 0f;
+}
 
     private void OnMovementCompleted(Transform target)
     {
