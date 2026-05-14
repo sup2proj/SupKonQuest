@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4595420145058669480}
   - component: {fileID: 2155664974853324132}
   - component: {fileID: -3634341256580888422}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Env_Ground_Snow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

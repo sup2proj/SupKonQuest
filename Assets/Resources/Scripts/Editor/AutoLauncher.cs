@@ -1,7 +1,5 @@
-﻿using Unity.VisualScripting;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 
 [InitializeOnLoad]
 public static class AutoLauncher
@@ -15,23 +13,30 @@ public static class AutoLauncher
     {
         if (state == PlayModeStateChange.EnteredPlayMode)
         {
-            if (Object.FindAnyObjectByType<MapGenerator>() == null)
+            string mapFolderName = "TEST";
+            // string mapFolderName = "EUROPE";
+            // string mapFolderName = "LOL";
+            MapGenerator mapGenerator = Object.FindAnyObjectByType<MapGenerator>();
+
+            if (mapGenerator == null)
             {
-                
                 ManagerController.initializePermanentGameObject();
-                
-                GameObject map = new GameObject("AUTO_MAP_GENERATOR"); 
-                MapGenerator mapGenerator = map.AddComponent<MapGenerator>();
-                mapGenerator.LoadAndGenerate("TEST");
-                Debug.Log("AutoLauncher : MapGenerator injecté dynamiquement.");
-                // Camera mainCamera = Camera.main;
-                // mainCamera.AddComponent<cameraMouvement>();
-                // Camera.main.AddComponent<cameraMouvement>();
+            
+                GameObject mapContainer = new GameObject("AUTO_MAP_GENERATOR"); 
+                mapGenerator = mapContainer.AddComponent<MapGenerator>();
+            
+                mapGenerator.LoadAndGenerate(mapFolderName);
+                Debug.Log($"AutoLauncher : Monde '{mapFolderName}' généré.");
             }
+
             Camera mainCam = Camera.main;
             if (mainCam != null) 
             {
-                mainCam.gameObject.AddComponent<cameraMouvement>();
+                CameraMouvement camMovement = mainCam.GetComponent<CameraMouvement>();
+                if (camMovement == null) 
+                    camMovement = mainCam.gameObject.AddComponent<CameraMouvement>();
+
+                camMovement.SetUpCamera(mapGenerator.mapWidth, mapGenerator.mapHeight);
             }
             else 
             {

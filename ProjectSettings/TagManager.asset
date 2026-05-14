@@ -6,14 +6,15 @@ TagManager:
   tags:
   - Units
   - Ground
+  - Price
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
-  - 
+  - empty
   - 
   - 
   - 

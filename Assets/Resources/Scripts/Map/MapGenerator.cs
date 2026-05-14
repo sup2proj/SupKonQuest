@@ -1,8 +1,7 @@
 ﻿using Enums.Environment;
-using Enums.Nature;
-using Enums.Structure;
 using UnityEngine;
 using System.Collections.Generic;
+using Random = UnityEngine.Random;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -10,12 +9,13 @@ public class MapGenerator : MonoBehaviour
     private readonly Color32 _colorDirt = new Color32(170, 160, 0, 255);
     private readonly Color32 _colorSnow = new Color32(255, 255, 255, 255);
     private readonly Color32 _colorWater = new Color32(0, 10, 170, 255);
-    public GroundType groundType;
-    public TreeType treeType;
+    public int mapWidth;
+    public int mapHeight;
     
     public TileData[,] allTiles;
 
     [Header("Source")]
+    public GameObject background;
     public Texture2D mapLayout;
 
     [Header("Grounds")]
@@ -41,13 +41,6 @@ public class MapGenerator : MonoBehaviour
     private Transform structuresFolder;
     private Transform natureFolder;
 
-    void Start()
-    {
-        // LoadAndGenerate("EUROPE");
-        // LoadAndGenerate("TEST");
-        // LoadAndGenerate("LOL");
-    }
-
     public void LoadAndGenerate(string folderName)
     {
         SetupResources();
@@ -57,7 +50,9 @@ public class MapGenerator : MonoBehaviour
         string path = "Maps/" + folderName + "/";
         mapLayout = Resources.Load<Texture2D>(path + "MapLayout");
         MapJsonData jsonData = StructureInstance.LoadDataFromPath(path + "MapData");
-
+        mapWidth = mapLayout.width;
+        mapHeight = mapLayout.height;
+        
         if (mapLayout != null && jsonData != null)
         {
             GenerateWorld();      
@@ -84,13 +79,11 @@ public class MapGenerator : MonoBehaviour
 
     void GenerateWorld()
     {
-        int w = mapLayout.width;
-        int h = mapLayout.height;
-        allTiles = new TileData[w, h];
+        allTiles = new TileData[mapWidth, mapHeight];
 
-        for (int x = 0; x < w; x++)
+        for (int x = 0; x < mapWidth; x++)
         {
-            for (int y = 0; y < h; y++)
+            for (int y = 0; y < mapHeight; y++)
             {
                 Color32 color = mapLayout.GetPixel(x, y);
                 var gData = GetGroundDatas(color);
@@ -104,6 +97,11 @@ public class MapGenerator : MonoBehaviour
                 Destroy(floor.GetComponent<MeshCollider>());
             }
         }
+        Vector3 bgPosition = new Vector3(mapWidth/2, (float)-0.01, mapHeight/2);
+        GameObject backGround = Instantiate(background,bgPosition, Quaternion.identity);
+        backGround.transform.localScale = new Vector3((mapWidth / 3)*tileSize, 1.5f, (mapHeight / 3)*tileSize);
+        backGround.name = "background";
+
     }
 
     void PlaceStructures(MapJsonData data)
@@ -117,14 +115,12 @@ public class MapGenerator : MonoBehaviour
     void SpawnStructureGroup(List<PointData> points, GameObject prefab,  StructureType type, int income)
     {
         if (points == null || prefab == null) return;
-        int h = mapLayout.height;
-
         foreach (PointData p in points)
         {
             if (p.x >= 0 && p.x < allTiles.GetLength(0) && p.y >= 0 && p.y < allTiles.GetLength(1))
             {
-                int unityY = (h - 1 - p.y) ;
-                Vector3 pos = new Vector3(p.x * tileSize, 0, unityY* tileSize);
+                int unityY = (mapHeight - 1 - p.y) ;
+                Vector3 pos = new Vector3((p.x) * tileSize, 0, unityY* tileSize);
                 
                 GameObject structureObj = Instantiate(prefab, pos, Quaternion.identity, structuresFolder);
                 structureObj.transform.localScale = new Vector3(3f, 3f, 3f);
@@ -167,10 +163,9 @@ public class MapGenerator : MonoBehaviour
     
     void AddNature()
     {
-        int h = mapLayout.height;
-        for (int x = 0; x < allTiles.GetLength(0); x++)
+        for (int x = 0; x < mapWidth; x++)
         {
-            for (int y = 0; y < allTiles.GetLength(1); y++)
+            for (int y = 0; y < mapHeight; y++)
             {
                 TileData tile = allTiles[x, y];
 
@@ -188,7 +183,7 @@ public class MapGenerator : MonoBehaviour
 
                         if (treeObj != null)
                         {
-                            Vector3 pos = new Vector3(x * tileSize, 0, y);
+                            Vector3 pos = new Vector3((x) * tileSize, 0, y);
                             
                             Quaternion rot = Quaternion.Euler(0, Random.Range(0, 360), 0);
                             GameObject tree = Instantiate(treeObj, pos, rot, natureFolder);
@@ -221,6 +216,8 @@ public class MapGenerator : MonoBehaviour
         string naturePath = "Prefabs/Nature/";
         string StructurePath = "Prefabs/Structures/";
         
+        if (background == null) background = Resources.Load<GameObject>(environmentPath+"background");
+
         if (groundDirt == null) groundDirt = Resources.Load<GameObject>(environmentPath+"Env_Ground_Dirt");
         if (groundGrass == null) groundGrass = Resources.Load<GameObject>(environmentPath+"Env_Ground_Grass");
         if (groundSnow == null) groundSnow = Resources.Load<GameObject>(environmentPath+"Env_Ground_Snow");
