@@ -4,6 +4,7 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using TMPro;
 
 public class LobbyRoomManager : MonoBehaviour
@@ -20,9 +21,13 @@ public class LobbyRoomManager : MonoBehaviour
     public TextMeshProUGUI playerListText;
     public TextMeshProUGUI mapNameText;
     public TextMeshProUGUI maxPlayersText;
+    public Button readyBtn;
+
+    private bool isLocalPlayerReady = false;
 
     [Header("Interface (UI) Host only")]
     public GameObject hostControlsPanel;
+    public Button startGameBtn;
 
     private string currentMap = "Europe";
     private int currentMaxPlayers = 4;
@@ -53,12 +58,12 @@ public class LobbyRoomManager : MonoBehaviour
         HandleLobbyPolling();
     }
 
+
     private async System.Threading.Tasks.Task CreateLobby()
     {
         try
         {
             string lobbyName = "Salon de " + AuthenticationService.Instance.PlayerId;
-            
             CreateLobbyOptions options = new CreateLobbyOptions
             {
                 IsPrivate = false,
@@ -74,7 +79,6 @@ public class LobbyRoomManager : MonoBehaviour
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
-
 
     public async void ChangeMap(string newMap)
     {
@@ -108,7 +112,6 @@ public class LobbyRoomManager : MonoBehaviour
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
 
-
     public async void LeaveLobby()
     {
         if (currentLobby != null)
@@ -127,6 +130,65 @@ public class LobbyRoomManager : MonoBehaviour
             catch (LobbyServiceException e) { Debug.LogError(e); }
         }
         SceneManager.LoadScene("MultiplayerScene");
+    }
+
+
+    public async void ToggleReady()
+    {
+        if (currentLobby == null) return;
+
+        isLocalPlayerReady = !isLocalPlayerReady;
+
+        try
+        {
+            UpdatePlayerOptions options = new UpdatePlayerOptions
+            {
+                Data = new Dictionary<string, PlayerDataObject>
+                {
+                    { "IsReady", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, isLocalPlayerReady.ToString()) }
+                }
+            };
+
+            string playerId = AuthenticationService.Instance.PlayerId;
+            await LobbyService.Instance.UpdatePlayerAsync(currentLobby.Id, playerId, options);
+
+            readyBtn.GetComponentInChildren<TextMeshProUGUI>().text = isLocalPlayerReady ? "Annuler Prêt" : "Être Prêt";
+        }
+        catch (LobbyServiceException e) { Debug.LogError(e); }
+    }
+
+    public async void StartNetworkGame()
+    {
+        if (!IsHost || currentLobby == null) return;
+
+        Debug.Log("Initialisation du réseau pour le lancement...");
+
+        try
+        {
+            UpdateLobbyOptions options = new UpdateLobbyOptions
+            {
+                Data = new Dictionary<string, DataObject>
+                {
+                    { "GameStarted", new DataObject(DataObject.VisibilityOptions.Member, "True") }
+                }
+            };
+            currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
+        }
+        catch (LobbyServiceException e) { Debug.LogError(e); }
+    }
+
+    private void CheckGameStartSignal()
+    {
+        if (currentLobby != null && currentLobby.Data != null)
+        {
+            if (currentLobby.Data.ContainsKey("GameStarted") && currentLobby.Data["GameStarted"].Value == "True")
+            {
+                Debug.Log("lancement partie");
+                
+                // Scène de la partie
+                // SceneManager.LoadScene("GameScene");
+            }
+        }
     }
 
 
@@ -152,7 +214,9 @@ public class LobbyRoomManager : MonoBehaviour
             {
                 lobbyUpdateTimer = 1.5f; 
                 currentLobby = await LobbyService.Instance.GetLobbyAsync(currentLobby.Id);
+                
                 RefreshUI();
+                CheckGameStartSignal();
             }
         }
     }
@@ -164,11 +228,26 @@ public class LobbyRoomManager : MonoBehaviour
         mapNameText.text = "Carte : " + currentLobby.Data["Map"].Value;
         maxPlayersText.text = "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers;
 
+        int readyCount = 0;
         string players = "Joueurs connectés :\n";
+        
         foreach (var player in currentLobby.Players)
         {
-            players += "- " + player.Id + "\n"; 
+            string readyStatus = "";
+            
+            if (player.Data != null && player.Data.ContainsKey("IsReady") && player.Data["IsReady"].Value == "True")
+            {
+                readyStatus = " <color=#00FF00>[PRÊT]</color>";
+                readyCount++;
+            }
+            
+            players += "- " + player.Id + readyStatus + "\n"; 
         }
         playerListText.text = players;
+
+        if (IsHost && startGameBtn != null)
+        {
+            startGameBtn.interactable = readyCount == currentLobby.Players.Count;
+        }
     }
 }
