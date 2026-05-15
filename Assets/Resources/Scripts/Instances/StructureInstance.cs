@@ -33,6 +33,7 @@ public class StructureInstance : MonoBehaviour
     
     [Header("UI")]
     [SerializeField] public HealthBar healthBar;
+    [SerializeField] public TerritoryStructureName territoryStructureName;
 
     [Header("Detection")]
     [SerializeField] private float unitsFarRadius = 5f;
@@ -410,6 +411,24 @@ public class StructureInstance : MonoBehaviour
     public List<UnitInstance> GetUnitsWithinConfiguredRadius()
     {
         return GetUnitsWithinRadius(unitsFarRadius);
+    }
+
+    // Centralise l'application du nom de territoire et adapte la couleur selon le playerId
+    public void ApplyTerritoryName(string territory)
+    {
+        if (string.IsNullOrWhiteSpace(territory))
+            return;
+
+        TerritoryStructureName t = territoryStructureName;
+        if (t == null)
+            t = GetComponent<TerritoryStructureName>() ?? GetComponentInChildren<TerritoryStructureName>(true);
+
+        if (t != null)
+        {
+            t.SetTerritoryName(territory);
+            Color c = PlayerManager.GetPlayerColor(playerId);
+            t.SetColor(c);
+        }
     }
     
     public static MapJsonData LoadDataFromPath(string path) {

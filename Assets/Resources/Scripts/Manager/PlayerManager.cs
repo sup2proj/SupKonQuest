@@ -159,4 +159,21 @@ public class PlayerManager : MonoBehaviour
         return null;
     }
 
+    // Fournit une couleur de sélection/identification pour un playerId
+    public static Color GetPlayerColor(int id)
+    {
+        switch (id)
+        {
+            case 1: return Color.white;
+            case 2: return Color.red;
+            case 3: return Color.blue;
+            case 4: return Color.green;
+            case 5: return Color.yellow;
+            case 6: return Color.cyan;
+            case 7: return new Color(1f, 0.5f, 0f, 1f); // orange
+            case 8: return new Color(0.6f, 0f, 1f, 1f); // violet
+            default: return Color.gray;
+        }
+    }
+
 }

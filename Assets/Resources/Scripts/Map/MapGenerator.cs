@@ -236,6 +236,9 @@ public class MapGenerator : MonoBehaviour
                     si.InitializePlayerId(p.owner);
                     si.structureType = type;
                     si.neutralStructure = (type == StructureType.NeutralStructure);
+
+                    si.ApplyTerritoryName(p.territory);
+
                     BlockNature(p.x, unityY);
                 }
                 else
