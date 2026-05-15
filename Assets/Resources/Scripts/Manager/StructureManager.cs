@@ -13,6 +13,7 @@ public class StructureManager : MonoBehaviour
     [Header("Unit Prefabs")]
     [SerializeField] private List<UnitPrefabMapping> unitPrefabMappings = new List<UnitPrefabMapping>();
     private Dictionary<UnitsType, GameObject> unitPrefabDict = new Dictionary<UnitsType, GameObject>();
+    private Dictionary<int, List<StructureInstance>> structuresByTerritory = new Dictionary<int, List<StructureInstance>>();
 
     [Header("Powered units")]
     [SerializeField] private float poweredStatsMultiplier = 1.20f;
@@ -31,6 +32,26 @@ public class StructureManager : MonoBehaviour
         {
             unitPrefabDict.Add(mapping.unitType, mapping.prefab);
         }
+    }
+
+    // Enregistre une structure dans l'index interne et lui assigne les métadonnées de territoire
+    public void RegisterStructure(StructureInstance si, int territoryId, string territoryName)
+    {
+        if (si == null) return;
+
+        si.territoryId = territoryId;
+        si.territoryName = territoryName;
+
+        if (territoryId <= 0) return;
+
+        if (!structuresByTerritory.TryGetValue(territoryId, out var list))
+        {
+            list = new List<StructureInstance>();
+            structuresByTerritory[territoryId] = list;
+        }
+
+        if (!list.Contains(si))
+            list.Add(si);
     }
 
     public bool SpawnUnitByTypeAtPosition(int playerId, UnitsType type, float x, float z, bool isPoweredUnit, bool isProtector, StructureInstance sourceStructure = null)
