@@ -53,6 +53,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\Resources\Scripts\Map\MapGenerator.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\StructureButtons\ActionButton.cs" />
+    <Compile Include="Assets\Resources\Scripts\Units\BoatTransport.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\UnitsRegistry.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitBoat.cs" />
@@ -61,12 +62,16 @@
     <Compile Include="Assets\QuickOutline\Scripts\Outline.cs" />
     <Compile Include="Assets\Resources\Scripts\Enums\GroundType.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
+    <Compile Include="Assets\Resources\Scripts\Units\UnitsAnimation.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\StructureManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\UI\ProgressBar.cs" />
+    <Compile Include="Assets\Resources\Scripts\Units\Spells.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\RessourceManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Enums\StructureType.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
+    <Compile Include="Assets\Resources\Scripts\Controller\ManagerController.cs" />
     <Compile Include="Assets\Resources\Scripts\Map\PointData.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitSupportData.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitCombatData.cs" />
@@ -84,11 +89,11 @@
     <Compile Include="Assets\Resources\Scripts\Enums\UnitsType.cs" />
     <Compile Include="Assets\Resources\Scripts\Enums\PlayerNumber.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\PlayerSession.cs" />
-    <Compile Include="Assets\Resources\Scripts\PlayerMovement\UnitsAnimation.cs" />
     <Compile Include="Assets\Resources\Scripts\Map\TileData.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\SelectionManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Units\DamageTable.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
@@ -101,24 +106,23 @@
     <Compile Include="Assets\Resources\Scripts\Enums\BuildingType.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\StatisticsInterface.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitHealerData.cs" />
-    <Compile Include="Assets\Resources\Scripts\Manager\DeplacementManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\UI\HealthBar.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
-    <Compile Include="Assets\Resources\Scripts\UI\HealthBar\HealthBar.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitData.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
+    <Compile Include="Assets\Resources\Scripts\Units\Buffs.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
     <Compile Include="Assets\Resources\Scripts\Camera\cameraMouvement.cs" />
-    <Compile Include="Assets\Resources\Scripts\Manager\ManagerController.cs" />
     <Compile Include="Assets\Resources\Scripts\Instances\StructureInstance.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\MovementManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Instances\PlayerInstance.cs" />
-    <Compile Include="Assets\Resources\Scripts\UI\ProgressBar\ProgressBar.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
