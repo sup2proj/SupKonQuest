@@ -15,8 +15,11 @@ public class StructureInstance : MonoBehaviour
     private Vector3 structurePosition;
 
     private Queue<UnitData> unitQueue = new Queue<UnitData>();
+    private Queue<bool> unitQueueProtectorFlags = new Queue<bool>();
+    [Header("Production")]
+    [SerializeField, Min(1)] private int maxQueueSize = 5;
     public bool neutralStructure;
-    public StructureType structureType;	
+    public StructureType structureType;    
 
     [Header("Units")]
     public List<GameObject> unitsProtectorTypes = new List<GameObject>();
@@ -62,6 +65,7 @@ public class StructureInstance : MonoBehaviour
         currentHealth = health;
         InitHealthBar();
         UnSelected();
+        StartCoroutine(ProcessProductionQueue());
     }
 
     void OnDestroy()
@@ -193,13 +197,84 @@ public class StructureInstance : MonoBehaviour
 
     public void AddToQueue(UnitsType type)
     {
+        AddToQueue(type, false);
+    }
+
+    public void AddToQueue(UnitsType type, bool isProtector)
+    {
+        if (StructureManager.Instance == null)
+            return;
+
+        // If this enqueue is for a protector and the structure belongs to the IA player,
+        // enforce maxQueueSize to avoid infinite protector spawns.
+        if (isProtector)
+        {
+            var ia = FindFirstObjectByType<IAInstance>();
+            int iaPlayerId = ia != null ? ia.PlayerId : -1;
+            if (iaPlayerId == playerId)
+            {
+                if (unitQueue.Count >= maxQueueSize)
+                {
+                    Debug.LogWarning($"[StructureInstance] {name} cannot enqueue protector {type}: protector-queue full ({unitQueue.Count}/{maxQueueSize}).");
+                    return;
+                }
+            }
+        }
+
+        if (unitQueue.Count >= maxQueueSize)
+        {
+            Debug.LogWarning($"[StructureInstance] {name} cannot enqueue {type}: queue full ({unitQueue.Count}/{maxQueueSize}).");
+            return;
+        }
+        
         UnitData data = StructureManager.Instance.unitData.Find(d => d.type == type);
         if (data != null)
         {
             unitQueue.Enqueue(data);
+            unitQueueProtectorFlags.Enqueue(isProtector);
+            Debug.Log($"[StructureInstance] {name} : Enqueued unit {type} (isProtector={isProtector}). QueueSize={unitQueue.Count}");
         }
     }
 
+    private IEnumerator ProcessProductionQueue()
+    {
+        while (true)
+        {
+            if (unitQueue.Count > 0)
+            {
+                UnitData data = unitQueue.Dequeue();
+                bool isProtector = false;
+                if (unitQueueProtectorFlags.Count > 0)
+                    isProtector = unitQueueProtectorFlags.Dequeue();
+                Debug.Log($"[StructureInstance] {name} : Dequeued unit {data?.type.ToString() ?? "null"} (isProtector={isProtector}). RemainingQueue={unitQueue.Count}");
+                if (data == null)
+                {
+                    yield return null;
+                    continue;
+                }
+
+                yield return new WaitForSeconds(Mathf.Max(0f, data.creationTime));
+
+                if (StructureManager.Instance != null)
+                {
+                    Vector3 spawnPosition = transform.position;
+                    bool spawned = StructureManager.Instance.SpawnUnitByTypeAtPosition(
+                        playerId,
+                        data.type,
+                        spawnPosition.x,
+                        spawnPosition.z,
+                        false,
+                        isProtector,
+                        this
+                    );
+
+                    Debug.Log($"[StructureInstance] {name} : Spawn queued unit {data.type} (protector={isProtector}) -> {(spawned ? "OK" : "FAILED")}");
+                }
+            }
+
+            yield return null;
+        }
+    }
 
     public void Selected()
     {
@@ -353,6 +428,40 @@ public class StructureInstance : MonoBehaviour
        if (healthBar != null)
            healthBar.SetHealth(currentHealth);
 
+       // Déclenchement IA uniquement si le comportement IA niveau 2 est actif
+       IAInstance ia = FindFirstObjectByType<IAInstance>();
+       if (ia != null && ia.DifficultyIA == 2 && attacker != null && attacker.playerId != playerId)
+       {
+           // On regarde dans le rayon de la structure: s'il y a au moins une unité de combat alliée,
+           // on autorise la création de protecteurs.
+           bool hasCombatAllyNearby = false;
+           var nearbyUnits = GetUnitsWithinConfiguredRadius();
+           for (int i = 0; i < nearbyUnits.Count; i++)
+           {
+               UnitInstance unit = nearbyUnits[i];
+               if (unit == null || unit.unitData == null)
+                   continue;
+
+               if (unit.playerId != playerId)
+                   continue;
+
+               if (unit.unitData is UnitCombatData)
+               {
+                   hasCombatAllyNearby = true;
+                   break;
+               }
+           }
+
+           if (hasCombatAllyNearby)
+           {
+               NormalDefense normalDefense = GetComponent<NormalDefense>();
+               if (normalDefense == null)
+                   normalDefense = gameObject.AddComponent<NormalDefense>();
+
+               normalDefense.MyStructureAttacked(attacker);
+           }
+       }
+
        TryTriggerProtectorRetaliation(attacker);
    
        // if (currentHealth <= 0)
@@ -399,4 +508,3 @@ public class StructureInstance : MonoBehaviour
        }
    }
 }
-
