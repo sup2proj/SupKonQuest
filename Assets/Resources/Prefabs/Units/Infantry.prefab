@@ -1742,7 +1742,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
   animator: {fileID: 0}
-  moveSpeed: 1
 --- !u!114 &-7223385642623911744
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1794,7 +1793,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
   animator: {fileID: 0}
-  moveSpeed: 1
 --- !u!114 &3449588668785832655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1808,7 +1806,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovementManager
   moveSpeed: 3.5
-  stoppingDistance: 0.2
+  stoppingDistance: 0.3
   rotationSpeed: 12
 --- !u!1 &6837486392623418950
 GameObject:
