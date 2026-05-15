@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\Data\BoatUnitsData\Destroyers.cs" />
     <Compile Include="Assets\Scripts\Enums\Structure\StructureType.cs" />
     <Compile Include="Assets\Scripts\Manager\OverlayManager.cs" />
+    <Compile Include="Assets\Scripts\Network\LobbyKeeper.cs" />
     <Compile Include="Assets\Scripts\Instances\LandUnitsInstances\UnitInstance.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\Enums\Structure\BuildingType.cs" />

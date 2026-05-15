@@ -13,7 +13,6 @@ public class LobbyRoomManager : MonoBehaviour
     public static Lobby JoinedLobby = null;
 
     private Lobby currentLobby;
-    private float heartbeatTimer;
     private float lobbyUpdateTimer;
 
     [Header("Interface (UI) Common")]
@@ -51,10 +50,6 @@ public class LobbyRoomManager : MonoBehaviour
 
     void Update()
     {
-        if (IsHost)
-        {
-            HandleLobbyHeartbeat();
-        }
         HandleLobbyPolling();
     }
 
@@ -84,6 +79,9 @@ public class LobbyRoomManager : MonoBehaviour
             };
 
             currentLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, currentMaxPlayers, options);
+            GameObject keeperObj = new GameObject("LobbyKeeper");
+            LobbyKeeper keeper = keeperObj.AddComponent<LobbyKeeper>();
+            keeper.StartKeepingLobbyAlive(currentLobby.Id);
             RefreshUI();
             lobbyStatusText.text = "Lobby Ouvert ! En attente de joueurs...";
         }
@@ -139,6 +137,10 @@ public class LobbyRoomManager : MonoBehaviour
             }
             catch (LobbyServiceException e) { Debug.LogError(e); }
         }
+        if (LobbyKeeper.Instance != null)
+            {
+                LobbyKeeper.Instance.StopKeepingLobby();
+            }
         SceneManager.LoadScene("MultiplayerScene");
     }
 
@@ -201,19 +203,6 @@ public class LobbyRoomManager : MonoBehaviour
         }
     }
 
-
-    private async void HandleLobbyHeartbeat()
-    {
-        if (currentLobby != null)
-        {
-            heartbeatTimer -= Time.deltaTime;
-            if (heartbeatTimer <= 0f)
-            {
-                heartbeatTimer = 15f; 
-                await LobbyService.Instance.SendHeartbeatPingAsync(currentLobby.Id);
-            }
-        }
-    }
 
     private async void HandleLobbyPolling()
     {
