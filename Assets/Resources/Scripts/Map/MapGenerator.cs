@@ -237,6 +237,17 @@ public class MapGenerator : MonoBehaviour
                     si.structureType = type;
                     si.neutralStructure = (type == StructureType.NeutralStructure);
 
+                    if (StructureManager.Instance != null)
+                    {
+                        StructureManager.Instance.RegisterStructure(si, p.territoryId, p.territory);
+                    }
+                    else
+                    {
+                        si.territoryId = p.territoryId;
+                        si.territoryName = p.territory;
+                    }
+
+                    // Appliquer l'affichage / couleur
                     si.ApplyTerritoryName(p.territory);
 
                     BlockNature(p.x, unityY);

@@ -8035,6 +8035,7 @@ MonoBehaviour:
   goldText: {fileID: 7237603916785720782}
   unitCountText: {fileID: 376047957894779082}
   structureCountText: {fileID: 340348959180343315}
+  territoryCountText: {fileID: 5191399063164303094}
   playerManager: {fileID: 0}
 --- !u!1 &8382807558444802106
 GameObject:

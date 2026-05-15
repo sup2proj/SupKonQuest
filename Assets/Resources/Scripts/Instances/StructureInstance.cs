@@ -30,6 +30,8 @@ public class StructureInstance : MonoBehaviour
     public int currentHealth;
     private Outline outline;
     private Collider structureCollider;
+    public int territoryId;
+    public string territoryName;
     
     [Header("UI")]
     [SerializeField] public HealthBar healthBar;
