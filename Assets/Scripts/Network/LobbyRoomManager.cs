@@ -155,7 +155,7 @@ public class LobbyRoomManager : MonoBehaviour
             {
                 Data = new Dictionary<string, PlayerDataObject>
                 {
-                    { "IsReady", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, isLocalPlayerReady.ToString()) }
+                    { "IsReady", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, isLocalPlayerReady.ToString()) }
                 }
             };
 
