@@ -300,59 +300,45 @@ public class ActionInterface : MonoBehaviour
     
     void ShowBoatPrices(TextMeshProUGUI[] boatPriceTexts)
     {
-        if (boatPriceTexts == null || unitDatas == null)
-            return;
-
-        int firstBoatIndex = 7;
-        int count = Mathf.Min(boatPriceTexts.Length, Mathf.Max(0, unitDatas.Length - firstBoatIndex));
-
-        for (int i = 0; i < count; i++)
+        if (boatPriceTexts == null) return;
+        
+        foreach (var boatPriceText in boatPriceTexts)
         {
-            var boatPriceText = boatPriceTexts[i];
-            if (boatPriceText == null)
-                continue;
-
-            int unitIndex = firstBoatIndex + i;
-            if (unitIndex < 0 || unitIndex >= unitDatas.Length || unitDatas[unitIndex] == null)
+            if (boatPriceText != null)
             {
-                boatPriceText.text = "";
-                continue;
+                boatPriceText.gameObject.SetActive(true);
+                boatPriceText.transform.SetAsLastSibling();
             }
-
-            float finalPrice = unitDatas[unitIndex].price;
-            boatPriceText.text = finalPrice.ToString();
-            boatPriceText.gameObject.SetActive(true);
-            boatPriceText.transform.SetAsLastSibling();
         }
     }
 
 	void HideImage(GameObject[] structureImage)
-{
-    if (structureImage == null) return;
-
-    foreach (var img in structureImage)
     {
-        if (img != null)
+        if (structureImage == null) return;
+
+        foreach (var img in structureImage)
         {
-            img.gameObject.SetActive(false);
+            if (img != null)
+            {
+                img.gameObject.SetActive(false);
+            }
         }
     }
-}
 
     void ShowImage(GameObject[] structureImage, StructureType selectedType)
-{
-    if (structureImage == null) return;
-    HideImage(structureImage);
-    int index = (int)selectedType;
-    if (index >= 0 && index < structureImage.Length && structureImage[index] != null)
     {
-        structureImage[index].gameObject.SetActive(true);
+        if (structureImage == null) return;
+        HideImage(structureImage);
+        int index = (int)selectedType;
+        if (index >= 0 && index < structureImage.Length && structureImage[index] != null)
+        {
+            structureImage[index].gameObject.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning($"[ActionInterface] Aucune image configurée pour {selectedType} (index {index}).");
+        }
     }
-    else
-    {
-        Debug.LogWarning($"[ActionInterface] Aucune image configurée pour {selectedType} (index {index}).");
-    }
-}
 
     public static void ShowStructureButtons(StructureType structureType)
 	{
