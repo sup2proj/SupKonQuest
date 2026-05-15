@@ -45,6 +45,7 @@ public class MapGenerator : MonoBehaviour
 
     [Header("Réglages")]
     public float tileSize = 1f;
+    [SerializeField] private NavMeshSurface navMeshSurface;
 
     private Transform groundFolder;
     private Transform structuresFolder;
