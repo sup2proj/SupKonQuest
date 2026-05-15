@@ -21,6 +21,9 @@ public class IAInstance : MonoBehaviour
         set => difficultyIA = value;
     }
 
+    // Expose playerId so other systems can detect IA-owned structures/units
+    public int PlayerId => playerId;
+
     private float decisionTimer;
     private int playerId = -1;
 
