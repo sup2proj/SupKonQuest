@@ -75,18 +75,28 @@ public class JoinLobbyManager : MonoBehaviour
         statusText.text = "Connexion au lobby...";
         try
         {
-            Lobby joinedLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId);
+            string myName = PlayerPrefs.GetString("PlayerName", "Joueur Inconnu");
+
+            JoinLobbyByIdOptions options = new JoinLobbyByIdOptions
+            {
+                Player = new Unity.Services.Lobbies.Models.Player
+                {
+                    Data = new Dictionary<string, PlayerDataObject>
+                    {
+                        { "PlayerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, myName) },
+                        { "IsReady", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "False") }
+                    }
+                }
+            };
+
+            Lobby joinedLobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyId, options);
             Debug.Log("Lobby rejoint avec succès : " + joinedLobby.Name);
             
             LobbyRoomManager.IsHost = false;
             LobbyRoomManager.JoinedLobby = joinedLobby;
             SceneManager.LoadScene("LobbyRoomScene");
         }
-        catch (LobbyServiceException e)
-        {
-            statusText.text = "Impossible de rejoindre (partie pleine ou fermée).";
-            Debug.LogError(e);
-        }
+        catch (LobbyServiceException e) { Debug.LogError(e); }
     }
 
     public void BackToMenu()

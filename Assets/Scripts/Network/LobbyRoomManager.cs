@@ -63,10 +63,20 @@ public class LobbyRoomManager : MonoBehaviour
     {
         try
         {
-            string lobbyName = "Salon de " + AuthenticationService.Instance.PlayerId;
+            string myName = PlayerPrefs.GetString("PlayerName", "Joueur Inconnu");
+            string lobbyName = "Salon de " + myName;
+            
             CreateLobbyOptions options = new CreateLobbyOptions
             {
                 IsPrivate = false,
+                Player = new Unity.Services.Lobbies.Models.Player
+                {
+                    Data = new Dictionary<string, PlayerDataObject>
+                    {
+                        { "PlayerName", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, myName) },
+                        { "IsReady", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "False") }
+                    }
+                },
                 Data = new Dictionary<string, DataObject>
                 {
                     { "Map", new DataObject(DataObject.VisibilityOptions.Public, currentMap) }
@@ -235,13 +245,20 @@ public class LobbyRoomManager : MonoBehaviour
         {
             string readyStatus = "";
             
+            string playerName = player.Id;
+            
+            if (player.Data != null && player.Data.ContainsKey("PlayerName"))
+            {
+                playerName = player.Data["PlayerName"].Value;
+            }
+            
             if (player.Data != null && player.Data.ContainsKey("IsReady") && player.Data["IsReady"].Value == "True")
             {
-                readyStatus = " <color=#00FF00>[PRÊT]</color>";
+                readyStatus = " <color=#00FF00>[PRÊT]</color>"; 
                 readyCount++;
             }
             
-            players += "- " + player.Id + readyStatus + "\n"; 
+            players += "- " + playerName + readyStatus + "\n"; 
         }
         playerListText.text = players;
 

@@ -32,6 +32,8 @@ public class AuthManager : MonoBehaviour
         try
         {
             await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(usernameInput.text, passwordInput.text);
+
+            PlayerPrefs.SetString("PlayerName", usernameInput.text);
             
             statusText.text = "Compte créé et connecté avec succès !";
             SceneManager.LoadScene("MultiplayerScene");
@@ -55,6 +57,8 @@ public class AuthManager : MonoBehaviour
         try
         {
             await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(usernameInput.text, passwordInput.text);
+
+            PlayerPrefs.SetString("PlayerName", usernameInput.text);
             
             statusText.text = "Connecté ! Bienvenue.";
             SceneManager.LoadScene("MultiplayerScene");
