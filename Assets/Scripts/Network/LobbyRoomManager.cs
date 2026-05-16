@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 
 public class LobbyRoomManager : MonoBehaviour
 {
@@ -173,32 +175,55 @@ public class LobbyRoomManager : MonoBehaviour
     {
         if (!IsHost || currentLobby == null) return;
 
-        Debug.Log("Initialisation du réseau pour le lancement...");
+        Debug.Log("Création du serveur Relay en cours...");
+        startGameBtn.interactable = false;
 
         try
         {
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(currentMaxPlayers - 1);
+            
+            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            Debug.Log("Serveur Relay créé ! Code : " + joinCode);
+
             UpdateLobbyOptions options = new UpdateLobbyOptions
             {
                 Data = new Dictionary<string, DataObject>
                 {
-                    { "GameStarted", new DataObject(DataObject.VisibilityOptions.Member, "True") }
+                    { "GameStarted", new DataObject(DataObject.VisibilityOptions.Member, "True") },
+                    { "RelayCode", new DataObject(DataObject.VisibilityOptions.Member, joinCode) }
                 }
             };
             currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
+            
+            // TODO: launch le reseau local et lance la scène
+            Debug.Log("L'hôte est prêt à charger la GameScene");
         }
-        catch (LobbyServiceException e) { Debug.LogError(e); }
+        catch (RelayServiceException e) { Debug.LogError("Erreur Relay : " + e.Message); }
+        catch (LobbyServiceException e) { Debug.LogError("Erreur Lobby : " + e.Message); }
     }
 
-    private void CheckGameStartSignal()
+    private async void CheckGameStartSignal()
     {
         if (currentLobby != null && currentLobby.Data != null)
         {
             if (currentLobby.Data.ContainsKey("GameStarted") && currentLobby.Data["GameStarted"].Value == "True")
             {
-                Debug.Log("lancement partie");
-                
-                // Scène de la partie
-                // SceneManager.LoadScene("GameScene");
+                lobbyUpdateTimer = 9999f; 
+
+                string relayCode = currentLobby.Data["RelayCode"].Value;
+                Debug.Log("j'ai j'ai ! Connexion au Relay avec code : " + relayCode);
+
+                if (!IsHost)
+                {
+                    try
+                    {
+                        JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
+                        Debug.Log("Client connecté au Relay");
+                        
+                        // TODO: launch le reseau et lance la scène
+                    }
+                    catch (RelayServiceException e) { Debug.LogError("Erreur Relay Client : " + e.Message); }
+                }
             }
         }
     }
