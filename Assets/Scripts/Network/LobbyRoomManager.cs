@@ -30,6 +30,12 @@ public class LobbyRoomManager : MonoBehaviour
 
     private bool isLocalPlayerReady = false;
 
+    [Header("Interface (UI) Chat")]
+    public UnityEngine.UI.ScrollRect chatScrollRect;
+    public TextMeshProUGUI chatHistoryText;
+    public TMP_InputField chatInputField;
+    public Button sendChatBtn;
+
     [Header("Interface (UI) Host only")]
     public GameObject hostControlsPanel;
     public Button startGameBtn;
@@ -51,6 +57,14 @@ public class LobbyRoomManager : MonoBehaviour
             currentLobby = JoinedLobby;
             lobbyStatusText.text = "Connecté au salon";
             RefreshUI();
+        }
+        if (chatInputField != null)
+        {
+            chatInputField.onSubmit.AddListener(delegate 
+            { 
+                SendChatMessage(); 
+                chatInputField.ActivateInputField(); 
+            });
         }
     }
 
@@ -80,7 +94,8 @@ public class LobbyRoomManager : MonoBehaviour
                 },
                 Data = new Dictionary<string, DataObject>
                 {
-                    { "Map", new DataObject(DataObject.VisibilityOptions.Public, currentMap) }
+                    { "Map", new DataObject(DataObject.VisibilityOptions.Public, currentMap) },
+                    { "ChatLog", new DataObject(DataObject.VisibilityOptions.Member, "Bienvenue dans le salon !\n") }
                 }
             };
 
@@ -136,6 +151,37 @@ public class LobbyRoomManager : MonoBehaviour
             await LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, targetPlayerId);
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
+    }
+
+    public async void SendChatMessage()
+    {
+        if (currentLobby == null || string.IsNullOrWhiteSpace(chatInputField.text)) return;
+        string myName = PlayerPrefs.GetString("PlayerName", "Joueur");
+        string myMessage = chatInputField.text;
+        chatInputField.text = "";
+
+        try
+        {
+            string currentChatLog = currentLobby.Data.ContainsKey("ChatLog") ? currentLobby.Data["ChatLog"].Value : "";
+            
+            string newChatLog = currentChatLog + "<b>" + myName + " :</b> " + myMessage + "\n";
+
+            if (newChatLog.Length > 800) 
+            {
+                newChatLog = newChatLog.Substring(newChatLog.Length - 800);
+            }
+            UpdateLobbyOptions options = new UpdateLobbyOptions
+            {
+                Data = new Dictionary<string, DataObject>
+                {
+                    { "ChatLog", new DataObject(DataObject.VisibilityOptions.Member, newChatLog) }
+                }
+            };
+            
+            currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
+            RefreshUI();
+        }
+        catch (LobbyServiceException e) { Debug.LogError("Erreur Chat : " + e.Message); }
     }
 
     public async void LeaveLobby()
@@ -312,6 +358,18 @@ public class LobbyRoomManager : MonoBehaviour
         if (IsHost && startGameBtn != null)
         {
             startGameBtn.interactable = (readyCount == currentLobby.Players.Count);
+        }
+        if (currentLobby.Data.ContainsKey("ChatLog"))
+        {
+            if (chatHistoryText.text != currentLobby.Data["ChatLog"].Value)
+            {
+                chatHistoryText.text = currentLobby.Data["ChatLog"].Value;
+                Canvas.ForceUpdateCanvases();
+                if (chatScrollRect != null)
+                {
+                    chatScrollRect.verticalNormalizedPosition = 0f;
+                }
+            }
         }
     }
 
