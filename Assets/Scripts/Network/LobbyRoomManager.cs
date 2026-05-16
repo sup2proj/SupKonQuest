@@ -19,7 +19,11 @@ public class LobbyRoomManager : MonoBehaviour
 
     [Header("Interface (UI) Common")]
     public TextMeshProUGUI lobbyStatusText;
-    public TextMeshProUGUI playerListText;
+
+    [Header("Players List (UI)")]
+    public Transform playerListContainer;
+    public GameObject playerListItemPrefab;
+
     public TextMeshProUGUI mapNameText;
     public TextMeshProUGUI maxPlayersText;
     public Button readyBtn;
@@ -118,6 +122,18 @@ public class LobbyRoomManager : MonoBehaviour
             currentMaxPlayers = newMax;
             UpdateLobbyOptions options = new UpdateLobbyOptions { MaxPlayers = currentMaxPlayers };
             currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
+        }
+        catch (LobbyServiceException e) { Debug.LogError(e); }
+    }
+
+    public async void KickPlayer(string targetPlayerId)
+    {
+        if (!IsHost || currentLobby == null) return;
+
+        try
+        {
+            Debug.Log("Éjection du joueur : " + targetPlayerId);
+            await LobbyService.Instance.RemovePlayerAsync(currentLobby.Id, targetPlayerId);
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
@@ -241,6 +257,17 @@ public class LobbyRoomManager : MonoBehaviour
                 try
                 {
                     currentLobby = await LobbyService.Instance.GetLobbyAsync(currentLobby.Id);
+                    bool amIStillInLobby = false;
+                    string myId = AuthenticationService.Instance.PlayerId;
+                    foreach (var p in currentLobby.Players)
+                    {
+                        if (p.Id == myId) amIStillInLobby = true;
+                    }
+                    if (!amIStillInLobby)
+                    {
+                        HandleDisconnection("Vous avez été expulsé du salon par l'hôte.");
+                        return;
+                    }
                     RefreshUI();
                     CheckGameStartSignal();
                 }
@@ -260,33 +287,31 @@ public class LobbyRoomManager : MonoBehaviour
         mapNameText.text = "Carte : " + currentLobby.Data["Map"].Value;
         maxPlayersText.text = "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers;
 
+        foreach (Transform child in playerListContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
         int readyCount = 0;
-        string players = "Joueurs connectés :\n";
-        
+        string myId = AuthenticationService.Instance.PlayerId;
+
         foreach (var player in currentLobby.Players)
         {
-            string readyStatus = "";
+            string playerName = player.Data != null && player.Data.ContainsKey("PlayerName") ? player.Data["PlayerName"].Value : player.Id;
+            bool isReady = player.Data != null && player.Data.ContainsKey("IsReady") && player.Data["IsReady"].Value == "True";
             
-            string playerName = player.Id;
+            if (isReady) readyCount++;
+
+            GameObject newPlayerItem = Instantiate(playerListItemPrefab, playerListContainer);
+            PlayerListItem itemScript = newPlayerItem.GetComponent<PlayerListItem>();
             
-            if (player.Data != null && player.Data.ContainsKey("PlayerName"))
-            {
-                playerName = player.Data["PlayerName"].Value;
-            }
-            
-            if (player.Data != null && player.Data.ContainsKey("IsReady") && player.Data["IsReady"].Value == "True")
-            {
-                readyStatus = " <color=#00FF00>[PRÊT]</color>"; 
-                readyCount++;
-            }
-            
-            players += "- " + playerName + readyStatus + "\n"; 
+            bool isMe = (player.Id == myId);
+            itemScript.Setup(player.Id, playerName, isReady, IsHost, isMe);
         }
-        playerListText.text = players;
 
         if (IsHost && startGameBtn != null)
         {
-            startGameBtn.interactable = readyCount == currentLobby.Players.Count;
+            startGameBtn.interactable = (readyCount == currentLobby.Players.Count);
         }
     }
 
