@@ -237,10 +237,18 @@ public class LobbyRoomManager : MonoBehaviour
             if (lobbyUpdateTimer <= 0f)
             {
                 lobbyUpdateTimer = 1.5f; 
-                currentLobby = await LobbyService.Instance.GetLobbyAsync(currentLobby.Id);
                 
-                RefreshUI();
-                CheckGameStartSignal();
+                try
+                {
+                    currentLobby = await LobbyService.Instance.GetLobbyAsync(currentLobby.Id);
+                    RefreshUI();
+                    CheckGameStartSignal();
+                }
+                catch (LobbyServiceException e)
+                {
+                    Debug.LogWarning("Impossible de rafraîchir le salon. Erreur : " + e.Reason);
+                    HandleDisconnection("La connexion au salon a été perdue (L'hôte a quitté ou le salon n'existe plus).");
+                }
             }
         }
     }
@@ -280,5 +288,15 @@ public class LobbyRoomManager : MonoBehaviour
         {
             startGameBtn.interactable = readyCount == currentLobby.Players.Count;
         }
+    }
+
+    private void HandleDisconnection(string reason)
+    {
+        Debug.LogWarning("Déconnexion forcée : " + reason);
+        
+        currentLobby = null; 
+        
+        PlayerPrefs.SetString("DisconnectReason", reason);
+        SceneManager.LoadScene("MultiplayerScene");
     }
 }
