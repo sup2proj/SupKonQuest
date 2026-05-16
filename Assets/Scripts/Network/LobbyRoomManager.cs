@@ -42,6 +42,7 @@ public class LobbyRoomManager : MonoBehaviour
 
     private string currentMap = "Europe";
     private int currentMaxPlayers = 4;
+    private Dictionary<string, string> lastProcessedMessages = new Dictionary<string, string>();
 
     async void Start()
     {
@@ -156,30 +157,23 @@ public class LobbyRoomManager : MonoBehaviour
     public async void SendChatMessage()
     {
         if (currentLobby == null || string.IsNullOrWhiteSpace(chatInputField.text)) return;
+
         string myName = PlayerPrefs.GetString("PlayerName", "Joueur");
         string myMessage = chatInputField.text;
-        chatInputField.text = "";
+        chatInputField.text = ""; 
 
         try
         {
-            string currentChatLog = currentLobby.Data.ContainsKey("ChatLog") ? currentLobby.Data["ChatLog"].Value : "";
-            
-            string newChatLog = currentChatLog + "<b>" + myName + " :</b> " + myMessage + "\n";
-
-            if (newChatLog.Length > 800) 
+            string messageToPost = "<b>" + myName + " :</b> " + myMessage + "|" + System.DateTime.Now.Ticks.ToString();
+            UpdatePlayerOptions options = new UpdatePlayerOptions
             {
-                newChatLog = newChatLog.Substring(newChatLog.Length - 800);
-            }
-            UpdateLobbyOptions options = new UpdateLobbyOptions
-            {
-                Data = new Dictionary<string, DataObject>
+                Data = new Dictionary<string, PlayerDataObject>
                 {
-                    { "ChatLog", new DataObject(DataObject.VisibilityOptions.Member, newChatLog) }
+                    { "LastMessage", new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, messageToPost) }
                 }
             };
-            
-            currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
-            RefreshUI();
+            await LobbyService.Instance.UpdatePlayerAsync(currentLobby.Id, AuthenticationService.Instance.PlayerId, options);
+            chatInputField.ActivateInputField();
         }
         catch (LobbyServiceException e) { Debug.LogError("Erreur Chat : " + e.Message); }
     }
@@ -303,16 +297,52 @@ public class LobbyRoomManager : MonoBehaviour
                 try
                 {
                     currentLobby = await LobbyService.Instance.GetLobbyAsync(currentLobby.Id);
+                    
                     bool amIStillInLobby = false;
                     string myId = AuthenticationService.Instance.PlayerId;
                     foreach (var p in currentLobby.Players)
                     {
                         if (p.Id == myId) amIStillInLobby = true;
                     }
+
                     if (!amIStillInLobby)
                     {
                         HandleDisconnection("Vous avez été expulsé du salon par l'hôte.");
-                        return;
+                        return; 
+                    }
+
+                    if (IsHost)
+                    {
+                        bool chatNeedsUpdate = false;
+                        string currentChatLog = currentLobby.Data.ContainsKey("ChatLog") ? currentLobby.Data["ChatLog"].Value : "";
+
+                        foreach (var player in currentLobby.Players)
+                        {
+                            if (player.Data != null && player.Data.ContainsKey("LastMessage"))
+                            {
+                                string rawMsg = player.Data["LastMessage"].Value;
+                                
+                                if (!lastProcessedMessages.ContainsKey(player.Id) || lastProcessedMessages[player.Id] != rawMsg)
+                                {
+                                    lastProcessedMessages[player.Id] = rawMsg;                                    
+                                    string actualMessage = rawMsg.Substring(0, rawMsg.LastIndexOf('|'));
+                                    currentChatLog += actualMessage + "\n";
+                                    chatNeedsUpdate = true;
+                                }
+                            }
+                        }
+                        if (chatNeedsUpdate)
+                        {
+                            if (currentChatLog.Length > 800) currentChatLog = currentChatLog.Substring(currentChatLog.Length - 800);
+                            UpdateLobbyOptions options = new UpdateLobbyOptions
+                            {
+                                Data = new Dictionary<string, DataObject>
+                                {
+                                    { "ChatLog", new DataObject(DataObject.VisibilityOptions.Member, currentChatLog) }
+                                }
+                            };
+                            currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
+                        }
                     }
                     RefreshUI();
                     CheckGameStartSignal();
@@ -320,7 +350,7 @@ public class LobbyRoomManager : MonoBehaviour
                 catch (LobbyServiceException e)
                 {
                     Debug.LogWarning("Impossible de rafraîchir le salon. Erreur : " + e.Reason);
-                    HandleDisconnection("La connexion au salon a été perdue (L'hôte a quitté ou le salon n'existe plus).");
+                    HandleDisconnection("La connexion au salon a été perdue.");
                 }
             }
         }
