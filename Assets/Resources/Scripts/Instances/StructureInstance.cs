@@ -375,7 +375,7 @@ public class StructureInstance : MonoBehaviour
         if (instanceId == -1)
             return null;
 
-        StructureInstance[] structures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+        StructureInstance[] structures = Object.FindObjectsOfType<StructureInstance>();
         for (int i = 0; i < structures.Length; i++)
         {
             StructureInstance structure = structures[i];
@@ -434,7 +434,7 @@ public class StructureInstance : MonoBehaviour
     }
     
     public static MapJsonData LoadDataFromPath(string path) {
-        TextAsset targetFile = Resources.Load<TextAsset>(path);
+        TextAsset targetFile = UnityEngine.Resources.Load<TextAsset>(path);
         if (targetFile != null) {
             return JsonUtility.FromJson<MapJsonData>(targetFile.text);
         }

@@ -5,7 +5,7 @@ public static class StructureDetector
     // Retourne la structure ennemie la plus proche dans le rayon (null si rien trouvé).
     public static StructureInstance FindNearestEnemyStructureInRadius(Vector3 origin, float radius, int ownerPlayerId)
     {
-        StructureInstance[] structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+        StructureInstance[] structures = Object.FindObjectsOfType<StructureInstance>();
         if (structures == null || structures.Length == 0)
             return null;
 

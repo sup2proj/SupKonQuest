@@ -91,7 +91,7 @@ public class MapGenerator : MonoBehaviour
         natureFolder = GetOrCreateFolder("Nature");
 
         string path = "Maps/" + folderName + "/";
-        mapLayout = Resources.Load<Texture2D>(path + "MapLayout");
+        mapLayout = UnityEngine.Resources.Load<Texture2D>(path + "MapLayout");
         MapJsonData jsonData = StructureInstance.LoadDataFromPath(path + "MapData");
         mapWidth = mapLayout.width;
         mapHeight = mapLayout.height;
@@ -334,7 +334,7 @@ public class MapGenerator : MonoBehaviour
         string naturePath = "Prefabs/Nature/";
         string StructurePath = "Prefabs/Structures/";
         
-        if (background == null) background = Resources.Load<GameObject>(environmentPath+"background");
+        if (background == null) background = UnityEngine.Resources.Load<GameObject>(environmentPath+"background");
 
         if (groundDirt == null) groundDirt = Resources.Load<GameObject>(environmentPath+"Env_Ground_Dirt");
         if (groundGrass == null) groundGrass = Resources.Load<GameObject>(environmentPath+"Env_Ground_Grass");

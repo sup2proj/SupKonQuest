@@ -31,7 +31,7 @@ public class UnitsAnimation : MonoBehaviour
         cachedUnit = GetComponent<UnitInstance>();
         movementManager = GetComponent<MovementManager>();
 
-        damageTable = Resources.Load<DamageTable>("Scripts/Data/Units/UnitsSO/DamageTable");
+        damageTable = UnityEngine.Resources.Load<DamageTable>("Scripts/Data/Units/UnitsSO/DamageTable");
         if (damageTable == null)
         {
             Debug.LogError("Impossible de charger DamageTable !");

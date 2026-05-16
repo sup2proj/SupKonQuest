@@ -62,7 +62,7 @@ public class NormalAttack : MonoBehaviour
         StructureInstance chosen = null;
         float bestDistSqr = float.MaxValue;
         float radiusSqr = effectiveRadius * effectiveRadius;
-        var structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+        var structures = Object.FindObjectsOfType<StructureInstance>();
         if (structures != null)
         {
             Vector3 origin = transform.position;
