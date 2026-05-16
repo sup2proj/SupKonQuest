@@ -9,6 +9,7 @@ public class DamageTable : ScriptableObject
     {
         public UnitsType attackerType;
         public UnitsType defenderType;
+        public StructureType defenderStructureType;
         public float damageMultiplier = 1f;
     }
 
@@ -33,8 +34,8 @@ public class DamageTable : ScriptableObject
         new DamageRelation { attackerType = UnitsType.Heavy, defenderType = UnitsType.Infantry,          damageMultiplier = 1.3f },
         new DamageRelation { attackerType = UnitsType.Heavy, defenderType = UnitsType.Archer,            damageMultiplier = 1.3f },
 
-        //new DamageRelation { attackerType = UnitsType.Heavy, defenderType = UnitsType.Camp,              damageMultiplier = 1.8f },
-        //new DamageRelation { attackerType = UnitsType.Heavy, defenderType = UnitsType.Port,              damageMultiplier = 1.6f },
+        new DamageRelation { attackerType = UnitsType.Heavy, defenderStructureType = StructureType.Structure,  damageMultiplier = 1.3f },
+        new DamageRelation { attackerType = UnitsType.Heavy, defenderStructureType = StructureType.Harbour,    damageMultiplier = 1.3f },
 
         new DamageRelation { attackerType = UnitsType.Heavy, defenderType = UnitsType.AntiBlindage,      damageMultiplier = 0.7f },
         new DamageRelation { attackerType = UnitsType.Heavy, defenderType = UnitsType.Mortar,            damageMultiplier = 0.7f },
@@ -43,15 +44,13 @@ public class DamageTable : ScriptableObject
 
         new DamageRelation { attackerType = UnitsType.AntiBlindage, defenderType = UnitsType.Heavy,      damageMultiplier = 1.3f },
 
-        //new DamageRelation { attackerType = UnitsType.AntiBlindage, defenderType = UnitsType.Camp,       damageMultiplier = 1.6f },
-        //new DamageRelation { attackerType = UnitsType.AntiBlindage, defenderType = UnitsType.Port,       damageMultiplier = 1.5f },
+        new DamageRelation { attackerType = UnitsType.AntiBlindage, defenderStructureType = StructureType.Structure,  damageMultiplier = 1.3f },
+        new DamageRelation { attackerType = UnitsType.AntiBlindage, defenderStructureType = StructureType.Harbour,    damageMultiplier = 1.3f },
 
         new DamageRelation { attackerType = UnitsType.AntiBlindage, defenderType = UnitsType.Infantry,   damageMultiplier = 0.7f },
         new DamageRelation { attackerType = UnitsType.AntiBlindage, defenderType = UnitsType.Archer,     damageMultiplier = 0.7f },
 
         // MORTAR
-        // Fort contre : Groupes d’unités, Lourd
-        // Faible contre : Infanterie rapide, Tir à distance
 
         new DamageRelation { attackerType = UnitsType.Mortar, defenderType = UnitsType.Heavy,            damageMultiplier = 1.3f },
 
@@ -82,19 +81,18 @@ public class DamageTable : ScriptableObject
         // FREGATE
 
         new DamageRelation { attackerType = UnitsType.Fregate, defenderType = UnitsType.Transport,       damageMultiplier = 1.3f },
-        //new DamageRelation { attackerType = UnitsType.Fregate, defenderType = UnitsType.Port,            damageMultiplier = 1.3f },
+        new DamageRelation { attackerType = UnitsType.Fregate, defenderStructureType = StructureType.Harbour,    damageMultiplier = 1.3f },
 
         new DamageRelation { attackerType = UnitsType.Fregate, defenderType = UnitsType.Destroyer,       damageMultiplier = 0.7f },
 
         // DESTROYER
-        // Fort contre : Frégate, Transport, Port
 
         new DamageRelation { attackerType = UnitsType.Destroyer, defenderType = UnitsType.Fregate,       damageMultiplier = 1.3f },
         new DamageRelation { attackerType = UnitsType.Destroyer, defenderType = UnitsType.Transport,     damageMultiplier = 1.3f },
-        //new DamageRelation { attackerType = UnitsType.Destroyer, defenderType = UnitsType.Port,          damageMultiplier = 1.8f },
+        new DamageRelation { attackerType = UnitsType.Destroyer, defenderStructureType = StructureType.Harbour,    damageMultiplier = 1.3f },
     };
 
-    public float GetMultiplier(UnitInstance attacker, UnitInstance target)
+    public float GetMultiplier(UnitInstance attacker, UnitInstance target, StructureInstance targetStructure = null)
     {
         Debug.Log($"[DamageTable] Calculating multiplier for {attacker?.name} attacking {target?.name}");
         if (attacker == null || target == null ||
@@ -103,6 +101,15 @@ public class DamageTable : ScriptableObject
 
         foreach (var r in relations)
         {
+            if (targetStructure != null)
+            {
+                if (r.attackerType == attacker.unitData.type &&
+                    r.defenderStructureType == targetStructure.structureType)
+                {
+                    Debug.Log($"[DamageTable] Multiplier found for {attacker.unitData.type} attacking {targetStructure.structureType}: {r.damageMultiplier}");
+                    return r.damageMultiplier;
+                }
+            }
             if (r.attackerType == attacker.unitData.type &&
                 r.defenderType == target.unitData.type)
             {

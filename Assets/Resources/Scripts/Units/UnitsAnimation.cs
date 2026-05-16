@@ -359,6 +359,7 @@ public class UnitsAnimation : MonoBehaviour
 {
     UnitInstance attacker = cachedUnit;
     UnitInstance target = attackTarget != null ? attackTarget.GetComponent<UnitInstance>() : null;
+    StructureInstance targetStructure = attackTarget != null ? attackTarget.GetComponent<StructureInstance>() : null;
 
     if (attacker != null && attacker.unitData is UnitCombatData combatData)
     {
@@ -368,32 +369,7 @@ public class UnitsAnimation : MonoBehaviour
         Debug.LogError("attacker NULL");
         return 0;
     }
-
-    if (target == null)
-    {
-        Debug.LogError("target NULL");
-        return 0;
-    }
-
-    if (attacker.unitData == null)
-    {
-        Debug.LogError("attacker.unitData NULL");
-        return 0;
-    }
-
-    if (target.unitData == null)
-    {
-        Debug.LogError("target.unitData NULL");
-        return 0;
-    }
-
-    if (damageTable == null)
-    {
-        Debug.LogError("damageTable NULL");
-        return 0;
-    }
-
-        return Mathf.Max(0f, combatData.attack * damageTable.GetMultiplier(attacker, target));
+        return Mathf.Max(0f, combatData.attack * damageTable.GetMultiplier(attacker, target != null ? target : null, targetStructure != null ? targetStructure : null));
     }
 
     return 0f;
