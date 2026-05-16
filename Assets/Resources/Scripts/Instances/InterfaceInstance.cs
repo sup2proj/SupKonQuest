@@ -2,8 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.EventSystems;
-
 
 public class InterfaceInstance : MonoBehaviour
 {
@@ -36,6 +34,9 @@ public class InterfaceInstance : MonoBehaviour
 
     [Header("Players (runtime)")]
     [SerializeField] private PlayerManager playerManager;
+
+    [Header("PanelInMiddle")]
+    [SerializeField] private PanelInMiddle panelInMiddle;
 
     public int ActivePlayerIndex => activePlayerIndex;
     public int ActivePlayerNumber => activePlayerIndex + 1;
@@ -124,10 +125,6 @@ public class InterfaceInstance : MonoBehaviour
         RefreshPlayerStatisticsUI();
     }
 
-    void Update()
-    {
-    }
-
     public void showInterfaceForStructure()
     {
         unitsQueue.SetActive(true);
@@ -140,10 +137,49 @@ public class InterfaceInstance : MonoBehaviour
 
     public void HideStructureInterface()
     {
-        unitsQueue.SetActive(false);
-        unitsProtector.SetActive(false);
+        if (unitsQueue != null)
+            unitsQueue.SetActive(false);
+
+        if (unitsProtector != null)
+            unitsProtector.SetActive(false);
+
         SetAllQueueSlotsActive(false);
+        hideUnitsProtectorSlots();
         HideProgressBarVisual(resetProgress: false);
+    }
+
+    public void HideHud()
+    {
+        HideStructureInterface();
+        hideBuffIcons();
+        HideBoatExitIcons();
+        HidePlayersList();
+        HideStatisticsInterface();
+
+        if (ActionInterface.Instance != null)
+            ActionInterface.Instance.HideAllButtons();
+    }
+
+    public void ShowVictoryPanel(int winnerPlayerId)
+    {
+        HideHud();
+        ResolvePanelInMiddle();
+
+        if (panelInMiddle == null || !panelInMiddle.HasAssignedPanelReferences)
+        {
+            Debug.LogWarning("[InterfaceInstance] panelInMiddle n'est pas assigne dans l'Inspector.", this);
+            return;
+        }
+
+        panelInMiddle.ShowVictory(winnerPlayerId);
+    }
+
+    public void HideVictoryPanel()
+    {
+        ResolvePanelInMiddle();
+
+        if (panelInMiddle != null)
+            panelInMiddle.Hide();
     }
 
     public void addUnitToQueue(GameObject clickedUnit)
@@ -484,6 +520,9 @@ public class InterfaceInstance : MonoBehaviour
 
     private void hideUnitsProtectorSlots()
     {
+        if (unitsProtectorSlots == null)
+            return;
+
         foreach (var img in unitsProtectorSlots)
         {
             if (img == null) continue;
@@ -652,12 +691,57 @@ public class InterfaceInstance : MonoBehaviour
 
     public void ShowBoatExitIcons()
     {
+        if (boatExitButton == null)
+            return;
+
         boatExitButton.gameObject.SetActive(true);
     }
     
     public void HideBoatExitIcons()
     {
+        if (boatExitButton == null)
+            return;
+
         boatExitButton.gameObject.SetActive(false);
+    }
+
+    private void HidePlayersList()
+    {
+        if (playersList == null)
+            return;
+
+        foreach (var playerImage in playersList)
+        {
+            if (playerImage == null) continue;
+            playerImage.gameObject.SetActive(false);
+        }
+    }
+
+    private void HideStatisticsInterface()
+    {
+        if (statisticsInterface == null)
+            return;
+
+        statisticsInterface.gameObject.SetActive(false);
+    }
+
+    private void ResolvePanelInMiddle()
+    {
+        if (panelInMiddle != null && panelInMiddle.HasAssignedPanelReferences)
+            return;
+
+        PanelInMiddle[] panels = FindObjectsByType<PanelInMiddle>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        for (int i = 0; i < panels.Length; i++)
+        {
+            if (panels[i] == null || !panels[i].HasAssignedPanelReferences)
+                continue;
+
+            panelInMiddle = panels[i];
+            return;
+        }
+
+        if (panelInMiddle == null && panels.Length > 0)
+            panelInMiddle = panels[0];
     }
     
     public void HideBuffIconForCooldown(int slotIndex, float cooldown)
