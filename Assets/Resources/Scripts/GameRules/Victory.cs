@@ -48,6 +48,18 @@ public class Victory : MonoBehaviour
         return true;
     }
 
+    public bool TryDeclareWinnerIfOnlyPlayerWithStructures(int playerId)
+    {
+        if (HasWinner || playerId <= 0)
+            return false;
+
+        if (!IsOnlyPlayerWithStructures(playerId))
+            return false;
+
+        DeclareWinner(playerId, "il est le dernier joueur avec des structures");
+        return true;
+    }
+
     private bool TryGetSoloPlayerId(out int playerId)
     {
         playerId = -1;
@@ -75,18 +87,15 @@ public class Victory : MonoBehaviour
             interfaceInstance.ShowVictoryPanel(playerId);
     }
     
-    public static void CheckVictoryAfterCapture(int playerIdToCheck)
+    public static bool CheckVictoryAfterCapture(int playerIdToCheck)
     {
         Victory victory = FindFirstObjectByType<Victory>(FindObjectsInactive.Include);
         if (victory != null)
-        {
-            victory.TryDeclareWinnerIfPlayerControlsEnoughTerritories(playerIdToCheck);
-            return;
-        }
+            return victory.TryDeclareWinnerIfPlayerControlsEnoughTerritories(playerIdToCheck);
 
         const int defaultTerritoriesToWin = 5;
         if (TerritoryControlUtility.CountControlledTerritories(playerIdToCheck) < defaultTerritoriesToWin)
-            return;
+            return false;
 
         InterfaceInstance interfaceInstance = InterfaceInstance.Instance;
         if (interfaceInstance == null)
@@ -94,5 +103,48 @@ public class Victory : MonoBehaviour
 
         if (interfaceInstance != null)
             interfaceInstance.ShowVictoryPanel(playerIdToCheck);
+
+        return true;
+    }
+
+    public static bool CheckVictoryAfterElimination(int playerIdToCheck)
+    {
+        Victory victory = FindFirstObjectByType<Victory>(FindObjectsInactive.Include);
+        if (victory != null)
+            return victory.TryDeclareWinnerIfOnlyPlayerWithStructures(playerIdToCheck);
+
+        if (!IsOnlyPlayerWithStructures(playerIdToCheck))
+            return false;
+
+        InterfaceInstance interfaceInstance = InterfaceInstance.Instance;
+        if (interfaceInstance == null)
+            interfaceInstance = FindFirstObjectByType<InterfaceInstance>(FindObjectsInactive.Include);
+
+        if (interfaceInstance != null)
+            interfaceInstance.ShowVictoryPanel(playerIdToCheck);
+
+        return true;
+    }
+
+    private static bool IsOnlyPlayerWithStructures(int playerId)
+    {
+        bool playerHasStructure = false;
+        StructureInstance[] structures = Object.FindObjectsOfType<StructureInstance>();
+        if (structures == null)
+            return false;
+
+        for (int i = 0; i < structures.Length; i++)
+        {
+            StructureInstance structure = structures[i];
+            if (structure == null || structure.playerId <= 0)
+                continue;
+
+            if (structure.playerId != playerId)
+                return false;
+
+            playerHasStructure = true;
+        }
+
+        return playerHasStructure;
     }
 }

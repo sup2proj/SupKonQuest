@@ -517,7 +517,20 @@ public class StructureInstance : MonoBehaviour
 
        ApplyTerritoryName(territoryName);
        UpdateStructureCounts(previousOwnerId, newOwnerId);
-       Victory.CheckVictoryAfterCapture(newOwnerId);
+       bool previousOwnerDefeated = Defeat.CheckDefeatAfterCapture(previousOwnerId, showPanel: false);
+       if (previousOwnerDefeated)
+       {
+           bool winnerDeclared = Victory.CheckVictoryAfterElimination(newOwnerId);
+           if (!winnerDeclared)
+               winnerDeclared = Victory.CheckVictoryAfterCapture(newOwnerId);
+
+           if (!winnerDeclared)
+               Defeat.ShowDefeatForPlayer(previousOwnerId);
+       }
+       else
+       {
+           Victory.CheckVictoryAfterCapture(newOwnerId);
+       }
 
        if (currentlySelected == this && PlayerManager.Instance != null && PlayerManager.Instance.GetActivePlayerId() != playerId)
            UnSelected();

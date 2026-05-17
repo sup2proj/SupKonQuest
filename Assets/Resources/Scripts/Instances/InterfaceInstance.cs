@@ -174,6 +174,20 @@ public class InterfaceInstance : MonoBehaviour
         panelInMiddle.ShowVictory(winnerPlayerId);
     }
 
+    public void ShowDefeatPanel(int defeatedPlayerId)
+    {
+        HideHud();
+        ResolvePanelInMiddle();
+
+        if (panelInMiddle == null || !panelInMiddle.HasAssignedPanelReferences)
+        {
+            Debug.LogWarning("[InterfaceInstance] panelInMiddle n'est pas assigne dans l'Inspector.", this);
+            return;
+        }
+
+        panelInMiddle.ShowDefeat(defeatedPlayerId);
+    }
+
     public void HideVictoryPanel()
     {
         ResolvePanelInMiddle();
