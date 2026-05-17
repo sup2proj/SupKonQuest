@@ -126,6 +126,32 @@ public class UnitsAnimation : MonoBehaviour
         }
         attackCoroutine = StartCoroutine(AttackLoopCoroutine());
     }
+    
+    public bool TryStartAttackTargetIfInRange(Transform target)
+    {
+        if (target == null)
+            return false;
+
+        if (attackTarget == target && attackCoroutine != null)
+            return true;
+
+        UnitInstance unit = cachedUnit;
+        if (unit != null && unit.unitData != null && (unit.unitData.type == UnitsType.Support || unit.unitData.type == UnitsType.Healer))
+            return false;
+
+        attackTarget = target;
+        if (!IsTargetWithinAttackRange())
+        {
+            attackTarget = null;
+            return false;
+        }
+
+        if (movementManager != null)
+            movementManager.StopMovement();
+
+        StartAttackWithDamage();
+        return true;
+    }
 
     private IEnumerator AttackLoopCoroutine()
     {

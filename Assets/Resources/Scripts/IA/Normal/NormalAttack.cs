@@ -11,11 +11,13 @@ public class NormalAttack : MonoBehaviour
     private float scanTimer;
     private StructureInstance currentTarget;
     private MovementManager movementManager;
+    private UnitsAnimation unitsAnimation;
     private UnitInstance unitInstance;
 
     private void Awake()
     {
         movementManager = GetComponent<MovementManager>();
+        unitsAnimation = GetComponent<UnitsAnimation>();
         unitInstance = GetComponent<UnitInstance>();
     }
 
@@ -23,8 +25,9 @@ public class NormalAttack : MonoBehaviour
     {
         if (movementManager == null)
             movementManager = GetComponent<MovementManager>();
+        if (unitsAnimation == null)
+            unitsAnimation = GetComponent<UnitsAnimation>();
 
-        bool isMoving = movementManager != null && movementManager.IsMoving();
         scanTimer += Time.deltaTime;
         if (scanTimer < scanInterval)
             return;
@@ -101,15 +104,31 @@ public class NormalAttack : MonoBehaviour
             return;
 
         MovementManager movement = GetComponent<MovementManager>();
+        float attackStopDistance = Mathf.Max(stopDistance, GetUnitAttackRange());
+        if (unitsAnimation != null)
+        {
+            if (unitsAnimation.TryStartAttackTargetIfInRange(target.transform))
+                return;
+
+            if (movement != null && !movement.CanMoveOnWorldPosition(target.StructurePosition))
+            {
+                movement.ForceMoveToPosition(target.StructurePosition, attackStopDistance);
+                return;
+            }
+
+            unitsAnimation.MoveToTarget(target.transform, attackStopDistance);
+            return;
+        }
+
         if (movement != null)
         {
             if (!movement.CanMoveOnWorldPosition(target.StructurePosition))
             {
-                movement.ForceMoveToPosition(target.StructurePosition, stopDistance);
+                movement.ForceMoveToPosition(target.StructurePosition, attackStopDistance);
                 return;
             }
 
-            movement.MoveToTarget(target.transform, stopDistance);
+            movement.MoveToTarget(target.transform, attackStopDistance);
             return;
         }
     }
