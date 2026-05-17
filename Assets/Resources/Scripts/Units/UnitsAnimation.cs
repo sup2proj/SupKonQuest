@@ -23,6 +23,8 @@ public class UnitsAnimation : MonoBehaviour
     private MovementManager movementManager;
 
     public Transform AttackTarget => attackTarget;
+    public GameObject cannonBallPrefab;
+    public float cannonBallSpeed = 1f;
     
     void Awake()
     {
@@ -35,6 +37,11 @@ public class UnitsAnimation : MonoBehaviour
         if (damageTable == null)
         {
             Debug.LogError("Impossible de charger DamageTable !");
+        }
+        if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar) {
+            cannonBallPrefab = Resources.Load<GameObject>("Prefabs/Units/CannonBall");
+            if (cannonBallPrefab == null)
+                Debug.LogError("[Mortar] CannonBall prefab introuvable dans Resources/Prefabs/");
         }
 
         // Connecter le callback de fin de mouvement
@@ -112,7 +119,6 @@ public class UnitsAnimation : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[UnitsAnimation] {gameObject.name} commence l'attaque contre {attackTarget.name}");
         isRetaliating = false;
         SetAttackAnimationState(true);
 
@@ -168,10 +174,48 @@ public class UnitsAnimation : MonoBehaviour
 
             float attack = GetAttackDamage();
 
+            // Mortar : spawn un boulet qui applique les dégâts à l'arrivée
+        if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar)
+        {
+            Debug.Log($"[Mortar] cannonBallPrefab={cannonBallPrefab}, attackTarget={attackTarget}");
+            
+            if (cannonBallPrefab != null && attackTarget != null)
+            {
+                Debug.Log($"[Mortar] Spawn boulet depuis {transform.position} vers {attackTarget.position}");
+            }
+            else
+            {
+                Debug.LogError($"[Mortar] PAS DE SPAWN - prefab null={cannonBallPrefab == null}, target null={attackTarget == null}");
+            }
+            if (cannonBallPrefab != null && attackTarget != null)
+            {
+                Transform targetSnapshot = attackTarget; // capture pour la lambda
+                UnitInstance targetUnitSnapshot = targetUnit;
+                StructureInstance targetStructureSnapshot = targetStructure;
+                UnitInstance attackerSnapshot = attackerUnit;
+
+                CannonBall.Spawn(cannonBallPrefab, transform.position, targetSnapshot, cannonBallSpeed, () =>
+                {
+                    if (targetUnitSnapshot != null)
+                    {
+                        targetUnitSnapshot.TakeDamage(attack);
+                        UnitsAnimation targetAnimation = targetUnitSnapshot.GetComponent<UnitsAnimation>();
+                        if (targetAnimation != null)
+                            targetAnimation.AttackTheAttacker(transform);
+                    }
+                    else if (targetStructureSnapshot != null)
+                    {
+                        targetStructureSnapshot.TakeDamage(attack, attackerSnapshot);
+                    }
+                });
+            }
+        }
+        else
+        {
+            // Comportement normal pour les autres unités
             if (targetUnit != null)
             {
                 targetUnit.TakeDamage(attack);
-
                 UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
                 if (targetAnimation != null && attackerUnit != null)
                     targetAnimation.AttackTheAttacker(transform);
@@ -180,12 +224,13 @@ public class UnitsAnimation : MonoBehaviour
             {
                 targetStructure.TakeDamage(attack, attackerUnit);
             }
-
-            yield return new WaitForSeconds(halfDuration);
         }
 
-        StopAttackInternal();
-    }
+                    yield return new WaitForSeconds(halfDuration);
+                }
+
+                StopAttackInternal();
+            }
 
     private AnimationClip GetAttackClip()
     {
@@ -363,7 +408,6 @@ public class UnitsAnimation : MonoBehaviour
 
     if (attacker != null && attacker.unitData is UnitCombatData combatData)
     {
-        Debug.Log($"[Attaque] {attacker.name} frappe {(target != null ? target.name : "structure")} pour {combatData.attack} dégâts");
         if (attacker == null)
     {
         Debug.LogError("attacker NULL");

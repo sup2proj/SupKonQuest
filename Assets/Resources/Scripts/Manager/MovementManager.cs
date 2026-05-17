@@ -206,7 +206,6 @@ public class MovementManager : MonoBehaviour
 
     public void MoveToPosition(Vector3 destination, float stopDistance)
     {
-        Debug.Log($"MoveToPosition | stopDistance reçu: {stopDistance} | agent.stoppingDistance avant: {agent.stoppingDistance}");
         if (!CanMoveOnWorldPosition(destination))
             return;
 
@@ -222,7 +221,6 @@ public class MovementManager : MonoBehaviour
             agent.speed = GetUnitSpeed();
             agent.areaMask = GetAllowedNavMeshAreaMask();
             agent.stoppingDistance = stoppingDistance;
-            Debug.Log($"MoveToPosition | agent.stoppingDistance après: {agent.stoppingDistance}");
             agent.ResetPath();
             agent.SetDestination(destination);
         }
@@ -296,7 +294,6 @@ public class MovementManager : MonoBehaviour
             string unitType = unitInstance != null && unitInstance.unitData != null
                 ? unitInstance.unitData.type.ToString()
                 : "Unknown";
-            Debug.Log($"[MovementManager] Destination refusée: unit={unitType}, tile={tile.groundType}, position={worldPosition}.", this);
         }
 
         return allowed;

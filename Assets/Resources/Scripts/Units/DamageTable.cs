@@ -106,14 +106,12 @@ public class DamageTable : ScriptableObject
                 if (r.attackerType == attacker.unitData.type &&
                     r.defenderStructureType == targetStructure.structureType)
                 {
-                    Debug.Log($"[DamageTable] Multiplier found for {attacker.unitData.type} attacking {targetStructure.structureType}: {r.damageMultiplier}");
                     return r.damageMultiplier;
                 }
             }
             if (r.attackerType == attacker.unitData.type &&
                 r.defenderType == target.unitData.type)
             {
-                Debug.Log($"[DamageTable] Multiplier found for {attacker.unitData.type} attacking {target.unitData.type}: {r.damageMultiplier}");
                 return r.damageMultiplier;
             }
         }

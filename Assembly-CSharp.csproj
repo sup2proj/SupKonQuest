@@ -51,7 +51,6 @@
   <ItemGroup>
     <Compile Include="Assets\Resources\Scripts\Manager\PlayerManager.cs" />
     <Compile Include="Assets\Resources\Scripts\IA\Hard\CombatManager.cs" />
-    <Compile Include="Assets\Resources\Scripts\GameRules\Defeat.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\Resources\Scripts\Map\MapGenerator.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\StructureButtons\ActionButton.cs" />
@@ -71,7 +70,6 @@
     <Compile Include="Assets\Resources\Scripts\IA\Hard\EnemyAnalyzer.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\ProgressBar.cs" />
     <Compile Include="Assets\Resources\Scripts\IA\Shared\IAInstance.cs" />
-    <Compile Include="Assets\Resources\Scripts\UI\TerritoryStructureName.cs" />
     <Compile Include="Assets\Resources\Scripts\Units\Spells.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\RessourceManager.cs" />
     <Compile Include="Assets\Resources\Scripts\IA\Shared\AIPathManager.cs" />
@@ -80,6 +78,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
+    <Compile Include="Assets\Resources\Scripts\Units\CannonBall.cs" />
     <Compile Include="Assets\Resources\Scripts\Controller\ManagerController.cs" />
     <Compile Include="Assets\Resources\Scripts\Map\PointData.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitSupportData.cs" />
@@ -109,7 +108,6 @@
     <Compile Include="Assets\Resources\Scripts\Manager\SelectionManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Units\DamageTable.cs" />
     <Compile Include="Assets\Resources\Scripts\IA\Easy\AIEasy.cs" />
-    <Compile Include="Assets\Resources\Scripts\GameRules\Victory.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
@@ -128,7 +126,6 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitData.cs" />
-    <Compile Include="Assets\Resources\Scripts\GameRules\StructureAttribution.cs" />
     <Compile Include="Assets\Resources\Scripts\IA\Normal\NormalDefense.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
@@ -139,7 +136,6 @@
     <Compile Include="Assets\Resources\Scripts\Instances\StructureInstance.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
-    <Compile Include="Assets\Resources\Scripts\GameRules\Conditions.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
     <Compile Include="Assets\Resources\Scripts\IA\Easy\EasyProduction.cs" />
     <Compile Include="Assets\Resources\Scripts\IA\SharedEasyNormal\MovementEasyNormal.cs" />
@@ -164,7 +160,6 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\QuickOutline\Resources\Shaders\OutlineMask.shader" />
-    <None Include="Assets\Resources\Fonts\Cinzel\README.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
@@ -176,7 +171,6 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\QuickOutline\Readme.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
-    <None Include="Assets\Resources\Fonts\Cinzel\OFL.txt" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
