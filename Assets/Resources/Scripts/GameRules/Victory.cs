@@ -64,7 +64,7 @@ public class Victory : MonoBehaviour
     {
         playerId = -1;
 
-        var sessions = Object.FindObjectsOfType<PlayerSession>();
+        var sessions = Object.FindObjectsByType<PlayerSession>(FindObjectsSortMode.None);
         if (sessions == null || sessions.Length != 1)
             return false;
 
@@ -129,7 +129,7 @@ public class Victory : MonoBehaviour
     private static bool IsOnlyPlayerWithStructures(int playerId)
     {
         bool playerHasStructure = false;
-        StructureInstance[] structures = Object.FindObjectsOfType<StructureInstance>();
+        StructureInstance[] structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
         if (structures == null)
             return false;
 

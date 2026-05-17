@@ -471,7 +471,7 @@ private Vector3 SampleNavMesh(Vector3 candidate)
 
     private void ForceRefreshSelectableObjects()
     {
-        var found = Object.FindObjectsOfType<SelectableObject>();
+        var found = Object.FindObjectsByType<SelectableObject>(FindObjectsSortMode.None);
 
         AllSelectableObjects.Clear();
         AllSelectableObjects.AddRange(found);

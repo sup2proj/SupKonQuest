@@ -41,7 +41,7 @@ public static class TerritoryControlUtility
     {
         territoriesByOwner = new Dictionary<int, int>();
 
-        var allStructures = Object.FindObjectsOfType<StructureInstance>();
+        var allStructures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
         if (allStructures == null || allStructures.Length == 0)
             return false;
 

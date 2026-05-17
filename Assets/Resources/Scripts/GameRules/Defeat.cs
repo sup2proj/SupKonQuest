@@ -51,7 +51,7 @@ public class Defeat : MonoBehaviour
         if (session != null)
             return session.StructureCount > 0;
 
-        StructureInstance[] structures = Object.FindObjectsOfType<StructureInstance>();
+        StructureInstance[] structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
         if (structures == null)
             return false;
 
