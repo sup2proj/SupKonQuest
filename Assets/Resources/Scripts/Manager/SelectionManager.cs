@@ -33,17 +33,11 @@ public class SelectionManager : MonoBehaviour
 
         AnalyzeSelectableObjectsContinuously();
 
-        if (IsPointerOverUi())
-        {
-            isMouseDown = false;
-            isDragging = false;
-            if (SelectionBox != null)
-                SelectionBox.gameObject.SetActive(false);
-            return;
-        }
-
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
+            if (IsPointerOverUi())
+                return;
+
             bool attackOrderIssued = TryIssueAttackMoveOrder();
             if (!attackOrderIssued)
                 TryIssueGroupMoveOrder();
@@ -51,19 +45,21 @@ public class SelectionManager : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
+            if (IsPointerOverUi())
+            {
+                ResetSelectionDrag();
+                return;
+            }
+
             if (TryIssueAttackMoveOrder())
             {
-                isMouseDown = false;
-                isDragging = false;
-                SelectionBox.gameObject.SetActive(false);
+                ResetSelectionDrag();
                 return;
             }
 
             if (TryIssueBoatShoreOrder())
             {
-                isMouseDown = false;
-                isDragging = false;
-                SelectionBox.gameObject.SetActive(false);
+                ResetSelectionDrag();
                 return;
             }
 
@@ -98,10 +94,16 @@ public class SelectionManager : MonoBehaviour
         }
         if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
-            isMouseDown = false;
-            isDragging = false;
-            SelectionBox.gameObject.SetActive(false);
+            ResetSelectionDrag();
         }
+    }
+
+    private void ResetSelectionDrag()
+    {
+        isMouseDown = false;
+        isDragging = false;
+        if (SelectionBox != null)
+            SelectionBox.gameObject.SetActive(false);
     }
 
     private bool IsPointerOverUi()

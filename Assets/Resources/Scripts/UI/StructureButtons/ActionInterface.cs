@@ -3,395 +3,340 @@ using TMPro;
 
 public class ActionInterface : MonoBehaviour
 {
+    private const int HarbourUnitDataOffset = 7;
+    private const float PoweredStructureMultiplier = 1.20f;
+
     public static ActionInterface Instance;
 
     [Header("Boutons pour Structure normale")]
     public ActionButton[] structureButtons;
-    
+
     [Header("Boutons pour Harbour")]
     public ActionButton[] harbourButtons;
-    
+
     [Header("Boutons pour Structure neutre")]
     public ActionButton[] neutralStructureButtons;
 
-	[Header("Boutons pour déclancher les compétences des unités")]
+    [Header("Boutons pour declancher les competences des unites")]
     public ActionButton[] unitActionButtons;
-    
-	[Header("Prices des unités (ordre identique aux unitDatas))")]
-    [SerializeField] private TextMeshProUGUI[] unitPriceTexts;
- 	[SerializeField] private TextMeshProUGUI[] boatPriceTexts;
-    [SerializeField] private TextMeshProUGUI[] unitProtectorPriceTexts;
- 	[SerializeField] public UnitData[] unitDatas;
 
-	[Header("Image des structures")]
+    [Header("Prices des unites (ordre identique aux unitDatas))")]
+    [SerializeField] private TextMeshProUGUI[] unitPriceTexts;
+    [SerializeField] private TextMeshProUGUI[] boatPriceTexts;
+    [SerializeField] private TextMeshProUGUI[] unitProtectorPriceTexts;
+    [SerializeField] public UnitData[] unitDatas;
+
+    [Header("Image des structures")]
     public GameObject[] structureImage;
 
-
     private StructureType currentStructureType;
-	private static float x;
-	private static float z;
-	private static StructureInstance currentSelectedStructure;
-    
+    private static float x;
+    private static float z;
+
     void Awake()
     {
         Instance = this;
         HideAllButtons();
     }
-    
+
     void Start()
     {
         SetupAllButtons();
-		SetupUnitPrices();	
+        SetupUnitPrices();
         SetupBoatPrices();
     }
 
-	public void SetupUnitPrices()
-	{
-		if (unitPriceTexts == null || unitDatas == null) return;
-
-		int count = Mathf.Min(unitPriceTexts.Length, unitDatas.Length);
-		for (int i = 0; i < count; i++)
-		{
-			if (unitPriceTexts[i] == null) continue;
-
-			if (unitDatas[i] == null)
-			{
-				unitPriceTexts[i].text = "";
-				continue;
-			}
-			float multiplier = (currentStructureType == StructureType.NeutralStructure) ? 1.20f : 1f;
-			float finalPrice = unitDatas[i].price * multiplier;
-			unitPriceTexts[i].text = finalPrice.ToString();
-		}
-	}
+    public void SetupUnitPrices()
+    {
+        SetupPriceTexts(unitPriceTexts, 0, GetCurrentUnitPriceMultiplier());
+    }
 
     public void SetupBoatPrices()
     {
-        if (boatPriceTexts == null || unitDatas == null) return;
-
-        int count = Mathf.Min(unitPriceTexts.Length, unitDatas.Length);
-        for (int i = 0; i < count; i++)
-        {
-            if (boatPriceTexts[i] == null) continue;
-
-            if (unitDatas[i] == null)
-            {
-                boatPriceTexts[i].text = "";
-                continue;
-            }
-            float finalPrice = unitDatas[i].price;
-            boatPriceTexts[i].text = finalPrice.ToString();
-        }
+        SetupPriceTexts(boatPriceTexts, HarbourUnitDataOffset, 1f);
     }
 
-    void SetupAllButtons()
+    private void SetupAllButtons()
     {
-        SetupButtonArray(structureButtons, "Structure");
-        SetupButtonArray(harbourButtons, "Harbour");
-        SetupButtonArray(neutralStructureButtons, "NeutralStructure");
+        SetupButtonArray(structureButtons, StructureType.Structure);
+        SetupButtonArray(harbourButtons, StructureType.Harbour);
+        SetupButtonArray(neutralStructureButtons, StructureType.NeutralStructure);
     }
 
-    void SetupButtonArray(ActionButton[] buttons, string typeName)
+    private void SetupButtonArray(ActionButton[] buttons, StructureType structureType)
     {
-        if (buttons == null || buttons.Length == 0)
-        {
+        if (buttons == null)
             return;
-        }
-        StructureType typeEnum = StructureType.Structure;
-        if (System.Enum.TryParse(typeName, out StructureType parsedType))
-        {
-            typeEnum = parsedType;
-        }
 
         for (int i = 0; i < buttons.Length; i++)
         {
-            if (buttons[i] != null)
-            {
-                int buttonNumber = i + 1;
-                string btnTypeName = typeName;
-                buttons[i].Setup(typeEnum, () => ButtonAction(buttonNumber, btnTypeName));
-            }
+            ActionButton button = buttons[i];
+            if (button == null)
+                continue;
+
+            int buttonNumber = i + 1;
+            button.Setup(structureType, () => ButtonAction(buttonNumber, structureType));
         }
     }
 
-    void ButtonAction(int buttonNumber, string structureTypeName)
+    private void ButtonAction(int buttonNumber, StructureType structureType)
     {
-		if (structureTypeName == "Structure") {
-            SendUnitsIcon(buttonNumber, false);
-            
-		}
-         else if (structureTypeName == "NeutralStructure") {
-            SendUnitsIcon(buttonNumber, true);
-		}
-         else if (structureTypeName == "Harbour") {
-			HarbourButtonAction(buttonNumber);
-		}
-    }
-	
-	private void SendUnitsIcon(int buttonNumber, bool isPowered)
-    {
-        GameObject clickedImageGO = GetClickedUnitsIcon(buttonNumber, isPowered);
-        if (clickedImageGO != null)
+        switch (structureType)
         {
-            if (InterfaceInstance.Instance != null)
-            {
-                int unitIndex = buttonNumber - 1;
-                UnitsType type = unitDatas[unitIndex].type;
+            case StructureType.Structure:
+                SendUnitsIcon(buttonNumber, false);
+                break;
 
-                bool accepted;
-                if (isPowered)
-                {
-                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, true, false);
-                }
-                else
-                {
-                    accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false, false);
-                }
+            case StructureType.NeutralStructure:
+                SendUnitsIcon(buttonNumber, true);
+                break;
 
-                if (accepted)
-                {
-                    InterfaceInstance.Instance.addUnitToQueue(clickedImageGO);
-                }
-                else
-                {
-                    Debug.Log($"[ActionInterface] Création refusée (pas assez d'or ?) -> icône non ajoutée à la queue. unitIndex={unitIndex}, type={type}");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("[ActionInterface] InterfaceInstance.Instance est null, impossible d'ajouter à la queue.");
-            }
+            case StructureType.Harbour:
+                HarbourButtonAction(buttonNumber);
+                break;
         }
+    }
+
+    private void SendUnitsIcon(int buttonNumber, bool isPowered)
+    {
+        ActionButton[] sourceButtons = isPowered ? neutralStructureButtons : structureButtons;
+        TryCreateUnitFromButton(buttonNumber, sourceButtons, 0, isPowered, "Structure");
     }
 
     public GameObject GetClickedUnitsIcon(int buttonNumber, bool isPowered)
     {
+        ActionButton[] sourceButtons = isPowered ? neutralStructureButtons : structureButtons;
         int index = buttonNumber - 1;
-        if (isPowered)
+
+        if (!IsValidIndex(sourceButtons, index) || sourceButtons[index] == null)
+            return null;
+
+        return sourceButtons[index].gameObject;
+    }
+
+    public void HarbourButtonAction(int buttonNumber)
+    {
+        TryCreateUnitFromButton(buttonNumber, harbourButtons, HarbourUnitDataOffset, false, "Harbour");
+    }
+
+    private bool TryCreateUnitFromButton(int buttonNumber, ActionButton[] sourceButtons, int unitDataOffset, bool isPowered, string logContext)
+    {
+        int buttonIndex = buttonNumber - 1;
+        if (!IsValidIndex(sourceButtons, buttonIndex) || sourceButtons[buttonIndex] == null)
         {
-            return neutralStructureButtons[index].gameObject;
+            Debug.LogWarning($"[ActionInterface] {logContext}: pas d'icone configuree pour le bouton {buttonNumber}");
+            return false;
         }
-        else
+
+        int unitIndex = buttonIndex + unitDataOffset;
+        if (!TryGetUnitData(unitIndex, logContext, out UnitData data))
+            return false;
+
+        if (InterfaceInstance.Instance == null)
         {
-            return structureButtons[index].gameObject;
+            Debug.LogWarning($"[ActionInterface] InterfaceInstance.Instance est null, creation impossible ({logContext}).");
+            return false;
+        }
+
+        bool accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, data.type, x, z, isPowered, false);
+        if (!accepted)
+        {
+            Debug.Log($"[ActionInterface] Creation refusee -> icone non ajoutee. unitIndex={unitIndex}, type={data.type}");
+            return false;
+        }
+
+        InterfaceInstance.Instance.addUnitToQueue(sourceButtons[buttonIndex].gameObject);
+        return true;
+    }
+
+    public void HideAllButtons()
+    {
+        Debug.Log("[ActionInterface] HideAllButtons() appele");
+        SetButtonsActive(false, structureButtons, harbourButtons, neutralStructureButtons, unitActionButtons);
+        SetTextsActive(false, unitPriceTexts, boatPriceTexts, unitProtectorPriceTexts);
+        SetImagesActive(false, structureImage);
+    }
+
+    private void SetButtonsActive(bool active, params ActionButton[][] buttonGroups)
+    {
+        if (buttonGroups == null)
+            return;
+
+        for (int i = 0; i < buttonGroups.Length; i++)
+        {
+            ActionButton[] buttons = buttonGroups[i];
+            if (buttons == null)
+                continue;
+
+            for (int j = 0; j < buttons.Length; j++)
+            {
+                if (buttons[j] != null)
+                    buttons[j].gameObject.SetActive(active);
+            }
         }
     }
 
-    public void HarbourButtonAction(int buttonNumber) {
-        int index = buttonNumber - 1;
-        Debug.Log("[ActionInterface] HarbourButtonAction appelé pour buttonNumber=" + buttonNumber + " (index=" + index + ")");
-        if (index < 0 || unitDatas == null || index >= unitDatas.Length)
+    private void SetTextsActive(bool active, params TextMeshProUGUI[][] textGroups)
+    {
+        if (textGroups == null)
+            return;
+
+        for (int i = 0; i < textGroups.Length; i++)
         {
-            Debug.LogWarning($"[ActionInterface] HarbourButtonAction: index invalide {index}");
+            TextMeshProUGUI[] texts = textGroups[i];
+            if (texts == null)
+                continue;
+
+            for (int j = 0; j < texts.Length; j++)
+            {
+                if (texts[j] == null)
+                    continue;
+
+                texts[j].gameObject.SetActive(active);
+                if (active)
+                    texts[j].transform.SetAsLastSibling();
+            }
+        }
+    }
+
+    private void SetImagesActive(bool active, GameObject[] images)
+    {
+        if (images == null)
+            return;
+
+        for (int i = 0; i < images.Length; i++)
+        {
+            if (images[i] != null)
+                images[i].SetActive(active);
+        }
+    }
+
+    private void ShowImage(StructureType selectedType)
+    {
+        SetImagesActive(false, structureImage);
+
+        int index = (int)selectedType;
+        if (IsValidIndex(structureImage, index) && structureImage[index] != null)
+        {
+            structureImage[index].SetActive(true);
             return;
         }
 
-        GameObject clickedImageGO = null;
-        if (harbourButtons != null && index < harbourButtons.Length && harbourButtons[index] != null)
-            clickedImageGO = harbourButtons[index].gameObject;
-
-        if (clickedImageGO != null)
-        {
-            if (InterfaceInstance.Instance != null)
-            {
-                int unitIndex = index + 7; // Décalage de 7 pour accéder aux unités navales dans unitDatas
-                UnitsType type = unitDatas[unitIndex].type;
-                Debug.Log(type);
-                bool accepted = InterfaceInstance.Instance.InitUnitsCreation(unitIndex, type, x, z, false, false);
-                if (accepted)
-                {
-                    InterfaceInstance.Instance.addUnitToQueue(clickedImageGO);
-                }
-                else
-                {
-                    Debug.Log($"[ActionInterface] Création refusée (pas assez d'or ?) -> icône non ajoutée à la queue. unitIndex={unitIndex}, type={type}");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("[ActionInterface] InterfaceInstance.Instance est null, impossible d'ajouter à la queue (Harbour)." );
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"[ActionInterface] HarbourButtonAction: pas d'icône configurée pour le bouton {buttonNumber}");
-        }
-    }
-    
-    public void HideAllButtons()
-    {
-        Debug.Log("[ActionInterface] HideAllButtons() appelé");
-        HideButtonArray(structureButtons);
-        HideButtonArray(harbourButtons);
-        HideButtonArray(neutralStructureButtons);
-		HideButtonArray(unitActionButtons);
-		HidePrices(unitPriceTexts);
-		HideImage(structureImage);
-
-    }
-
-    void HideButtonArray(ActionButton[] buttons)
-    {
-        if (buttons == null) return;
-        
-        foreach (var button in buttons)
-        {
-            if (button != null)
-            {
-                button.gameObject.SetActive(false);
-            }
-        }
-    }
-
-    void ShowButtonArray(ActionButton[] buttons)
-    {
-        if (buttons == null) return;
-        
-        foreach (var button in buttons)
-        {
-            if (button != null)
-            {
-                button.gameObject.SetActive(true);
-            }
-        }
-    }
-
-	void HidePrices(TextMeshProUGUI[] unitPriceTexts)
-    {
-        if (unitPriceTexts == null) return;
-        
-        foreach (var unitPriceText in unitPriceTexts)
-        {
-            if (unitPriceText != null)
-            {
-                unitPriceText.gameObject.SetActive(false);
-            }
-        }
-        foreach (var unitProtectorPriceText in unitProtectorPriceTexts)
-        {
-            if (unitProtectorPriceText != null)
-            {
-                unitProtectorPriceText.gameObject.SetActive(false);
-            }
-        }
-
-        foreach (var boatPriceText in boatPriceTexts)
-        {
-            if (boatPriceText != null)
-            {
-                boatPriceText.gameObject.SetActive(false);
-            }
-        }
-    }
-
-    void ShowPrices(TextMeshProUGUI[] unitPriceTexts)
-    {
-        if (unitPriceTexts == null) return;
-        
-        foreach (var unitPriceText in unitPriceTexts)
-        {
-            if (unitPriceText != null)
-            {
-                unitPriceText.gameObject.SetActive(true);
-                unitPriceText.transform.SetAsLastSibling();
-            }
-        }
-    }
-    
-    void ShowBoatPrices(TextMeshProUGUI[] boatPriceTexts)
-    {
-        if (boatPriceTexts == null) return;
-        
-        foreach (var boatPriceText in boatPriceTexts)
-        {
-            if (boatPriceText != null)
-            {
-                boatPriceText.gameObject.SetActive(true);
-                boatPriceText.transform.SetAsLastSibling();
-            }
-        }
-    }
-
-	void HideImage(GameObject[] structureImage)
-    {
-        if (structureImage == null) return;
-
-        foreach (var img in structureImage)
-        {
-            if (img != null)
-            {
-                img.gameObject.SetActive(false);
-            }
-        }
-    }
-
-    void ShowImage(GameObject[] structureImage, StructureType selectedType)
-    {
-        if (structureImage == null) return;
-        HideImage(structureImage);
-        int index = (int)selectedType;
-        if (index >= 0 && index < structureImage.Length && structureImage[index] != null)
-        {
-            structureImage[index].gameObject.SetActive(true);
-        }
-        else
-        {
-            Debug.LogWarning($"[ActionInterface] Aucune image configurée pour {selectedType} (index {index}).");
-        }
+        Debug.LogWarning($"[ActionInterface] Aucune image configuree pour {selectedType} (index {index}).");
     }
 
     public static void ShowStructureButtons(StructureType structureType)
-	{
-		if (Instance == null)
-		{
-			Debug.LogError("[ActionInterface] Instance est null! ShowStructureButtons ne peut pas fonctionner.");
-			return;
-		}
+    {
+        if (Instance == null)
+        {
+            Debug.LogError("[ActionInterface] Instance est null! ShowStructureButtons ne peut pas fonctionner.");
+            return;
+        }
 
-		Instance.currentStructureType = structureType;
-		Instance.HideAllButtons();
-		Instance.SetupUnitPrices();
+        Instance.currentStructureType = structureType;
+        Instance.HideAllButtons();
+        Instance.SetupUnitPrices();
+        Instance.SetupBoatPrices();
+        Instance.ShowImage(structureType);
+        Instance.ShowButtonsAndPricesFor(structureType);
+    }
 
-		switch (structureType)
-		{
-			case StructureType.Structure:
-				Debug.Log("[ActionInterface] Affichage des boutons pour Structure");
-				Instance.ShowButtonArray(Instance.structureButtons);
-				Instance.ShowImage(Instance.structureImage, structureType);
-				Instance.ShowPrices(Instance.unitPriceTexts);
-				break;
+    private void ShowButtonsAndPricesFor(StructureType structureType)
+    {
+        switch (structureType)
+        {
+            case StructureType.Structure:
+                Debug.Log("[ActionInterface] Affichage des boutons pour Structure");
+                SetButtonsActive(true, structureButtons);
+                SetTextsActive(true, unitPriceTexts);
+                break;
 
-			case StructureType.Harbour:
-				Debug.Log("[ActionInterface] Affichage des boutons pour Harbour");
-				Instance.ShowButtonArray(Instance.harbourButtons);
-				Instance.ShowImage(Instance.structureImage, structureType);
-                Instance.ShowBoatPrices(Instance.boatPriceTexts);
-				break;
+            case StructureType.Harbour:
+                Debug.Log("[ActionInterface] Affichage des boutons pour Harbour");
+                SetButtonsActive(true, harbourButtons);
+                SetTextsActive(true, boatPriceTexts);
+                break;
 
-			case StructureType.NeutralStructure:
-				Debug.Log("[ActionInterface] Affichage des boutons pour NeutralStructure");
-				Instance.ShowButtonArray(Instance.neutralStructureButtons);
-				Instance.ShowImage(Instance.structureImage, structureType);
-				Instance.ShowPrices(Instance.unitPriceTexts);
-				break;
-		}
-	}
+            case StructureType.NeutralStructure:
+                Debug.Log("[ActionInterface] Affichage des boutons pour NeutralStructure");
+                SetButtonsActive(true, neutralStructureButtons);
+                SetTextsActive(true, unitPriceTexts);
+                break;
+        }
+    }
 
     public static void SetSelectedStructure(StructureInstance structure, Vector3 position)
     {
-        currentSelectedStructure = structure;
         x = position.x;
         z = position.z;
-        Debug.Log($"[ActionInterface] Structure sélectionnée aux coordonnées x={position.x}, z={position.z}");
+        string structureName = structure != null ? structure.name : "null";
+        Debug.Log($"[ActionInterface] Structure selectionnee: {structureName}, x={position.x}, z={position.z}");
     }
 
-    public void ShowUnitProtectorPrice(int unitIndex,  int priceIndex)
+    public void ShowUnitProtectorPrice(int unitIndex, int priceIndex)
     {
-        if (unitProtectorPriceTexts == null || unitDatas == null) return;
-        
-        float multiplier = (currentStructureType == StructureType.NeutralStructure) ? 1.20f : 1f;
-        float finalPrice = unitDatas[unitIndex].price * multiplier;
-        unitProtectorPriceTexts[priceIndex].text = finalPrice.ToString();
-        unitProtectorPriceTexts[priceIndex].gameObject.SetActive(true);
+        if (!IsValidIndex(unitProtectorPriceTexts, priceIndex))
+            return;
+
+        if (!TryGetUnitData(unitIndex, "Protector", out UnitData data))
+            return;
+
+        TextMeshProUGUI priceText = unitProtectorPriceTexts[priceIndex];
+        if (priceText == null)
+            return;
+
+        priceText.text = FormatPrice(data.price * GetCurrentUnitPriceMultiplier());
+        priceText.gameObject.SetActive(true);
+        priceText.transform.SetAsLastSibling();
+    }
+
+    private void SetupPriceTexts(TextMeshProUGUI[] priceTexts, int unitDataOffset, float multiplier)
+    {
+        if (priceTexts == null || unitDatas == null)
+            return;
+
+        for (int i = 0; i < priceTexts.Length; i++)
+        {
+            TextMeshProUGUI priceText = priceTexts[i];
+            if (priceText == null)
+                continue;
+
+            int unitIndex = i + unitDataOffset;
+            if (!IsValidIndex(unitDatas, unitIndex) || unitDatas[unitIndex] == null)
+            {
+                priceText.text = "";
+                continue;
+            }
+
+            priceText.text = FormatPrice(unitDatas[unitIndex].price * multiplier);
+        }
+    }
+
+    private bool TryGetUnitData(int unitIndex, string logContext, out UnitData data)
+    {
+        data = null;
+        if (!IsValidIndex(unitDatas, unitIndex) || unitDatas[unitIndex] == null)
+        {
+            Debug.LogWarning($"[ActionInterface] {logContext}: unitData invalide index={unitIndex}");
+            return false;
+        }
+
+        data = unitDatas[unitIndex];
+        return true;
+    }
+
+    private float GetCurrentUnitPriceMultiplier()
+    {
+        return currentStructureType == StructureType.NeutralStructure ? PoweredStructureMultiplier : 1f;
+    }
+
+    private string FormatPrice(float price)
+    {
+        return Mathf.RoundToInt(price).ToString();
+    }
+
+    private bool IsValidIndex<T>(T[] array, int index)
+    {
+        return array != null && index >= 0 && index < array.Length;
     }
 }
