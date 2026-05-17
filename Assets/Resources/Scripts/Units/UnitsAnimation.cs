@@ -24,7 +24,7 @@ public class UnitsAnimation : MonoBehaviour
 
     public Transform AttackTarget => attackTarget;
     public GameObject cannonBallPrefab;
-    public float cannonBallSpeed = 1f;
+    public float cannonBallSpeed = 3f;
     
     void Awake()
     {
