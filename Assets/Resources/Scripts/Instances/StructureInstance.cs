@@ -375,7 +375,7 @@ public class StructureInstance : MonoBehaviour
         if (instanceId == -1)
             return null;
 
-        StructureInstance[] structures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+        StructureInstance[] structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
         for (int i = 0; i < structures.Length; i++)
         {
             StructureInstance structure = structures[i];
@@ -418,23 +418,30 @@ public class StructureInstance : MonoBehaviour
     // Centralise l'application du nom de territoire et adapte la couleur selon le playerId
     public void ApplyTerritoryName(string territory)
     {
-        if (string.IsNullOrWhiteSpace(territory))
-            return;
-
-        TerritoryStructureName t = territoryStructureName;
-        if (t == null)
-            t = GetComponent<TerritoryStructureName>() ?? GetComponentInChildren<TerritoryStructureName>(true);
+        TerritoryStructureName t = GetTerritoryStructureName();
 
         if (t != null)
         {
-            t.SetTerritoryName(territory);
-            Color c = PlayerManager.GetPlayerColor(playerId);
-            t.SetColor(c);
+            if (!string.IsNullOrWhiteSpace(territory))
+            {
+                territoryName = territory;
+                t.SetTerritoryName(territory);
+            }
+
+            t.SetColor(PlayerManager.GetPlayerColor(playerId));
         }
+    }
+
+    private TerritoryStructureName GetTerritoryStructureName()
+    {
+        if (territoryStructureName == null)
+            territoryStructureName = GetComponent<TerritoryStructureName>() ?? GetComponentInChildren<TerritoryStructureName>(true);
+
+        return territoryStructureName;
     }
     
     public static MapJsonData LoadDataFromPath(string path) {
-        TextAsset targetFile = Resources.Load<TextAsset>(path);
+        TextAsset targetFile = UnityEngine.Resources.Load<TextAsset>(path);
         if (targetFile != null) {
             return JsonUtility.FromJson<MapJsonData>(targetFile.text);
         }
@@ -443,11 +450,22 @@ public class StructureInstance : MonoBehaviour
     
    public void TakeDamage(float amount, UnitInstance attacker)
    {
+       if (attacker != null && attacker.playerId == playerId)
+           return;
+
+       int previousOwnerId = playerId;
+
        currentHealth -= Mathf.RoundToInt(amount);
        currentHealth = Mathf.Clamp(currentHealth, 0, health);
    
        if (healthBar != null)
            healthBar.SetHealth(currentHealth);
+
+       if (currentHealth <= 0 && attacker != null && attacker.playerId != previousOwnerId)
+       {
+           CaptureStructure(attacker.playerId, previousOwnerId);
+           return;
+       }
 
        // Déclenchement IA uniquement si le comportement IA niveau 2 est actif
        IAInstance ia = FindFirstObjectByType<IAInstance>();
@@ -487,6 +505,64 @@ public class StructureInstance : MonoBehaviour
    
        // if (currentHealth <= 0)
        //     Die();
+   }
+
+   private void CaptureStructure(int newOwnerId, int previousOwnerId)
+   {
+       playerId = newOwnerId;
+       currentHealth = health;
+
+       if (healthBar != null)
+           healthBar.SetHealth(currentHealth);
+
+       ApplyTerritoryName(territoryName);
+       UpdateStructureCounts(previousOwnerId, newOwnerId);
+       bool previousOwnerDefeated = Defeat.CheckDefeatAfterCapture(previousOwnerId, showPanel: false);
+       if (previousOwnerDefeated)
+       {
+           bool winnerDeclared = Victory.CheckVictoryAfterElimination(newOwnerId);
+           if (!winnerDeclared)
+               winnerDeclared = Victory.CheckVictoryAfterCapture(newOwnerId);
+
+           if (!winnerDeclared)
+               Defeat.ShowDefeatForPlayer(previousOwnerId);
+       }
+       else
+       {
+           Victory.CheckVictoryAfterCapture(newOwnerId);
+       }
+
+       if (currentlySelected == this && PlayerManager.Instance != null && PlayerManager.Instance.GetActivePlayerId() != playerId)
+           UnSelected();
+
+       Debug.Log($"[StructureInstance] {name} capturée par le joueur {newOwnerId} (ancien propriétaire: {previousOwnerId}).", this);
+   }
+
+   private void UpdateStructureCounts(int previousOwnerId, int newOwnerId)
+   {
+       if (previousOwnerId == newOwnerId)
+           return;
+
+       PlayerManager playerManager = PlayerManager.Instance;
+       if (playerManager == null)
+           playerManager = FindFirstObjectByType<PlayerManager>();
+
+       if (playerManager == null)
+       {
+           Debug.LogWarning("[StructureInstance] PlayerManager introuvable, impossible de mettre à jour les compteurs de structures.", this);
+           return;
+       }
+
+       PlayerSession previousOwnerSession = previousOwnerId > 0 ? playerManager.GetSession(previousOwnerId) : null;
+       if (previousOwnerSession != null)
+           previousOwnerSession.removeStructure(1);
+
+       PlayerSession newOwnerSession = newOwnerId > 0 ? playerManager.GetSession(newOwnerId) : null;
+       if (newOwnerSession != null)
+           newOwnerSession.AddStructure(1);
+
+       if (StatisticsInterface.Instance != null)
+           StatisticsInterface.Instance.Refresh();
    }
 
    private void TryTriggerProtectorRetaliation(UnitInstance attacker)

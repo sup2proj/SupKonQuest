@@ -10,7 +10,7 @@ public class ManagerController : MonoBehaviour
 
     public static void initializePermanentOverlay()
     {
-        GameObject permanentOverlay = Resources.Load<GameObject>("Prefabs/Ui/GameInterface");
+        GameObject permanentOverlay = UnityEngine.Resources.Load<GameObject>("Prefabs/Ui/GameInterface");
         initializeEventSystem();
         if (permanentOverlay != null)
         {
@@ -24,7 +24,7 @@ public class ManagerController : MonoBehaviour
     
     public static void intializePermanentManager()
     {
-        GameObject managers = Resources.Load<GameObject>("Prefabs/Managers");
+        GameObject managers = UnityEngine.Resources.Load<GameObject>("Prefabs/Managers");
         initializeEventSystem();
         if (managers != null)
         {

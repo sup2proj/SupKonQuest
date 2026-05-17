@@ -21,8 +21,6 @@ public class MovementEasyNormal : MonoBehaviour
     private bool isPaused = false;
     private bool isInCombat = false;
     private Transform lastAttackTarget = null;
-    private float nextStructureScanTime = 0f;
-
     private NormalAttack normalAttackComponent;
 
     private void Awake()

@@ -1,18 +1,24 @@
 using Enums.Environment;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.AI;
-using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class MovementManager : MonoBehaviour
 {
     public static MovementManager Instance;
-    
+
+    private const float NavMeshSampleDistance = 2.0f;
+    private const float AgentStoppedSqrVelocity = 0.01f;
+    private const float AgentStuckVelocityThreshold = 0.05f;
+    private const float AgentStuckTimeout = 1.5f;
+    private const float AnimationMoveVelocityThreshold = 0.1f;
+    private const float TransformMoveSqrThreshold = 0.0001f;
+
     [Header("Movement")]
     public float moveSpeed = 3.5f;
     public float stoppingDistance = 0.3f;
     public float rotationSpeed = 12f;
-	
+
     private Vector3 movement;
     private Vector3 targetPosition;
     private bool isMovingToTarget = false;
@@ -22,7 +28,6 @@ public class MovementManager : MonoBehaviour
     private UnitInstance unitInstance;
     private NavMeshAgent agent;
     private Animator animator;
-    private SelectableObject selectable;
     private MapGenerator mapGenerator;
 
     private static int priorityCounter = 0;
@@ -33,12 +38,10 @@ public class MovementManager : MonoBehaviour
         unitInstance = GetComponent<UnitInstance>();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        selectable = GetComponent<SelectableObject>();
 
         if (agent != null)
         {
-            agent.speed = GetUnitSpeed();
-            agent.areaMask = GetAllowedNavMeshAreaMask();
+            RefreshAgentSettings();
             agent.avoidancePriority = Mathf.Clamp(priorityCounter % 99, 1, 99);
             priorityCounter++;
         }
@@ -46,21 +49,19 @@ public class MovementManager : MonoBehaviour
 
     private void Start()
     {
-        if (agent != null)
-        {
-            agent.speed = GetUnitSpeed();
-            agent.areaMask = GetAllowedNavMeshAreaMask();
-            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2.0f, agent.areaMask))
-            {
-                agent.Warp(hit.position);
-            }
-        }
+        if (agent == null)
+            return;
+
+        RefreshAgentSettings();
+        if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, NavMeshSampleDistance, agent.areaMask))
+            agent.Warp(hit.position);
     }
 
     private void Update()
     {
         if (SelectionManager.Instance == null)
             HandleMouseClick();
+
         HandleMovement();
     }
 
@@ -69,80 +70,80 @@ public class MovementManager : MonoBehaviour
         if (Mouse.current == null || Camera.main == null)
             return;
 
-        if (Mouse.current.rightButton.wasPressedThisFrame)
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                Vector3 destination = hit.point;
-                destination.y = transform.position.y;
-                MoveToPosition(destination, stoppingDistance);
-            }
-        }
+        if (!Mouse.current.rightButton.wasPressedThisFrame)
+            return;
+
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        if (!Physics.Raycast(ray, out RaycastHit hit))
+            return;
+
+        Vector3 destination = hit.point;
+        destination.y = transform.position.y;
+        MoveToPosition(destination, stoppingDistance);
     }
 
     private void HandleMovement()
     {
-        if (agent != null)
-        {
-            agent.speed = GetUnitSpeed();
-            agent.areaMask = GetAllowedNavMeshAreaMask();
-        }
+        RefreshAgentSettings();
 
-        // Version optimisée utilisant NavMeshAgent
         if (CanUseNavMeshAgent())
-        {
             HandleNavMeshMovement();
-        }
         else
-        {
             HandleTransformMovement();
-        }
 
-        // Mise à jour de l'animation
         UpdateMovementAnimation();
     }
 
     private void HandleNavMeshMovement()
     {
-        if (isMovingToTarget)
+        if (!isMovingToTarget)
+            return;
+
+        if (followTarget != null)
+            agent.SetDestination(followTarget.position);
+
+        if (HasReachedAgentDestination())
         {
-            
-            // Si on suit une cible, mettre à jour la destination
-            if (followTarget != null)
-            {
-                agent.SetDestination(followTarget.position);
-            }
-
-            float dynamicStoppingDistance = Mathf.Max(agent.stoppingDistance, agent.speed * 0.1f);
-            //Debug.Log($"Agent stopping distance: {agent.stoppingDistance:F3} | Speed: {agent.speed:F3}");
-            //Debug.Log($"Distance restante: {agent.remainingDistance:F3} | StoppingDistance: {dynamicStoppingDistance:F3} | Manque: {(agent.remainingDistance - dynamicStoppingDistance):F3}");
-
-            if (!agent.pathPending
-                && agent.remainingDistance <= dynamicStoppingDistance
-                && agent.velocity.sqrMagnitude < 0.01f)
-            {
-                isMovingToTarget = false;
-                agent.ResetPath();
-                stuckTimer = 0f;
-                NotifyMovementComplete();
-            }
-            else if (agent.velocity.magnitude < 0.05f)
-            {
-                stuckTimer += Time.deltaTime;
-                if (stuckTimer > 1.5f)
-                {
-                    isMovingToTarget = false;
-                    agent.velocity = Vector3.zero;
-                    agent.ResetPath();
-                    stuckTimer = 0f;
-                }
-            }
-            else
-            {
-                stuckTimer = 0f;
-            }
+            StopNavMeshMovement(notifyComplete: true, clearVelocity: false);
+            return;
         }
+
+        if (IsAgentStuckTimedOut())
+            StopNavMeshMovement(notifyComplete: false, clearVelocity: true);
+    }
+
+    private bool HasReachedAgentDestination()
+    {
+        float dynamicStoppingDistance = Mathf.Max(agent.stoppingDistance, agent.speed * 0.1f);
+        return !agent.pathPending
+            && agent.remainingDistance <= dynamicStoppingDistance
+            && agent.velocity.sqrMagnitude < AgentStoppedSqrVelocity;
+    }
+
+    private bool IsAgentStuckTimedOut()
+    {
+        if (agent.velocity.magnitude >= AgentStuckVelocityThreshold)
+        {
+            stuckTimer = 0f;
+            return false;
+        }
+
+        stuckTimer += Time.deltaTime;
+        return stuckTimer > AgentStuckTimeout;
+    }
+
+    private void StopNavMeshMovement(bool notifyComplete, bool clearVelocity)
+    {
+        isMovingToTarget = false;
+        stuckTimer = 0f;
+
+        if (clearVelocity)
+            agent.velocity = Vector3.zero;
+
+        agent.ResetPath();
+
+        if (notifyComplete)
+            NotifyMovementComplete();
     }
 
     private void HandleTransformMovement()
@@ -156,12 +157,10 @@ public class MovementManager : MonoBehaviour
         if (followTarget != null)
             targetPosition = followTarget.position;
 
-        Vector3 current = transform.position;
-        Vector3 toTarget = targetPosition - current;
+        Vector3 toTarget = targetPosition - transform.position;
         toTarget.y = 0f;
 
-        float distance = toTarget.magnitude;
-        if (distance <= stoppingDistance)
+        if (toTarget.magnitude <= stoppingDistance)
         {
             isMovingToTarget = false;
             movement = Vector3.zero;
@@ -169,66 +168,67 @@ public class MovementManager : MonoBehaviour
             return;
         }
 
-        Vector3 desiredDir = toTarget.normalized;
-        movement = desiredDir;
+        movement = toTarget.normalized;
 
-        float finalSpeed = GetUnitSpeed();
-        transform.position += movement * finalSpeed * Time.deltaTime;
-
-        Quaternion targetRot = Quaternion.LookRotation(movement, Vector3.up);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotationSpeed * Time.deltaTime);
+        transform.position += movement * GetUnitSpeed() * Time.deltaTime;
+        Quaternion targetRotation = Quaternion.LookRotation(movement, Vector3.up);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
     private void UpdateMovementAnimation()
     {
-        if (animator != null)
-        {
-            bool isActuallyMoving = false;
-            if (CanUseNavMeshAgent())
-                isActuallyMoving = isMovingToTarget && agent.velocity.magnitude > 0.1f;
-            else
-                isActuallyMoving = isMovingToTarget && movement.sqrMagnitude > 0.0001f;
+        if (animator == null)
+            return;
 
-            animator.SetBool("isMoving", isActuallyMoving);
-        }
+        animator.SetBool("isMoving", IsActuallyMoving());
+    }
+
+    private bool IsActuallyMoving()
+    {
+        if (CanUseNavMeshAgent())
+            return isMovingToTarget && agent.velocity.magnitude > AnimationMoveVelocityThreshold;
+
+        return isMovingToTarget && movement.sqrMagnitude > TransformMoveSqrThreshold;
     }
 
     private float GetUnitSpeed()
     {
-        if (unitInstance != null && unitInstance.unitData != null)
-        {
-            if (unitInstance.unitData.speed > 0f)
-                return unitInstance.unitData.speed;
-        }
+        if (unitInstance != null && unitInstance.unitData != null && unitInstance.unitData.speed > 0f)
+            return unitInstance.unitData.speed;
 
         return moveSpeed;
     }
 
+    private void RefreshAgentSettings()
+    {
+        if (agent == null)
+            return;
+
+        agent.speed = GetUnitSpeed();
+        agent.areaMask = GetAllowedNavMeshAreaMask();
+    }
+
     public void MoveToPosition(Vector3 destination, float stopDistance)
     {
-        Debug.Log($"MoveToPosition | stopDistance reçu: {stopDistance} | agent.stoppingDistance avant: {agent.stoppingDistance}");
         if (!CanMoveOnWorldPosition(destination))
             return;
 
-        BoatTransport.ClearPendingBoarding(unitInstance);
+        SetPositionDestination(destination, stopDistance, clearPendingBoarding: true);
+    }
 
-        followTarget = null;
-        targetPosition = destination;
-        stoppingDistance = Mathf.Max(0f, stopDistance);
-        isMovingToTarget = true;
-
-        if (CanUseNavMeshAgent())
-        {
-            agent.speed = GetUnitSpeed();
-            agent.areaMask = GetAllowedNavMeshAreaMask();
-            agent.stoppingDistance = stoppingDistance;
-            Debug.Log($"MoveToPosition | agent.stoppingDistance après: {agent.stoppingDistance}");
-            agent.ResetPath();
-            agent.SetDestination(destination);
-        }
+    public void MoveToPositionAsGroup(Vector3 destination, float stopDistance)
+    {
+        StopAttackForMovement();
+        MoveToPosition(destination, stopDistance);
     }
 
     public void MoveToTarget(Transform target, float stopDistance)
+    {
+        StopAttackForMovement();
+        MoveToTargetInternal(target, Mathf.Max(0f, stopDistance));
+    }
+
+    private void MoveToTargetInternal(Transform target, float stopDistance)
     {
         if (target != null && !CanMoveOnWorldPosition(target.position))
             return;
@@ -236,21 +236,48 @@ public class MovementManager : MonoBehaviour
         BoatTransport.ClearPendingBoarding(unitInstance);
 
         followTarget = target;
-
         if (target != null)
             targetPosition = target.position;
 
-        stoppingDistance = Mathf.Max(0f, GetUnitAttackRange(stopDistance));
-        isMovingToTarget = true;
+        StartMovement(GetUnitAttackRange(stopDistance));
 
-        if (CanUseNavMeshAgent() && target != null)
-        {
-            agent.speed = GetUnitSpeed();
-            agent.areaMask = GetAllowedNavMeshAreaMask();
-            agent.stoppingDistance = stoppingDistance;
-            agent.ResetPath();
-            agent.SetDestination(target.position);
-        }
+        if (target != null)
+            ApplyAgentDestination(target.position);
+    }
+
+    private void SetPositionDestination(Vector3 destination, float stopDistance, bool clearPendingBoarding)
+    {
+        if (clearPendingBoarding)
+            BoatTransport.ClearPendingBoarding(unitInstance);
+
+        followTarget = null;
+        targetPosition = destination;
+        StartMovement(stopDistance);
+        ApplyAgentDestination(destination);
+    }
+
+    private void StartMovement(float stopDistance)
+    {
+        stoppingDistance = Mathf.Max(0f, stopDistance);
+        isMovingToTarget = true;
+    }
+
+    private void ApplyAgentDestination(Vector3 destination)
+    {
+        if (!CanUseNavMeshAgent())
+            return;
+
+        RefreshAgentSettings();
+        agent.stoppingDistance = stoppingDistance;
+        agent.ResetPath();
+        agent.SetDestination(destination);
+    }
+
+    private void StopAttackForMovement()
+    {
+        UnitsAnimation animatedMover = GetComponent<UnitsAnimation>();
+        if (animatedMover != null)
+            animatedMover.StopAttackForMovement();
     }
 
     public void StopMovement()
@@ -290,16 +317,23 @@ public class MovementManager : MonoBehaviour
         if (!map.TryGetTileAtWorldPosition(worldPosition, out TileData tile))
             return false;
 
-        bool allowed = IsBoatUnit() ? tile.groundType == GroundType.Water : tile.groundType != GroundType.Water;
+        bool allowed = IsGroundAllowed(tile.groundType);
         if (!allowed)
-        {
-            string unitType = unitInstance != null && unitInstance.unitData != null
-                ? unitInstance.unitData.type.ToString()
-                : "Unknown";
-            Debug.Log($"[MovementManager] Destination refusée: unit={unitType}, tile={tile.groundType}, position={worldPosition}.", this);
-        }
+            Debug.Log($"[MovementManager] Destination refusee: unit={GetUnitTypeName()}, tile={tile.groundType}, position={worldPosition}.", this);
 
         return allowed;
+    }
+
+    private bool IsGroundAllowed(GroundType groundType)
+    {
+        return IsBoatUnit() ? groundType == GroundType.Water : groundType != GroundType.Water;
+    }
+
+    private string GetUnitTypeName()
+    {
+        return unitInstance != null && unitInstance.unitData != null
+            ? unitInstance.unitData.type.ToString()
+            : "Unknown";
     }
 
     private MapGenerator GetMapGenerator()
@@ -356,63 +390,40 @@ public class MovementManager : MonoBehaviour
     private void NotifyMovementComplete()
     {
         if (OnMovementComplete != null)
-        {
             OnMovementComplete(followTarget);
-        }
     }
-    
-    public void MoveBoatsUnitToPositionAsGroup(UnitInstance unit, Vector3 destination, float stopDistance, int groupMoveId, bool isLeader)
+
+    public void MoveBoatsUnitToPositionAsGroup(UnitInstance unit, Vector3 destination, float stopDistance)
     {
-        if (unit == null)
+        if (!TryGetMovementForUnit(unit, destination, out MovementManager movement))
             return;
 
-        MovementManager movement = unit.GetComponent<MovementManager>();
-        if (movement == null || !movement.CanMoveOnWorldPosition(destination))
-            return;
-
-        UnitsAnimation animatedMover = unit.GetComponent<UnitsAnimation>();
-        if (animatedMover != null)
-        {
-            animatedMover.MoveToPositionAsGroup(destination, stopDistance, groupMoveId, isLeader);
-            return;
-        }
-
-        movement.MoveToPosition(destination, stopDistance);
+        movement.MoveToPositionAsGroup(destination, stopDistance);
     }
 
     public void MoveBoatsUnitToTarget(UnitInstance unit, Transform target, float stopDistance)
     {
-        if (unit == null || target == null)
+        if (target == null)
             return;
 
-        MovementManager movement = unit.GetComponent<MovementManager>();
-        if (movement == null || !movement.CanMoveOnWorldPosition(target.position))
+        if (!TryGetMovementForUnit(unit, target.position, out MovementManager movement))
             return;
-
-        UnitsAnimation animatedMover = unit.GetComponent<UnitsAnimation>();
-        if (animatedMover != null)
-        {
-            animatedMover.MoveToTarget(target, stopDistance);
-            return;
-        }
 
         movement.MoveToTarget(target, stopDistance);
     }
 
+    private bool TryGetMovementForUnit(UnitInstance unit, Vector3 destination, out MovementManager movement)
+    {
+        movement = null;
+        if (unit == null)
+            return false;
+
+        movement = unit.GetComponent<MovementManager>();
+        return movement != null && movement.CanMoveOnWorldPosition(destination);
+    }
+
     public void ForceMoveToPosition(Vector3 destination, float stopDistance)
     {
-        followTarget = null;
-        targetPosition = destination;
-        stoppingDistance = Mathf.Max(0f, stopDistance);
-        isMovingToTarget = true;
-
-        if (CanUseNavMeshAgent())
-        {
-            agent.speed = GetUnitSpeed();
-            agent.areaMask = GetAllowedNavMeshAreaMask();
-            agent.stoppingDistance = stoppingDistance;
-            agent.ResetPath();
-            agent.SetDestination(destination);
-        }
+        SetPositionDestination(destination, stopDistance, clearPendingBoarding: false);
     }
 }

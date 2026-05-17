@@ -18,7 +18,6 @@ public class ProductionEasyNormal : MonoBehaviour
     private float nextProductionReadyTime;
     private bool mapReady;
     private bool loggedWaitingForMap;
-    private int currentDifficultyIA;
 
     public void Initialize(PlayerManager pm, StructureManager sm, MapGenerator mg, int id, int difficultyIA)
     {
@@ -28,7 +27,6 @@ public class ProductionEasyNormal : MonoBehaviour
             structureManager = sm;
         if (mapGenerator == null) 
             mapGenerator = mg;
-        currentDifficultyIA = difficultyIA;
         playerId = id;
     }
 
@@ -216,7 +214,7 @@ public class ProductionEasyNormal : MonoBehaviour
     private List<StructureInstance> GetOwnedStructures()
     {
         var result = new List<StructureInstance>();
-        var structures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+        var structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
         if (structures == null) return result;
         for (int i = 0; i < structures.Length; i++)
         {
@@ -229,7 +227,7 @@ public class ProductionEasyNormal : MonoBehaviour
 
     private bool HasSpecialStructure()
     {
-        var structures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+        var structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
         if (structures == null)
             return false;
         for (int i = 0; i < structures.Length; i++)

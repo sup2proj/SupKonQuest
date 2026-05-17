@@ -51,6 +51,6 @@ public class PlayerSession : MonoBehaviour
 
     public void removeStructure(int amount)
     {
-        structureCount -= amount;
+        structureCount = Mathf.Max(0, structureCount - amount);
     }
 }

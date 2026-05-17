@@ -214,7 +214,7 @@ public class EasyProduction : MonoBehaviour
     private List<StructureInstance> GetOwnedStructures()
     {
         var result = new List<StructureInstance>();
-        var structures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+        var structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
         if (structures == null) return result;
         for (int i = 0; i < structures.Length; i++)
         {
@@ -227,7 +227,7 @@ public class EasyProduction : MonoBehaviour
 
     private bool HasSpecialStructure()
     {
-        var structures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+        var structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
         if (structures == null)
             return false;
         for (int i = 0; i < structures.Length; i++)

@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using Enums.Environment;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
+
 public class SelectionManager : MonoBehaviour
 {
     public static SelectionManager Instance { get; private set; }
@@ -17,7 +18,6 @@ public class SelectionManager : MonoBehaviour
 
     bool isMouseDown, isDragging = false;
     float selectableRefreshTimer;
-    int nextGroupMoveId = 1;
 
     Vector3 mouseStartPos;
 
@@ -35,6 +35,9 @@ public class SelectionManager : MonoBehaviour
 
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
+            if (IsPointerOverUi())
+                return;
+
             bool attackOrderIssued = TryIssueAttackMoveOrder();
             if (!attackOrderIssued)
                 TryIssueGroupMoveOrder();
@@ -42,19 +45,21 @@ public class SelectionManager : MonoBehaviour
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
+            if (IsPointerOverUi())
+            {
+                ResetSelectionDrag();
+                return;
+            }
+
             if (TryIssueAttackMoveOrder())
             {
-                isMouseDown = false;
-                isDragging = false;
-                SelectionBox.gameObject.SetActive(false);
+                ResetSelectionDrag();
                 return;
             }
 
             if (TryIssueBoatShoreOrder())
             {
-                isMouseDown = false;
-                isDragging = false;
-                SelectionBox.gameObject.SetActive(false);
+                ResetSelectionDrag();
                 return;
             }
 
@@ -89,10 +94,27 @@ public class SelectionManager : MonoBehaviour
         }
         if (Mouse.current.leftButton.wasReleasedThisFrame)
         {
-            isMouseDown = false;
-            isDragging = false;
-            SelectionBox.gameObject.SetActive(false);
+            ResetSelectionDrag();
         }
+    }
+
+    private void ResetSelectionDrag()
+    {
+        isMouseDown = false;
+        isDragging = false;
+        if (SelectionBox != null)
+            SelectionBox.gameObject.SetActive(false);
+    }
+
+    private bool IsPointerOverUi()
+    {
+        if (EventSystem.current == null)
+            return false;
+
+        if (EventSystem.current.IsPointerOverGameObject())
+            return true;
+
+        return EventSystem.current.IsPointerOverGameObject(-1);
     }
 
     private void TryIssueGroupMoveOrder()
@@ -110,17 +132,14 @@ public class SelectionManager : MonoBehaviour
     if (groupUnits.Count == 0)
         return;
 
-    int groupMoveId = nextGroupMoveId++;
-    UnitInstance leader = GetClosestUnitToPoint(groupUnits, hit.point);
     List<Vector3> slots = GetFormationPositions(hit.point, groupUnits.Count);
 
     for (int i = 0; i < groupUnits.Count; i++)
     {
         UnitInstance unit = groupUnits[i];
-        bool isLeader = (unit == leader);
         Vector3 destination = slots[i];
         destination.y = unit.transform.position.y;
-        MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, destination, groupMoveStoppingDistance, groupMoveId, isLeader);
+        MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, destination, groupMoveStoppingDistance);
     }
 }
 
@@ -241,18 +260,14 @@ private Vector3 SampleNavMesh(Vector3 candidate)
             return true;
         }
 
-        int groupMoveId = nextGroupMoveId++;
-        UnitInstance leader = GetClosestUnitToPoint(boardingUnits, landDestination);
-
         for (int i = 0; i < boardingUnits.Count; i++)
         {
             UnitInstance unit = boardingUnits[i];
-            bool isLeader = unit == leader;
-            MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, landDestination, groupMoveStoppingDistance, groupMoveId, isLeader);
+            MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, landDestination, groupMoveStoppingDistance);
             BoatTransport.PrepareBoarding(unit, targetBoat);
         }
 
-        MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(targetBoat, waterDestination, groupMoveStoppingDistance, groupMoveId, false);
+        MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(targetBoat, waterDestination, groupMoveStoppingDistance);
 
         Debug.Log($"[SelectionManager] Ordre rive bateau: {boardingUnits.Count} unite(s) -> {landDestination}, bateau {targetBoat.name} -> {waterDestination}.");
         return true;
@@ -456,7 +471,7 @@ private Vector3 SampleNavMesh(Vector3 candidate)
 
     private void ForceRefreshSelectableObjects()
     {
-        var found = FindObjectsByType<SelectableObject>(FindObjectsSortMode.None);
+        var found = Object.FindObjectsByType<SelectableObject>(FindObjectsSortMode.None);
 
         AllSelectableObjects.Clear();
         AllSelectableObjects.AddRange(found);
