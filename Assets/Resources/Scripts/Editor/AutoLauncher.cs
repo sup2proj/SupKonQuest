@@ -13,6 +13,9 @@ public static class AutoLauncher
     {
         if (state == PlayModeStateChange.EnteredPlayMode)
         {
+            string localPlayerName ="toto";
+            string[] playerList = { "toto" };
+            
             string mapFolderName = "TEST";
             // string mapFolderName = "EUROPE";
             // string mapFolderName = "LOL";
@@ -29,6 +32,13 @@ public static class AutoLauncher
                 Debug.Log($"AutoLauncher : Monde '{mapFolderName}' généré.");
             }
 
+            StructureAttribution campAssignment = new StructureAttribution();
+            campAssignment.Setup(mapFolderName);
+            campAssignment.SetCampAssignment(playerList);
+            (int startCameraPositionX,int startCameraPositionY)=campAssignment.GetPlayerCameraStartPosition(localPlayerName);
+            Debug.Log($"1-{campAssignment.campAssignments[0].playerName}, 2-{campAssignment.campAssignments[1].playerName}");
+            Debug.Log($"1-{campAssignment.campAssignments[0].playerType}, 2-{campAssignment.campAssignments[1].playerType}");
+
             Camera mainCam = Camera.main;
             if (mainCam != null) 
             {
@@ -36,7 +46,7 @@ public static class AutoLauncher
                 if (camMovement == null) 
                     camMovement = mainCam.gameObject.AddComponent<CameraMouvement>();
 
-                camMovement.SetUpCamera(mapGenerator.mapWidth, mapGenerator.mapHeight);
+                camMovement.SetUpCamera(mapGenerator.mapWidth, mapGenerator.mapHeight, startCameraPositionX, startCameraPositionY);
             }
             else 
             {

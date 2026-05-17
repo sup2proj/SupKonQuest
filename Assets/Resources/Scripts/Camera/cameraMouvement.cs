@@ -36,13 +36,29 @@ public class CameraMouvement : MonoBehaviour
 
         cam.transform.position = targetPosition;
     }
-    public void SetUpCamera(int width, int height)
+    
+    public void SetUpCamera(int width, int height, int targetX, int targetZ)
     {
         this.mapWidth = width;
         this.mapHeight = height;
 
-        targetPosition = new Vector3(0, 10f, height / 2f);
+        if (cam == null) cam = GetComponent<Camera>();
+
+        cam.orthographic = true;
+        cam.transform.rotation = Quaternion.Euler(30f, 45f, 0f);
+
+        Vector3 playerBasePosition = new Vector3(targetX, 0f, mapHeight - 1 - targetZ);
+
+        float distance = 20f / Mathf.Abs(cam.transform.forward.y);
+
+        targetPosition = playerBasePosition - (cam.transform.forward * distance);
+        targetPosition.y = 20f;
+
+        ApplyLimits();
+        cam.transform.position = targetPosition;
+        
     }
+    
     void CameraMove()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();
@@ -72,6 +88,7 @@ public class CameraMouvement : MonoBehaviour
         Vector3 moveDirection = (forwardAxis * moveZ + rightAxis * moveX).normalized;
         targetPosition += moveDirection * currentSpeed * Time.deltaTime;
     }
+    
     void CameraZoom()
     {
         float scroll = Mouse.current.scroll.ReadValue().y;
