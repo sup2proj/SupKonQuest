@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using Enums.Environment;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
+
 public class SelectionManager : MonoBehaviour
 {
     public static SelectionManager Instance { get; private set; }
@@ -31,6 +32,15 @@ public class SelectionManager : MonoBehaviour
             return;
 
         AnalyzeSelectableObjectsContinuously();
+
+        if (IsPointerOverUi())
+        {
+            isMouseDown = false;
+            isDragging = false;
+            if (SelectionBox != null)
+                SelectionBox.gameObject.SetActive(false);
+            return;
+        }
 
         if (Mouse.current.rightButton.wasPressedThisFrame)
         {
@@ -92,6 +102,17 @@ public class SelectionManager : MonoBehaviour
             isDragging = false;
             SelectionBox.gameObject.SetActive(false);
         }
+    }
+
+    private bool IsPointerOverUi()
+    {
+        if (EventSystem.current == null)
+            return false;
+
+        if (EventSystem.current.IsPointerOverGameObject())
+            return true;
+
+        return EventSystem.current.IsPointerOverGameObject(-1);
     }
 
     private void TryIssueGroupMoveOrder()
