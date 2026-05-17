@@ -18,10 +18,34 @@ public class Victory : MonoBehaviour
             return;
         }
 
+        TryDeclareWinnerByTerritories();
+    }
+
+    public bool TryDeclareWinnerByTerritories()
+    {
+        if (HasWinner)
+            return false;
+
         if (TerritoryControlUtility.TryGetWinnerByTerritories(territoriesToWin, out int territoryWinnerId))
         {
-            DeclareWinner(territoryWinnerId, $"a contrôlé {territoriesToWin} territoires");
+            DeclareWinner(territoryWinnerId, $"a controle {territoriesToWin} territoires");
+            return true;
         }
+
+        return false;
+    }
+
+    public bool TryDeclareWinnerIfPlayerControlsEnoughTerritories(int playerId)
+    {
+        if (HasWinner || playerId <= 0)
+            return false;
+
+        int controlledTerritories = TerritoryControlUtility.CountControlledTerritories(playerId);
+        if (controlledTerritories < territoriesToWin)
+            return false;
+
+        DeclareWinner(playerId, $"a controle {controlledTerritories} territoires");
+        return true;
     }
 
     private bool TryGetSoloPlayerId(out int playerId)
@@ -41,7 +65,7 @@ public class Victory : MonoBehaviour
         HasWinner = true;
         WinnerPlayerId = playerId;
 
-        Debug.Log($"[Victory] Le joueur {playerId} a gagné : {reason}.");
+        Debug.Log($"[Victory] Le joueur {playerId} a gagne : {reason}.");
 
         InterfaceInstance interfaceInstance = InterfaceInstance.Instance;
         if (interfaceInstance == null)
@@ -49,5 +73,26 @@ public class Victory : MonoBehaviour
 
         if (interfaceInstance != null)
             interfaceInstance.ShowVictoryPanel(playerId);
+    }
+    
+    public static void CheckVictoryAfterCapture(int playerIdToCheck)
+    {
+        Victory victory = FindFirstObjectByType<Victory>(FindObjectsInactive.Include);
+        if (victory != null)
+        {
+            victory.TryDeclareWinnerIfPlayerControlsEnoughTerritories(playerIdToCheck);
+            return;
+        }
+
+        const int defaultTerritoriesToWin = 5;
+        if (TerritoryControlUtility.CountControlledTerritories(playerIdToCheck) < defaultTerritoriesToWin)
+            return;
+
+        InterfaceInstance interfaceInstance = InterfaceInstance.Instance;
+        if (interfaceInstance == null)
+            interfaceInstance = FindFirstObjectByType<InterfaceInstance>(FindObjectsInactive.Include);
+
+        if (interfaceInstance != null)
+            interfaceInstance.ShowVictoryPanel(playerIdToCheck);
     }
 }

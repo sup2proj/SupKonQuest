@@ -150,11 +150,11 @@ public class UnitsAnimation : MonoBehaviour
             if (!isRetaliating && !IsTargetWithinAttackRange())
                 break;
 
-            UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+            UnitInstance targetUnit = GetTargetUnit();
             StructureInstance targetStructure = null;
 
             if (targetUnit == null)
-                targetStructure = attackTarget.GetComponent<StructureInstance>();
+                targetStructure = GetTargetStructure();
 
             // Vérifier si la cible existe et est encore en vie
             if (targetUnit == null && targetStructure == null)
@@ -164,6 +164,8 @@ public class UnitsAnimation : MonoBehaviour
             if (targetUnit != null && targetUnit.currentHealth <= 0)
                 break;
             if (targetStructure != null && targetStructure.currentHealth <= 0)
+                break;
+            if (targetStructure != null && targetStructure.playerId == attackerUnit.playerId)
                 break;
 
             float attack = GetAttackDamage();
@@ -269,10 +271,10 @@ public class UnitsAnimation : MonoBehaviour
             return;
         }
 
-        UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+        UnitInstance targetUnit = GetTargetUnit();
         StructureInstance targetStructure = null;
         if (targetUnit == null)
-            targetStructure = attackTarget.GetComponent<StructureInstance>();
+            targetStructure = GetTargetStructure();
 
         // Vérifier si la cible existe et est encore en vie
         if (targetUnit == null && targetStructure == null)
@@ -288,6 +290,11 @@ public class UnitsAnimation : MonoBehaviour
             return;
         }
         if (targetStructure != null && targetStructure.currentHealth <= 0)
+        {
+            StopAttackInternal();
+            return;
+        }
+        if (targetStructure != null && unit != null && targetStructure.playerId == unit.playerId)
         {
             StopAttackInternal();
             return;
@@ -355,10 +362,38 @@ public class UnitsAnimation : MonoBehaviour
         return toTarget.sqrMagnitude;
     }
 
+    private UnitInstance GetTargetUnit()
+    {
+        if (attackTarget == null)
+            return null;
+
+        UnitInstance unit = attackTarget.GetComponent<UnitInstance>();
+        if (unit == null)
+            unit = attackTarget.GetComponentInParent<UnitInstance>();
+        if (unit == null)
+            unit = attackTarget.GetComponentInChildren<UnitInstance>();
+
+        return unit;
+    }
+
+    private StructureInstance GetTargetStructure()
+    {
+        if (attackTarget == null)
+            return null;
+
+        StructureInstance structure = attackTarget.GetComponent<StructureInstance>();
+        if (structure == null)
+            structure = attackTarget.GetComponentInParent<StructureInstance>();
+        if (structure == null)
+            structure = attackTarget.GetComponentInChildren<StructureInstance>();
+
+        return structure;
+    }
+
     private float GetAttackDamage()
 {
     UnitInstance attacker = cachedUnit;
-    UnitInstance target = attackTarget != null ? attackTarget.GetComponent<UnitInstance>() : null;
+    UnitInstance target = GetTargetUnit();
 
     if (attacker != null && attacker.unitData is UnitCombatData combatData)
     {
@@ -371,6 +406,15 @@ public class UnitsAnimation : MonoBehaviour
 
     if (target == null)
     {
+        StructureInstance targetStructure = GetTargetStructure();
+        if (targetStructure != null)
+        {
+            if (targetStructure.playerId == attacker.playerId)
+                return 0f;
+
+            return Mathf.Max(0f, combatData.attack);
+        }
+
         Debug.LogError("target NULL");
         return 0;
     }
