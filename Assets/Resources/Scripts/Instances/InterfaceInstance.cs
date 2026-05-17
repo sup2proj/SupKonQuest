@@ -41,6 +41,20 @@ public class InterfaceInstance : MonoBehaviour
     public int ActivePlayerIndex => activePlayerIndex;
     public int ActivePlayerNumber => activePlayerIndex + 1;
 
+    private struct ProtectorUiMapping
+    {
+        public int slotIndex;
+        public int unitDataIndex;
+        public int priceIndex;
+
+        public ProtectorUiMapping(int slotIndex, int unitDataIndex, int priceIndex)
+        {
+            this.slotIndex = slotIndex;
+            this.unitDataIndex = unitDataIndex;
+            this.priceIndex = priceIndex;
+        }
+    }
+
     private static readonly Dictionary<int, UnitsType> ProtectorSlotToType = new Dictionary<int, UnitsType>
     {
         { 0, UnitsType.Infantry },
@@ -50,8 +64,24 @@ public class InterfaceInstance : MonoBehaviour
         { 4, UnitsType.AntiBlindage },
     };
 
-    // Mapping des boutons UI -> playerId. Par défaut, index i => player i+1.
-    // Tu peux le surcharger ici si tes boutons ne sont pas dans l'ordre.
+    private static readonly Dictionary<UnitsType, ProtectorUiMapping> ProtectorUiByType = new Dictionary<UnitsType, ProtectorUiMapping>
+    {
+        { UnitsType.Infantry, new ProtectorUiMapping(0, 5, 4) },
+        { UnitsType.Mortar, new ProtectorUiMapping(1, 6, 3) },
+        { UnitsType.Heavy, new ProtectorUiMapping(2, 4, 2) },
+        { UnitsType.Archer, new ProtectorUiMapping(3, 1, 1) },
+        { UnitsType.AntiBlindage, new ProtectorUiMapping(4, 0, 0) },
+    };
+
+    private static readonly Dictionary<int, int> ProtectorSlotToIconButtonNumber = new Dictionary<int, int>
+    {
+        { 0, 5 },
+        { 1, 6 },
+        { 2, 4 },
+        { 3, 2 },
+        { 4, 1 },
+    };
+
     private static readonly Dictionary<int, int> PlayerUiIndexToPlayerId = new Dictionary<int, int>
     {
         { 0, 1 },
@@ -88,8 +118,6 @@ public class InterfaceInstance : MonoBehaviour
         public float z;
         public bool isPoweredUnit;
         public bool isProtector;
-        public int playerId;
-        public int paidCost;
         public int buildingPlayerId;
         public int sourceStructureId;
     }
@@ -103,8 +131,8 @@ public class InterfaceInstance : MonoBehaviour
     {
         if (unitsQueue != null && unitsProtector != null)
         {
-            unitsQueue.SetActive(false);
-            unitsProtector.SetActive(false);
+            SetGameObjectActive(unitsQueue, false);
+            SetGameObjectActive(unitsProtector, false);
         }
         
         if (unitsQueue == null && unitsProtector == null)
@@ -113,8 +141,7 @@ public class InterfaceInstance : MonoBehaviour
             return;
         }
 
-        if (playerManager == null)
-            playerManager = FindFirstObjectByType<PlayerManager>();
+        ResolvePlayerManager();
         HideProgressBarVisual(resetProgress: false);
         hideBuffIcons();
         HideBoatExitIcons();
@@ -127,8 +154,8 @@ public class InterfaceInstance : MonoBehaviour
 
     public void showInterfaceForStructure()
     {
-        unitsQueue.SetActive(true);
-        unitsProtector.SetActive(true);
+        SetGameObjectActive(unitsQueue, true);
+        SetGameObjectActive(unitsProtector, true);
         hideUnitsProtectorSlots();
         displayedStructure = StructureInstance.CurrentlySelected;
         RefreshQueueSlotsVisibility();
@@ -137,12 +164,8 @@ public class InterfaceInstance : MonoBehaviour
 
     public void HideStructureInterface()
     {
-        if (unitsQueue != null)
-            unitsQueue.SetActive(false);
-
-        if (unitsProtector != null)
-            unitsProtector.SetActive(false);
-
+        SetGameObjectActive(unitsQueue, false);
+        SetGameObjectActive(unitsProtector, false);
         SetAllQueueSlotsActive(false);
         hideUnitsProtectorSlots();
         HideProgressBarVisual(resetProgress: false);
@@ -162,28 +185,16 @@ public class InterfaceInstance : MonoBehaviour
 
     public void ShowVictoryPanel(int winnerPlayerId)
     {
-        HideHud();
-        ResolvePanelInMiddle();
-
-        if (panelInMiddle == null || !panelInMiddle.HasAssignedPanelReferences)
-        {
-            Debug.LogWarning("[InterfaceInstance] panelInMiddle n'est pas assigne dans l'Inspector.", this);
+        if (!TryPreparePanelInMiddle())
             return;
-        }
 
         panelInMiddle.ShowVictory(winnerPlayerId);
     }
 
     public void ShowDefeatPanel(int defeatedPlayerId)
     {
-        HideHud();
-        ResolvePanelInMiddle();
-
-        if (panelInMiddle == null || !panelInMiddle.HasAssignedPanelReferences)
-        {
-            Debug.LogWarning("[InterfaceInstance] panelInMiddle n'est pas assigne dans l'Inspector.", this);
+        if (!TryPreparePanelInMiddle())
             return;
-        }
 
         panelInMiddle.ShowDefeat(defeatedPlayerId);
     }
@@ -194,6 +205,20 @@ public class InterfaceInstance : MonoBehaviour
 
         if (panelInMiddle != null)
             panelInMiddle.Hide();
+    }
+
+    private bool TryPreparePanelInMiddle()
+    {
+        HideHud();
+        ResolvePanelInMiddle();
+
+        if (panelInMiddle == null || !panelInMiddle.HasAssignedPanelReferences)
+        {
+            Debug.LogWarning("[InterfaceInstance] panelInMiddle n'est pas assigne dans l'Inspector.", this);
+            return false;
+        }
+
+        return true;
     }
 
     public void addUnitToQueue(GameObject clickedUnit)
@@ -244,8 +269,7 @@ public class InterfaceInstance : MonoBehaviour
         int cost = Mathf.RoundToInt(unitData.price * multiplier);
         cost = Mathf.Max(0, cost);
 
-        if (playerManager == null)
-            playerManager = FindFirstObjectByType<PlayerManager>();
+        ResolvePlayerManager();
         PlayerSession session = playerManager.GetSession(playerId);
         if (!session.SpendGold(cost))
         {
@@ -274,8 +298,6 @@ public class InterfaceInstance : MonoBehaviour
             z = z,
             isPoweredUnit = isPoweredUnit,
             isProtector = isProtector,
-            playerId = playerId,
-            paidCost = cost,
             buildingPlayerId = buildingPlayerId,
             sourceStructureId = sourceStructureId,
         });
@@ -293,6 +315,61 @@ public class InterfaceInstance : MonoBehaviour
             statisticsInterface.Refresh();
     }
 
+    private PlayerManager ResolvePlayerManager()
+    {
+        if (playerManager == null)
+            playerManager = FindFirstObjectByType<PlayerManager>();
+
+        return playerManager;
+    }
+
+    private void SetGameObjectActive(GameObject target, bool active)
+    {
+        if (target != null)
+            target.SetActive(active);
+    }
+
+    private void SetImageActive(Image image, bool active)
+    {
+        if (image != null)
+            SetGameObjectActive(image.gameObject, active);
+    }
+
+    private void SetImageArrayActive(Image[] images, bool active)
+    {
+        if (images == null)
+            return;
+
+        foreach (var image in images)
+        {
+            SetImageActive(image, active);
+        }
+    }
+
+    private void SetImageListActive(List<Image> images, bool active)
+    {
+        if (images == null)
+            return;
+
+        foreach (var image in images)
+        {
+            SetImageActive(image, active);
+        }
+    }
+
+    private void WireImageButton(Image image, UnityEngine.Events.UnityAction action)
+    {
+        if (image == null)
+            return;
+
+        var button = image.GetComponent<Button>();
+        if (button == null)
+            return;
+
+        button.onClick.RemoveAllListeners();
+        button.onClick.AddListener(action);
+    }
+
 	//TEMPORAIRE ---------------------
     private void WirePlayersListClicks()
     {
@@ -302,12 +379,8 @@ public class InterfaceInstance : MonoBehaviour
         for (int i = 0; i < playersList.Count; i++)
         {
             var img = playersList[i];
-            if (img == null) continue;
-
-            var btn = img.GetComponent<Button>();
             int capturedIndex = i;
-            btn.onClick.RemoveAllListeners();
-            btn.onClick.AddListener(() => SelectPlayerFromPlayersList(capturedIndex));
+            WireImageButton(img, () => SelectPlayerFromPlayersList(capturedIndex));
         }
     }
 
@@ -322,8 +395,7 @@ public class InterfaceInstance : MonoBehaviour
 
         activePlayerIndex = playerId - 1;
 
-        if (playerManager == null)
-            playerManager = FindFirstObjectByType<PlayerManager>();
+        ResolvePlayerManager();
 
         if (playerManager != null)
             playerManager.SetActivePlayer(playerId);
@@ -342,8 +414,7 @@ public class InterfaceInstance : MonoBehaviour
 
     private int GetSelectedPlayerId()
     {
-        if (playerManager == null)
-            playerManager = FindFirstObjectByType<PlayerManager>();
+        ResolvePlayerManager();
 
         // Source de vérité: PlayerManager
         if (playerManager != null)
@@ -414,7 +485,7 @@ public class InterfaceInstance : MonoBehaviour
             else
             {
                 StructureInstance sourceStructure = StructureInstance.FindByInstanceId(req.sourceStructureId);
-                bool spawned = StructureManager.Instance.SpawnUnitByTypeAtPosition(
+                StructureManager.Instance.SpawnUnitByTypeAtPosition(
                     req.buildingPlayerId,
                     req.type,
                     req.x,
@@ -450,13 +521,7 @@ public class InterfaceInstance : MonoBehaviour
 
     private void SetAllQueueSlotsActive(bool active)
     {
-        if (queueSlots == null) return;
-
-        foreach (var img in queueSlots)
-        {
-            if (img == null) continue;
-            img.gameObject.SetActive(active);
-        }
+        SetImageArrayActive(queueSlots, active);
     }
 
     private void RefreshQueueSlotsVisibility()
@@ -534,38 +599,25 @@ public class InterfaceInstance : MonoBehaviour
 
     private void hideUnitsProtectorSlots()
     {
-        if (unitsProtectorSlots == null)
-            return;
-
-        foreach (var img in unitsProtectorSlots)
-        {
-            if (img == null) continue;
-            img.gameObject.SetActive(false);
-        }
+        SetImageArrayActive(unitsProtectorSlots, false);
     }
 
     private void WireProtectorSlotClicks()
     {
+        if (unitsProtectorSlots == null)
+            return;
+
         for (int i = 0; i < unitsProtectorSlots.Length; i++)
         {
             var img = unitsProtectorSlots[i];
-            if (img == null) continue;
-
-            var btn = img.GetComponent<Button>();
             int capturedIndex = i;
-            btn.onClick.RemoveAllListeners();
-            btn.onClick.AddListener(() => SpawnStructProtectorOnInterface(capturedIndex));
+            WireImageButton(img, () => SpawnStructProtectorOnInterface(capturedIndex));
         }
     }
 
     private void WireBoatExitButtonClick()
     {
-        if (boatExitButton == null)
-            return;
-
-        var btn = boatExitButton.GetComponent<Button>();
-        btn.onClick.RemoveAllListeners();
-        btn.onClick.AddListener(() => OnBoatExitClicked());
+        WireImageButton(boatExitButton, OnBoatExitClicked);
     }
     
     private void OnBoatExitClicked()
@@ -607,12 +659,8 @@ public class InterfaceInstance : MonoBehaviour
         for (int i = 0; i < buffSlots.Length; i++)
         {
             var img = buffSlots[i];
-            if (img == null) continue;
-
-            var btn = img.GetComponent<Button>();
             int capturedIndex = i;
-            btn.onClick.RemoveAllListeners();
-            btn.onClick.AddListener(() => OnBuffSlotClicked(capturedIndex));
+            WireImageButton(img, () => OnBuffSlotClicked(capturedIndex));
         }
     }
 
@@ -629,21 +677,13 @@ public class InterfaceInstance : MonoBehaviour
         ProtectorSlotToType.TryGetValue(slotIndex, out var type);
         var selected = StructureInstance.CurrentlySelected;
         Vector3 pos = selected.StructurePosition;
-        int buildingPlayerId = selected != null ? selected.playerId : GetSelectedPlayerId();
         bool accepted = InitUnitsCreation(slotIndex, type, pos.x + 1f, pos.z + 1f, false, true);
-        // Modification de slotIndex car dans les datas les unités ne sont pas dans le bonne ordre
-        if (slotIndex == 0) {
-            slotIndex = 5;
-        } else if (slotIndex == 1) {
-            slotIndex = 6;
-        } else if (slotIndex == 2) {
-            slotIndex = 4;
-        } else if (slotIndex == 3) {
-            slotIndex = 2;
-        } else if (slotIndex == 4) {
-            slotIndex = 1;
-        }
-        GameObject clickedImageGO = ActionInterface.Instance.GetClickedUnitsIcon(slotIndex, false);
+        // Correspondance UI car les icones ne suivent pas l'ordre des slots.
+        int iconButtonIndex;
+        if (!ProtectorSlotToIconButtonNumber.TryGetValue(slotIndex, out iconButtonIndex))
+            iconButtonIndex = slotIndex;
+
+        GameObject clickedImageGO = ActionInterface.Instance.GetClickedUnitsIcon(iconButtonIndex, false);
         if (accepted && clickedImageGO != null)
         {
             addUnitToQueue(clickedImageGO);
@@ -653,82 +693,56 @@ public class InterfaceInstance : MonoBehaviour
     public void showUnitsNextToStructure(UnitsType type, bool isPoweredUnit) 
     {
         WireProtectorSlotClicks();
-        if (type == UnitsType.Infantry)
-        {
-            unitsProtectorSlots[0].gameObject.SetActive(true);
-            ActionInterface.Instance.ShowUnitProtectorPrice(5, 4);
-        } else if (type == UnitsType.Mortar) {
-            unitsProtectorSlots[1].gameObject.SetActive(true);
-            ActionInterface.Instance.ShowUnitProtectorPrice(6, 3);
-        } else if (type == UnitsType.Heavy) {
-            unitsProtectorSlots[2].gameObject.SetActive(true);
-            ActionInterface.Instance.ShowUnitProtectorPrice(4, 2);
-        } else if (type == UnitsType.Archer) {
-            unitsProtectorSlots[3].gameObject.SetActive(true);
-            ActionInterface.Instance.ShowUnitProtectorPrice(1, 1);
-        }  else if (type == UnitsType.AntiBlindage) {
-            unitsProtectorSlots[4].gameObject.SetActive(true);
-            ActionInterface.Instance.ShowUnitProtectorPrice(0, 0);
-        } 
+        ProtectorUiMapping mapping;
+        if (!ProtectorUiByType.TryGetValue(type, out mapping))
+            return;
+
+        if (unitsProtectorSlots == null || mapping.slotIndex < 0 || mapping.slotIndex >= unitsProtectorSlots.Length)
+            return;
+
+        SetImageActive(unitsProtectorSlots[mapping.slotIndex], true);
+        ActionInterface.Instance.ShowUnitProtectorPrice(mapping.unitDataIndex, mapping.priceIndex);
     }
 
     public void hideBuffIcons()
     {
-        if (buffSlots == null)
-            return;
-
-        foreach (var buffIcon in buffSlots)
-        {
-            if (buffIcon == null) continue;
-            buffIcon.gameObject.SetActive(false);
-        }
+        SetImageArrayActive(buffSlots, false);
     }
 
     public void ShowSupportIcons()
     {
+        if (buffSlots == null)
+            return;
+
         int slotsToShow = Mathf.Min(buffSlots.Length, 3);
         for (int i = 0; i < slotsToShow; i++)
         {
-            if (buffSlots[i] == null) continue;
-            buffSlots[i].gameObject.SetActive(true);
+            SetImageActive(buffSlots[i], true);
         }
     }
     
     public void ShowHealerIcon()
     {
-        int healerIndex = buffSlots.Length - 1;
-        if (buffSlots[healerIndex] == null)
+        if (buffSlots == null || buffSlots.Length == 0)
             return;
-    
-        buffSlots[healerIndex].gameObject.SetActive(true);
+
+        int healerIndex = buffSlots.Length - 1;
+        SetImageActive(buffSlots[healerIndex], true);
     }
 
     public void ShowBoatExitIcons()
     {
-        if (boatExitButton == null)
-            return;
-
-        boatExitButton.gameObject.SetActive(true);
+        SetImageActive(boatExitButton, true);
     }
     
     public void HideBoatExitIcons()
     {
-        if (boatExitButton == null)
-            return;
-
-        boatExitButton.gameObject.SetActive(false);
+        SetImageActive(boatExitButton, false);
     }
 
     private void HidePlayersList()
     {
-        if (playersList == null)
-            return;
-
-        foreach (var playerImage in playersList)
-        {
-            if (playerImage == null) continue;
-            playerImage.gameObject.SetActive(false);
-        }
+        SetImageListActive(playersList, false);
     }
 
     private void HideStatisticsInterface()
@@ -736,7 +750,7 @@ public class InterfaceInstance : MonoBehaviour
         if (statisticsInterface == null)
             return;
 
-        statisticsInterface.gameObject.SetActive(false);
+        SetGameObjectActive(statisticsInterface.gameObject, false);
     }
 
     private void ResolvePanelInMiddle()
@@ -760,16 +774,21 @@ public class InterfaceInstance : MonoBehaviour
     
     public void HideBuffIconForCooldown(int slotIndex, float cooldown)
     {
+        if (buffSlots == null || slotIndex < 0 || slotIndex >= buffSlots.Length)
+            return;
+
         Image slot = buffSlots[slotIndex];
         if (slot == null)
             return;
+
         if (buffSlotReappearCoroutines.TryGetValue(slotIndex, out var existing) && existing != null)
             StopCoroutine(existing);
-        slot.gameObject.SetActive(false);
+
+        SetImageActive(slot, false);
 
         if (cooldown <= 0f)
         {
-            slot.gameObject.SetActive(true);
+            SetImageActive(slot, true);
             buffSlotReappearCoroutines.Remove(slotIndex);
             return;
         }
@@ -782,7 +801,7 @@ public class InterfaceInstance : MonoBehaviour
         yield return new WaitForSeconds(cooldown);
 
         if (buffSlots != null && slotIndex >= 0 && slotIndex < buffSlots.Length && buffSlots[slotIndex] != null)
-            buffSlots[slotIndex].gameObject.SetActive(true);
+            SetImageActive(buffSlots[slotIndex], true);
 
         buffSlotReappearCoroutines.Remove(slotIndex);
     }
