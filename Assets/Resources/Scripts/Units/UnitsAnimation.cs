@@ -1,29 +1,19 @@
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.AI;
 
 public class UnitsAnimation : MonoBehaviour
 {
     public Animator animator;
 
     private Transform attackTarget;
-    private int activeGroupMoveId = -1;
-    private bool isGroupLeader = false;
-
-    private static readonly HashSet<int> completedGroupMoves = new HashSet<int>();
-
     private UnitInstance cachedUnit;
     private Coroutine attackCoroutine;
-    private Coroutine spellAttackResetCoroutine;
-    private Coroutine ensureAttackAnimationCoroutine;
-    private bool isRetaliating;
     private DamageTable damageTable;
 
     private MovementManager movementManager;
 
     public Transform AttackTarget => attackTarget;
-    
+
     void Awake()
     {
         if (animator == null)
@@ -33,100 +23,51 @@ public class UnitsAnimation : MonoBehaviour
 
         damageTable = UnityEngine.Resources.Load<DamageTable>("Scripts/Data/Units/UnitsSO/DamageTable");
         if (damageTable == null)
-        {
             Debug.LogError("Impossible de charger DamageTable !");
-        }
 
-        // Connecter le callback de fin de mouvement
         if (movementManager != null)
-        {
             movementManager.OnMovementComplete += OnMovementCompleted;
-        }
-    }
-
-    void Start()
-    {
-        // Le MovementManager gère maintenant l'initialisation du NavMeshAgent
     }
 
     void Update()
     {
         HandleAutoAttack();
-
-        // L'animation de mouvement est maintenant gérée par MovementManager
-        // On ne gère plus que l'animation spécifique aux archers
-        if (animator != null && movementManager != null)
-        {
-            UnitInstance unit = cachedUnit;
-            if (unit != null && unit.objectModel != null && unit.unitData != null)
-            {
-                if (unit.unitData.type == UnitsType.Archer && movementManager.IsMoving())
-                {
-                    unit.objectModel.SetActive(true);
-                }
-            }
-        }
+        RefreshMovingArcherModel();
     }
 
     public void AttackTheAttacker(Transform attacker = null)
     {
-        UnitInstance selfUnit = cachedUnit;
         if (attacker != null)
-        {
             attackTarget = attacker;
-        }
-        if (attackTarget == null)
+
+        if (attackTarget == null || !CanAttackWithDamage(cachedUnit))
             return;
 
         if (attackCoroutine != null)
         {
-            UnitInstance currentTargetUnit = attackTarget.GetComponent<UnitInstance>();
-            if (currentTargetUnit != null)
-            {
-                if (animator != null)
-                    animator.SetBool("isAttacking", true);
-                if (selfUnit != null && selfUnit.objectModel != null)
-                    selfUnit.objectModel.SetActive(true);
-                return;
-            }
+            SetAttackVisuals(true);
+            return;
         }
-        if (animator != null && selfUnit != null && selfUnit.objectModel != null)
-        {
-            animator.SetBool("isAttacking", true);
-            selfUnit.objectModel.SetActive(true);
-        }
-        if (attackCoroutine != null)
-        {
-            StopCoroutine(attackCoroutine);
-            attackCoroutine = null;
-        }
-        attackCoroutine = StartCoroutine(AttackLoopCoroutine());
+
+        BeginAttackLoop();
     }
 
     public void StartAttackWithDamage()
     {
         UnitInstance unit = cachedUnit;
-        if (unit != null && unit.unitData != null && (unit.unitData.type == UnitsType.Support || unit.unitData.type == UnitsType.Healer))
+        if (!CanAttackWithDamage(unit))
         {
             Debug.Log("[UnitsAnimation] StartAttackWithDamage ignored for support/healer " + gameObject.name, this);
             return;
         }
 
+        if (attackTarget == null)
+            return;
+
         Debug.Log($"[UnitsAnimation] {gameObject.name} commence l'attaque contre {attackTarget.name}");
-        isRetaliating = false;
-        SetAttackAnimationState(true);
-
-        if (unit != null && unit.objectModel != null)
-            unit.objectModel.SetActive(true);
-
-        if (attackCoroutine != null)
-        {
-            StopCoroutine(attackCoroutine);
-            attackCoroutine = null;
-        }
-        attackCoroutine = StartCoroutine(AttackLoopCoroutine());
+        BeginAttackLoop();
     }
-    
+
     public bool TryStartAttackTargetIfInRange(Transform target)
     {
         if (target == null)
@@ -135,14 +76,14 @@ public class UnitsAnimation : MonoBehaviour
         if (attackTarget == target && attackCoroutine != null)
             return true;
 
-        UnitInstance unit = cachedUnit;
-        if (unit != null && unit.unitData != null && (unit.unitData.type == UnitsType.Support || unit.unitData.type == UnitsType.Healer))
+        if (!CanAttackWithDamage(cachedUnit))
             return false;
 
+        Transform previousTarget = attackTarget;
         attackTarget = target;
         if (!IsTargetWithinAttackRange())
         {
-            attackTarget = null;
+            attackTarget = previousTarget;
             return false;
         }
 
@@ -157,14 +98,11 @@ public class UnitsAnimation : MonoBehaviour
     {
         while (true)
         {
-            if (attackTarget == null)
-                break;
-
             UnitInstance attackerUnit = cachedUnit;
-            if (attackerUnit == null || attackerUnit.currentHealth <= 0)
+            if (attackTarget == null || attackerUnit == null || attackerUnit.currentHealth <= 0)
                 break;
 
-            if (!isRetaliating && !IsTargetWithinAttackRange())
+            if (!IsTargetWithinAttackRange())
                 break;
 
             AnimationClip attackClip = GetAttackClip();
@@ -173,41 +111,15 @@ public class UnitsAnimation : MonoBehaviour
             SetAttackAnimationState(true);
             yield return new WaitForSeconds(halfDuration);
 
-            if (!isRetaliating && !IsTargetWithinAttackRange())
+            if (!IsTargetWithinAttackRange())
+                break;
+            if (!TryGetCurrentTarget(out UnitInstance targetUnit, out StructureInstance targetStructure))
+                break;
+            if (IsFriendlyStructureTarget(targetStructure, attackerUnit))
                 break;
 
-            UnitInstance targetUnit = GetTargetUnit();
-            StructureInstance targetStructure = null;
-
-            if (targetUnit == null)
-                targetStructure = GetTargetStructure();
-
-            // Vérifier si la cible existe et est encore en vie
-            if (targetUnit == null && targetStructure == null)
-                break;
-
-            // Vérifier si la cible est encore en vie
-            if (targetUnit != null && targetUnit.currentHealth <= 0)
-                break;
-            if (targetStructure != null && targetStructure.currentHealth <= 0)
-                break;
-            if (targetStructure != null && targetStructure.playerId == attackerUnit.playerId)
-                break;
-
-            float attack = GetAttackDamage();
-
-            if (targetUnit != null)
-            {
-                targetUnit.TakeDamage(attack);
-
-                UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
-                if (targetAnimation != null && attackerUnit != null)
-                    targetAnimation.AttackTheAttacker(transform);
-            }
-            else
-            {
-                targetStructure.TakeDamage(attack, attackerUnit);
-            }
+            float attack = GetAttackDamage(targetUnit, targetStructure);
+            ApplyAttackDamage(targetUnit, targetStructure, attackerUnit, attack);
 
             yield return new WaitForSeconds(halfDuration);
         }
@@ -229,30 +141,6 @@ public class UnitsAnimation : MonoBehaviour
         return null;
     }
 
-    private void EnsureAttackAnimationStateAfterCoroutineStart()
-    {
-        if (ensureAttackAnimationCoroutine != null)
-            StopCoroutine(ensureAttackAnimationCoroutine);
-
-        ensureAttackAnimationCoroutine = StartCoroutine(EnsureAttackAnimationStateNextFrame());
-    }
-
-    private IEnumerator EnsureAttackAnimationStateNextFrame()
-    {
-        yield return null;
-
-        if (attackCoroutine != null && attackTarget != null)
-        {
-            SetAttackAnimationState(true);
-
-            UnitInstance unit = cachedUnit;
-            if (unit != null && unit.objectModel != null)
-                unit.objectModel.SetActive(true);
-        }
-
-        ensureAttackAnimationCoroutine = null;
-    }
-
     private void SetAttackAnimationState(bool isAttacking)
     {
         if (animator != null)
@@ -261,84 +149,119 @@ public class UnitsAnimation : MonoBehaviour
 
     private void StopAttackInternal()
     {
-        if (attackCoroutine != null)
-        {
-            StopCoroutine(attackCoroutine);
-            attackCoroutine = null;
-        }
-        SetAttackAnimationState(false);
-        isRetaliating = false;
-
-        if (ensureAttackAnimationCoroutine != null)
-        {
-            StopCoroutine(ensureAttackAnimationCoroutine);
-            ensureAttackAnimationCoroutine = null;
-        }
-
-        UnitInstance unit = cachedUnit;
-        if (unit != null && unit.objectModel != null)
-            unit.objectModel.SetActive(false);
+        StopAttackCoroutine();
+        SetAttackVisuals(false);
         attackTarget = null;
+    }
+
+    public void StopAttackForMovement()
+    {
+        attackTarget = null;
+        StopAttackInternal();
     }
 
     void HandleAutoAttack()
     {
         UnitInstance unit = cachedUnit;
-        if (unit != null && unit.unitData != null && (unit.unitData.type == UnitsType.Support || unit.unitData.type == UnitsType.Healer))
-        {
+        if (!CanAttackWithDamage(unit))
             return;
-        }
 
         if (attackTarget == null)
         {
-            SetAttackAnimationState(false);
-            if (unit != null && unit.objectModel != null)
-                unit.objectModel.SetActive(false);
+            SetAttackVisuals(false);
             return;
         }
 
-        UnitInstance targetUnit = GetTargetUnit();
-        StructureInstance targetStructure = null;
-        if (targetUnit == null)
-            targetStructure = GetTargetStructure();
-
-        // Vérifier si la cible existe et est encore en vie
-        if (targetUnit == null && targetStructure == null)
+        if (!TryGetCurrentTarget(out UnitInstance targetUnit, out StructureInstance targetStructure))
         {
             StopAttackInternal();
             return;
         }
 
-        // Vérifier si la cible est encore en vie
-        if (targetUnit != null && targetUnit.currentHealth <= 0)
+        if (IsFriendlyStructureTarget(targetStructure, unit))
         {
             StopAttackInternal();
             return;
         }
-        if (targetStructure != null && targetStructure.currentHealth <= 0)
+        if (!IsTargetWithinAttackRange())
         {
             StopAttackInternal();
             return;
         }
-        if (targetStructure != null && unit != null && targetStructure.playerId == unit.playerId)
-        {
-            StopAttackInternal();
-            return;
-        }
-
-        if (!isRetaliating && !IsTargetWithinAttackRange())
-        {
-            StopAttackInternal();
-            return;
-        }
-
         if (attackCoroutine != null)
-        {
-            SetAttackAnimationState(true);
+            SetAttackVisuals(true);
+    }
 
-            if (unit != null && unit.objectModel != null)
-                unit.objectModel.SetActive(true);
-        }
+    private void RefreshMovingArcherModel()
+    {
+        UnitInstance unit = cachedUnit;
+        if (animator == null || movementManager == null || unit == null || unit.objectModel == null || unit.unitData == null)
+            return;
+
+        if (unit.unitData.type == UnitsType.Archer && movementManager.IsMoving())
+            unit.objectModel.SetActive(true);
+    }
+
+    private bool CanAttackWithDamage(UnitInstance unit)
+    {
+        if (unit == null || unit.unitData == null)
+            return false;
+
+        return unit.unitData.type != UnitsType.Support && unit.unitData.type != UnitsType.Healer;
+    }
+
+    private void SetAttackVisuals(bool visible)
+    {
+        SetAttackAnimationState(visible);
+        SetObjectModelVisible(visible);
+    }
+
+    private void SetObjectModelVisible(bool visible)
+    {
+        UnitInstance unit = cachedUnit;
+        if (unit == null)
+            unit = GetComponent<UnitInstance>();
+
+        if (unit != null && unit.objectModel != null)
+            unit.objectModel.SetActive(visible);
+    }
+
+    private void BeginAttackLoop()
+    {
+        SetAttackVisuals(true);
+        StopAttackCoroutine();
+        attackCoroutine = StartCoroutine(AttackLoopCoroutine());
+    }
+
+    private void StopAttackCoroutine()
+    {
+        if (attackCoroutine == null)
+            return;
+
+        StopCoroutine(attackCoroutine);
+        attackCoroutine = null;
+    }
+
+    private bool TryGetCurrentTarget(out UnitInstance targetUnit, out StructureInstance targetStructure)
+    {
+        targetUnit = GetTargetUnit();
+        targetStructure = targetUnit == null ? GetTargetStructure() : null;
+
+        if (targetUnit == null && targetStructure == null)
+            return false;
+
+        if (targetUnit != null && targetUnit.currentHealth <= 0)
+            return false;
+
+        if (targetStructure != null && targetStructure.currentHealth <= 0)
+            return false;
+
+        return true;
+    }
+
+    private bool IsFriendlyStructureTarget(StructureInstance targetStructure, UnitInstance attackerUnit)
+    {
+        return targetStructure != null && attackerUnit != null && targetStructure.playerId == attackerUnit.playerId;
     }
 
     private float GetCurrentAttackRange()
@@ -416,109 +339,80 @@ public class UnitsAnimation : MonoBehaviour
         return structure;
     }
 
-    private float GetAttackDamage()
-{
-    UnitInstance attacker = cachedUnit;
-    UnitInstance target = GetTargetUnit();
-
-    if (attacker != null && attacker.unitData is UnitCombatData combatData)
+    private float GetAttackDamage(UnitInstance targetUnit, StructureInstance targetStructure)
     {
-        Debug.Log($"[Attaque] {attacker.name} frappe {(target != null ? target.name : "structure")} pour {combatData.attack} dégâts");
+        UnitInstance attacker = cachedUnit;
         if (attacker == null)
-    {
-        Debug.LogError("attacker NULL");
-        return 0;
-    }
+        {
+            Debug.LogError("attacker NULL");
+            return 0f;
+        }
 
-    if (target == null)
-    {
-        StructureInstance targetStructure = GetTargetStructure();
+        if (!(attacker.unitData is UnitCombatData combatData))
+        {
+            Debug.LogError("attacker.unitData NULL");
+            return 0f;
+        }
+
         if (targetStructure != null)
         {
             if (targetStructure.playerId == attacker.playerId)
                 return 0f;
 
+            Debug.Log($"[Attaque] {attacker.name} frappe structure pour {combatData.attack} degats");
             return Mathf.Max(0f, combatData.attack);
         }
 
-        Debug.LogError("target NULL");
-        return 0;
+        if (targetUnit == null)
+        {
+            Debug.LogError("target NULL");
+            return 0f;
+        }
+
+        if (targetUnit.unitData == null)
+        {
+            Debug.LogError("target.unitData NULL");
+            return 0f;
+        }
+
+        if (damageTable == null)
+        {
+            Debug.LogError("damageTable NULL");
+            return 0f;
+        }
+
+        float damage = combatData.attack * damageTable.GetMultiplier(attacker, targetUnit);
+        Debug.Log($"[Attaque] {attacker.name} frappe {targetUnit.name} pour {damage} degats");
+        return Mathf.Max(0f, damage);
     }
 
-    if (attacker.unitData == null)
+    private void ApplyAttackDamage(UnitInstance targetUnit, StructureInstance targetStructure, UnitInstance attackerUnit, float attack)
     {
-        Debug.LogError("attacker.unitData NULL");
-        return 0;
-    }
+        if (targetUnit != null)
+        {
+            targetUnit.TakeDamage(attack);
 
-    if (target.unitData == null)
-    {
-        Debug.LogError("target.unitData NULL");
-        return 0;
-    }
+            UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
+            if (targetAnimation != null && attackerUnit != null)
+                targetAnimation.AttackTheAttacker(transform);
 
-    if (damageTable == null)
-    {
-        Debug.LogError("damageTable NULL");
-        return 0;
-    }
+            return;
+        }
 
-        return Mathf.Max(0f, combatData.attack * damageTable.GetMultiplier(attacker, target));
+        if (targetStructure != null)
+            targetStructure.TakeDamage(attack, attackerUnit);
     }
-
-    return 0f;
-}
 
     private void OnMovementCompleted(Transform target)
     {
-        if (isGroupLeader && activeGroupMoveId >= 0)
-            completedGroupMoves.Add(activeGroupMoveId);
+        if (target == null)
+            return;
 
-        if (target != null)
-        {
-            attackTarget = target;
-
-            UnitInstance unit = cachedUnit;
-            if (unit != null && unit.unitData != null)
-            {
-                if (unit.unitData.type != UnitsType.Healer &&
-                    unit.unitData.type != UnitsType.Support)
-                {
-                    StartAttackWithDamage();
-                }
-            }
-        }
+        attackTarget = target;
+        if (CanAttackWithDamage(cachedUnit))
+            StartAttackWithDamage();
     }
 
-    private void ClearGroupMoveState()
-    {
-        activeGroupMoveId = -1;
-        isGroupLeader = false;
-    }
-
-    public void MoveToPosition(Vector3 destination, float stopDistance)
-    {
-        attackTarget = null;
-        StopAttackInternal();
-        ClearGroupMoveState();
-
-        if (movementManager != null)
-        {
-            movementManager.MoveToPosition(destination, stopDistance);
-        }
-    }
-
-    public void MoveToTarget(Transform target, float stopDistance)
-    {
-        attackTarget = null;
-        StopAttackInternal();
-        ClearGroupMoveState();
-
-        if (movementManager != null)
-        {
-            movementManager.MoveToTarget(target, GetCurrentAttackRange());
-        }
-    }
 
     public void EngageTarget(Transform target, float stopDistance)
     {
@@ -529,44 +423,26 @@ public class UnitsAnimation : MonoBehaviour
         bool alreadyMovingToTarget = movementManager.IsMoving();
         bool alreadyAttackingTarget = attackTarget == target;
 
-        if ((alreadyMovingToTarget || alreadyAttackingTarget))
+        if (alreadyMovingToTarget || alreadyAttackingTarget)
             return;
 
-        MoveToTarget(target, desiredStopDistance);
-    }
-
-    public void MoveToPositionAsGroup(Vector3 destination, float stopDistance, int groupMoveId, bool isLeader)
-    {
-        activeGroupMoveId = groupMoveId;
-        isGroupLeader = isLeader;
-        attackTarget = null;
-        StopAttackInternal();
-
-        if (movementManager != null)
-        {
-            movementManager.MoveToPosition(destination, stopDistance);
-        }
+        movementManager.MoveToTarget(target, desiredStopDistance);
     }
 
     public void StartAttackAnimationFromSpell()
     {
-        UnitInstance unit = cachedUnit != null ? cachedUnit : GetComponent<UnitInstance>();
-        if (animator != null)
-            animator.SetBool("isAttacking", true);
-        if (unit != null && unit.objectModel != null)
-            unit.objectModel.SetActive(true);
-        spellAttackResetCoroutine = StartCoroutine(ResetSpellAttackToIdleAfterAnimation());
+        SetAttackVisuals(true);
+        StartCoroutine(ResetSpellAttackToIdleAfterAnimation());
     }
 
     private IEnumerator ResetSpellAttackToIdleAfterAnimation()
     {
         AnimationClip attackClip = GetAttackClip();
-        float duration =  attackClip.length;
+        float duration = attackClip != null ? attackClip.length : 0.05f;
         duration = Mathf.Max(0.05f, duration);
+
         yield return new WaitForSeconds(duration);
-        animator.SetBool("isAttacking", false);
-        UnitInstance unit = cachedUnit;
-        unit.objectModel.SetActive(false);
-        spellAttackResetCoroutine = null;
+
+        SetAttackVisuals(false);
     }
 }

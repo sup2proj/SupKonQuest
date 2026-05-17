@@ -228,7 +228,25 @@ public class MovementManager : MonoBehaviour
         }
     }
 
+    public void MoveToPositionAsGroup(Vector3 destination, float stopDistance)
+    {
+        UnitsAnimation animatedMover = GetComponent<UnitsAnimation>();
+        if (animatedMover != null)
+            animatedMover.StopAttackForMovement();
+
+        MoveToPosition(destination, stopDistance);
+    }
+
     public void MoveToTarget(Transform target, float stopDistance)
+    {
+        UnitsAnimation animatedMover = GetComponent<UnitsAnimation>();
+        if (animatedMover != null)
+            animatedMover.StopAttackForMovement();
+
+        MoveToTargetInternal(target, Mathf.Max(0f, stopDistance));
+    }
+
+    private void MoveToTargetInternal(Transform target, float stopDistance)
     {
         if (target != null && !CanMoveOnWorldPosition(target.position))
             return;
@@ -361,7 +379,7 @@ public class MovementManager : MonoBehaviour
         }
     }
     
-    public void MoveBoatsUnitToPositionAsGroup(UnitInstance unit, Vector3 destination, float stopDistance, int groupMoveId, bool isLeader)
+    public void MoveBoatsUnitToPositionAsGroup(UnitInstance unit, Vector3 destination, float stopDistance)
     {
         if (unit == null)
             return;
@@ -370,14 +388,7 @@ public class MovementManager : MonoBehaviour
         if (movement == null || !movement.CanMoveOnWorldPosition(destination))
             return;
 
-        UnitsAnimation animatedMover = unit.GetComponent<UnitsAnimation>();
-        if (animatedMover != null)
-        {
-            animatedMover.MoveToPositionAsGroup(destination, stopDistance, groupMoveId, isLeader);
-            return;
-        }
-
-        movement.MoveToPosition(destination, stopDistance);
+        movement.MoveToPositionAsGroup(destination, stopDistance);
     }
 
     public void MoveBoatsUnitToTarget(UnitInstance unit, Transform target, float stopDistance)
@@ -388,13 +399,6 @@ public class MovementManager : MonoBehaviour
         MovementManager movement = unit.GetComponent<MovementManager>();
         if (movement == null || !movement.CanMoveOnWorldPosition(target.position))
             return;
-
-        UnitsAnimation animatedMover = unit.GetComponent<UnitsAnimation>();
-        if (animatedMover != null)
-        {
-            animatedMover.MoveToTarget(target, stopDistance);
-            return;
-        }
 
         movement.MoveToTarget(target, stopDistance);
     }

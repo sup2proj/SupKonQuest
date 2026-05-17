@@ -116,7 +116,8 @@ public class NormalAttack : MonoBehaviour
                 return;
             }
 
-            unitsAnimation.MoveToTarget(target.transform, attackStopDistance);
+            if (movement != null)
+                movement.MoveToTarget(target.transform, attackStopDistance);
             return;
         }
 

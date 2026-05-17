@@ -17,7 +17,6 @@ public class SelectionManager : MonoBehaviour
 
     bool isMouseDown, isDragging = false;
     float selectableRefreshTimer;
-    int nextGroupMoveId = 1;
 
     Vector3 mouseStartPos;
 
@@ -110,17 +109,14 @@ public class SelectionManager : MonoBehaviour
     if (groupUnits.Count == 0)
         return;
 
-    int groupMoveId = nextGroupMoveId++;
-    UnitInstance leader = GetClosestUnitToPoint(groupUnits, hit.point);
     List<Vector3> slots = GetFormationPositions(hit.point, groupUnits.Count);
 
     for (int i = 0; i < groupUnits.Count; i++)
     {
         UnitInstance unit = groupUnits[i];
-        bool isLeader = (unit == leader);
         Vector3 destination = slots[i];
         destination.y = unit.transform.position.y;
-        MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, destination, groupMoveStoppingDistance, groupMoveId, isLeader);
+        MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, destination, groupMoveStoppingDistance);
     }
 }
 
@@ -241,18 +237,14 @@ private Vector3 SampleNavMesh(Vector3 candidate)
             return true;
         }
 
-        int groupMoveId = nextGroupMoveId++;
-        UnitInstance leader = GetClosestUnitToPoint(boardingUnits, landDestination);
-
         for (int i = 0; i < boardingUnits.Count; i++)
         {
             UnitInstance unit = boardingUnits[i];
-            bool isLeader = unit == leader;
-            MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, landDestination, groupMoveStoppingDistance, groupMoveId, isLeader);
+            MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, landDestination, groupMoveStoppingDistance);
             BoatTransport.PrepareBoarding(unit, targetBoat);
         }
 
-        MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(targetBoat, waterDestination, groupMoveStoppingDistance, groupMoveId, false);
+        MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(targetBoat, waterDestination, groupMoveStoppingDistance);
 
         Debug.Log($"[SelectionManager] Ordre rive bateau: {boardingUnits.Count} unite(s) -> {landDestination}, bateau {targetBoat.name} -> {waterDestination}.");
         return true;
