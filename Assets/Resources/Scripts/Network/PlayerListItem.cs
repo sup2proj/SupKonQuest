@@ -7,13 +7,20 @@ public class PlayerListItem : MonoBehaviour
     public TextMeshProUGUI playerNameText;
     public Button kickButton;
     
-    private string myPlayerId;
+    private string myPlayerId; 
 
     public void Setup(string id, string playerName, bool isReady, bool isHostView, bool isMe)
     {
         myPlayerId = id;
         
-        playerNameText.text = "- " + playerName + (isReady ? " <color=#00FF00>[PRÊT]</color>" : "");
+        if (isReady)
+        {
+            playerNameText.text = "<color=#00FF00>- " + playerName + "</color>";
+        }
+        else
+        {
+            playerNameText.text = "- " + playerName;
+        }
 
         if (isHostView && !isMe)
         {

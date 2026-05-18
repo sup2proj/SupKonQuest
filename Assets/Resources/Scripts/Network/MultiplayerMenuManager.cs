@@ -8,25 +8,30 @@ using System.Collections.Generic;
 public class MultiplayerMenuManager : MonoBehaviour
 {
     [Header("Interface")]
-    public TextMeshProUGUI statusText;
+    public LocalizedText statusText;
 
     void Start()
     {
-        if (PlayerPrefs.HasKey("DisconnectReason"))
+        if (PlayerPrefs.HasKey("DisconnectReasonEN") && PlayerPrefs.HasKey("DisconnectReasonFR"))
         {
-            string errorMessage = PlayerPrefs.GetString("DisconnectReason");
-            
+            string errEN = PlayerPrefs.GetString("DisconnectReasonEN");
+            string errFR = PlayerPrefs.GetString("DisconnectReasonFR");
+
             if (statusText != null)
             {
-                statusText.text = "<color=red>" + errorMessage + "</color>";
+                string formattedEN = "<color=red>" + errEN + "</color>";
+                string formattedFR = "<color=red>" + errFR + "</color>";
+                statusText.SetDynamicTranslations(formattedEN, formattedFR);
             }
-            PlayerPrefs.DeleteKey("DisconnectReason");
+            
+            PlayerPrefs.DeleteKey("DisconnectReasonEN");
+            PlayerPrefs.DeleteKey("DisconnectReasonFR");
         }
         else
         {
             if (statusText != null)
             {
-                statusText.text = "Bienvenue dans le menu multijoueur.";
+                statusText.SetDynamicTranslations("Welcome to the multiplayer menu.", "Bienvenue dans le menu multijoueur.");
             }
         }
     }
@@ -48,7 +53,7 @@ public class MultiplayerMenuManager : MonoBehaviour
 
     public async void QuickMatchmaking()
     {
-        if (statusText != null) statusText.text = "Recherche d'une partie en cours...";
+        if (statusText != null) statusText.SetDynamicTranslations("Searching for a match...", "Recherche d'une partie en cours...");
         try
         {
             string myName = PlayerPrefs.GetString("PlayerName", "Joueur");
@@ -66,7 +71,7 @@ public class MultiplayerMenuManager : MonoBehaviour
 
             Lobby joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync(options);
             Debug.Log("Partie trouvée ! Connexion en tant que Client.");
-            if (statusText != null) statusText.text = "Partie trouvée !";
+            if (statusText != null) statusText.SetDynamicTranslations("Match found!", "Partie trouvée !");
             LobbyRoomManager.IsHost = false;
             LobbyRoomManager.JoinedLobby = joinedLobby;
             SceneManager.LoadScene("LobbyRoomScene");
@@ -74,7 +79,7 @@ public class MultiplayerMenuManager : MonoBehaviour
         catch (LobbyServiceException e)
         {
             Debug.Log("Aucune partie trouvée. Je suis l'Hôte ! (" + e.Message + ")");
-            if (statusText != null) statusText.text = "Aucune partie. Création d'un salon...";
+            if (statusText != null) statusText.SetDynamicTranslations("No match found. Creating a lobby...", "Aucune partie. Création d'un salon...");
 
             LobbyRoomManager.IsHost = true;
             SceneManager.LoadScene("LobbyRoomScene");

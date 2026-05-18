@@ -784,6 +784,7 @@ GameObject:
   - component: {fileID: 767774843}
   - component: {fileID: 767774845}
   - component: {fileID: 767774844}
+  - component: {fileID: 767774846}
   m_Layer: 5
   m_Name: statusText
   m_TagString: Untagged
@@ -910,6 +911,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 767774842}
   m_CullTransparentMesh: 1
+--- !u!114 &767774846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 767774842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: 
+  frenchText: 
 --- !u!1 &882798233
 GameObject:
   m_ObjectHideFlags: 0
@@ -1089,7 +1104,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::JoinLobbyManager
   lobbyListContainer: {fileID: 2048252631}
   lobbyItemPrefab: {fileID: 7153847662329229881, guid: 068c3e9cec0b69c459fcba2b6c2bbdb7, type: 3}
-  statusText: {fileID: 767774844}
+  statusText: {fileID: 767774846}
 --- !u!1 &1641883920
 GameObject:
   m_ObjectHideFlags: 0

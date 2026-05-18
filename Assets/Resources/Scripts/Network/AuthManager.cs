@@ -10,69 +10,73 @@ public class AuthManager : MonoBehaviour
     [Header("UI - Interface")]
     public TMP_InputField usernameInput;
     public TMP_InputField passwordInput;
-    public TextMeshProUGUI statusText;
+    public LocalizedText statusText;
 
     async void Start()
     {
         try
         {
             await UnityServices.InitializeAsync();
-            statusText.text = "Connexion aux serveurs... Prêt !";
+            if (statusText != null) statusText.SetDynamicTranslations("Connecting to servers... Ready!", "Connexion aux serveurs... Prêt !");
         }
         catch (System.Exception e)
         {
-            statusText.text = "Erreur d'initialisation des serveurs.";
+            if (statusText != null) statusText.SetDynamicTranslations("Server initialization error.", "Erreur d'initialisation des serveurs.");
             Debug.LogError(e);
         }
     }
 
     public async void SignUp()
     {
-        statusText.text = "Création du compte en cours...";
+        if (statusText != null) statusText.SetDynamicTranslations("Creating account...", "Création du compte en cours...");
+            
         try
         {
             await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(usernameInput.text, passwordInput.text);
 
             PlayerPrefs.SetString("PlayerName", usernameInput.text);
             
-            statusText.text = "Compte créé et connecté avec succès !";
+            if (statusText != null) statusText.SetDynamicTranslations("Account created and connected successfully!", "Compte créé et connecté avec succès !");
+                
             SceneManager.LoadScene("MultiplayerScene");
             Debug.Log("Compte créé. ID Unique du joueur : " + AuthenticationService.Instance.PlayerId);
         }
         catch (AuthenticationException ex)
         {
-            statusText.text = "Erreur de création : " + ex.Message;
+            if (statusText != null) statusText.SetDynamicTranslations("Creation error: " + ex.Message, "Erreur de création : " + ex.Message);
             Debug.LogError(ex);
         }
         catch (RequestFailedException ex)
         {
-            statusText.text = "Erreur réseau.";
+            if (statusText != null) statusText.SetDynamicTranslations("Network error.", "Erreur réseau.");
             Debug.LogError(ex);
         }
     }
 
     public async void SignIn()
     {
-        statusText.text = "Connexion en cours...";
+        if (statusText != null) statusText.SetDynamicTranslations("Signing in...", "Connexion en cours...");
+            
         try
         {
             await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(usernameInput.text, passwordInput.text);
 
             PlayerPrefs.SetString("PlayerName", usernameInput.text);
             
-            statusText.text = "Connecté ! Bienvenue.";
+            if (statusText != null) statusText.SetDynamicTranslations("Connected! Welcome.", "Connecté ! Bienvenue.");
+                
             SceneManager.LoadScene("MultiplayerScene");
             Debug.Log("Connexion réussie. ID Unique : " + AuthenticationService.Instance.PlayerId);
             
         }
         catch (AuthenticationException ex)
         {
-            statusText.text = "Identifiants incorrects.";
+            if (statusText != null) statusText.SetDynamicTranslations("Invalid credentials.", "Identifiants incorrects.");
             Debug.LogError(ex);
         }
         catch (RequestFailedException ex)
         {
-            statusText.text = "Erreur réseau.";
+            if (statusText != null) statusText.SetDynamicTranslations("Network error.", "Erreur réseau.");
             Debug.LogError(ex);
         }
     }

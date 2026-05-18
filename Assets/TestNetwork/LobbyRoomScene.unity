@@ -1088,6 +1088,7 @@ GameObject:
   - component: {fileID: 400941644}
   - component: {fileID: 400941646}
   - component: {fileID: 400941645}
+  - component: {fileID: 400941647}
   m_Layer: 5
   m_Name: nbPlayerText
   m_TagString: Untagged
@@ -1214,6 +1215,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400941643}
   m_CullTransparentMesh: 1
+--- !u!114 &400941647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 400941643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: 
+  frenchText: 
 --- !u!1 &401878612
 GameObject:
   m_ObjectHideFlags: 0
@@ -1790,6 +1805,7 @@ GameObject:
   - component: {fileID: 700285893}
   - component: {fileID: 700285895}
   - component: {fileID: 700285894}
+  - component: {fileID: 700285896}
   m_Layer: 5
   m_Name: currentMapText
   m_TagString: Untagged
@@ -1916,6 +1932,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 700285892}
   m_CullTransparentMesh: 1
+--- !u!114 &700285896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 700285892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: 
+  frenchText: 
 --- !u!1 &734916744
 GameObject:
   m_ObjectHideFlags: 0
@@ -2482,6 +2512,7 @@ GameObject:
   - component: {fileID: 943641018}
   - component: {fileID: 943641020}
   - component: {fileID: 943641019}
+  - component: {fileID: 943641021}
   m_Layer: 5
   m_Name: statusText
   m_TagString: Untagged
@@ -2608,6 +2639,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 943641017}
   m_CullTransparentMesh: 1
+--- !u!114 &943641021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943641017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: 
+  frenchText: 
 --- !u!1 &978559565
 GameObject:
   m_ObjectHideFlags: 0
@@ -2704,11 +2749,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04b51b78ea50cb3468ac89283081a5b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LobbyRoomManager
-  lobbyStatusText: {fileID: 943641019}
+  lobbyStatusText: {fileID: 943641021}
   playerListContainer: {fileID: 1447326812}
   playerListItemPrefab: {fileID: 999506119987350797, guid: 0527021e359cce44a954fb139a79b2aa, type: 3}
-  mapNameText: {fileID: 700285894}
-  maxPlayersText: {fileID: 400941645}
+  mapNameText: {fileID: 700285896}
+  maxPlayersText: {fileID: 400941647}
   readyBtn: {fileID: 323749599}
   chatScrollRect: {fileID: 1188243874}
   chatHistoryText: {fileID: 1264101568}

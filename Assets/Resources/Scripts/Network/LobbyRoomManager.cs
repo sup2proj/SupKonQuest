@@ -18,14 +18,14 @@ public class LobbyRoomManager : MonoBehaviour
     private float lobbyUpdateTimer;
 
     [Header("Interface (UI) Common")]
-    public TextMeshProUGUI lobbyStatusText;
+    public LocalizedText lobbyStatusText;
 
     [Header("Players List (UI)")]
     public Transform playerListContainer;
     public GameObject playerListItemPrefab;
 
-    public TextMeshProUGUI mapNameText;
-    public TextMeshProUGUI maxPlayersText;
+    public LocalizedText mapNameText;
+    public LocalizedText maxPlayersText;
     public Button readyBtn;
 
     private bool isLocalPlayerReady = false;
@@ -49,14 +49,16 @@ public class LobbyRoomManager : MonoBehaviour
         if (IsHost)
         {
             hostControlsPanel.SetActive(true);
-            lobbyStatusText.text = "Création du Lobby en cours...";
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Creating Lobby...", "Création du Lobby en cours...");
+                
             await CreateLobby();
         }
         else
         {
             hostControlsPanel.SetActive(false);
             currentLobby = JoinedLobby;
-            lobbyStatusText.text = "Connecté au salon";
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Connected to lobby", "Connecté au salon");
+                
             RefreshUI();
         }
         if (chatInputField != null)
@@ -80,7 +82,11 @@ public class LobbyRoomManager : MonoBehaviour
         try
         {
             string myName = PlayerPrefs.GetString("PlayerName", "Joueur Inconnu");
-            string lobbyName = "Salon de " + myName;
+            
+            // 0 = Anglais, 1 = Français
+            int currentLang = PlayerPrefs.GetInt("Language", 0);
+            string lobbyName = (currentLang == 0 ? "Lobby of " : "Salon de ") + myName;
+            string welcomeMsg = (currentLang == 0 ? "Welcome to the lobby!\n" : "Bienvenue dans le salon !\n");
             
             CreateLobbyOptions options = new CreateLobbyOptions
             {
@@ -96,16 +102,19 @@ public class LobbyRoomManager : MonoBehaviour
                 Data = new Dictionary<string, DataObject>
                 {
                     { "Map", new DataObject(DataObject.VisibilityOptions.Public, currentMap) },
-                    { "ChatLog", new DataObject(DataObject.VisibilityOptions.Member, "Bienvenue dans le salon !\n") }
+                    { "ChatLog", new DataObject(DataObject.VisibilityOptions.Member, welcomeMsg) }
                 }
             };
 
             currentLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, currentMaxPlayers, options);
+            
             GameObject keeperObj = new GameObject("LobbyKeeper");
             LobbyKeeper keeper = keeperObj.AddComponent<LobbyKeeper>();
             keeper.StartKeepingLobbyAlive(currentLobby.Id);
+            
             RefreshUI();
-            lobbyStatusText.text = "Lobby Ouvert ! En attente de joueurs...";
+            
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Lobby Open! Waiting for players...", "Lobby Ouvert ! En attente de joueurs...");
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
@@ -196,9 +205,9 @@ public class LobbyRoomManager : MonoBehaviour
             catch (LobbyServiceException e) { Debug.LogError(e); }
         }
         if (LobbyKeeper.Instance != null)
-            {
-                LobbyKeeper.Instance.StopKeepingLobby();
-            }
+        {
+            LobbyKeeper.Instance.StopKeepingLobby();
+        }
         SceneManager.LoadScene("MultiplayerScene");
     }
 
@@ -222,7 +231,17 @@ public class LobbyRoomManager : MonoBehaviour
             string playerId = AuthenticationService.Instance.PlayerId;
             await LobbyService.Instance.UpdatePlayerAsync(currentLobby.Id, playerId, options);
 
-            readyBtn.GetComponentInChildren<TextMeshProUGUI>().text = isLocalPlayerReady ? "Annuler Prêt" : "Être Prêt";
+            if (readyBtn != null)
+            {
+                LocalizedText btnText = readyBtn.GetComponentInChildren<LocalizedText>();
+                if (btnText != null)
+                {
+                    if (isLocalPlayerReady)
+                        btnText.SetDynamicTranslations("Cancel Ready", "Annuler Prêt");
+                    else
+                        btnText.SetDynamicTranslations("Ready", "Être Prêt");
+                }
+            }
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
@@ -307,7 +326,7 @@ public class LobbyRoomManager : MonoBehaviour
 
                     if (!amIStillInLobby)
                     {
-                        HandleDisconnection("Vous avez été expulsé du salon par l'hôte.");
+                        HandleDisconnection("Kicked by host.", "Vous avez été expulsé du salon par l'hôte.");
                         return; 
                     }
 
@@ -350,7 +369,7 @@ public class LobbyRoomManager : MonoBehaviour
                 catch (LobbyServiceException e)
                 {
                     Debug.LogWarning("Impossible de rafraîchir le salon. Erreur : " + e.Reason);
-                    HandleDisconnection("La connexion au salon a été perdue.");
+                    HandleDisconnection("Connection lost.", "La connexion au salon a été perdue.");
                 }
             }
         }
@@ -360,8 +379,11 @@ public class LobbyRoomManager : MonoBehaviour
     {
         if (currentLobby == null) return;
 
-        mapNameText.text = "Carte : " + currentLobby.Data["Map"].Value;
-        maxPlayersText.text = "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers;
+        if (mapNameText != null)
+            mapNameText.SetDynamicTranslations("Map: " + currentLobby.Data["Map"].Value, "Carte : " + currentLobby.Data["Map"].Value);
+            
+        if (maxPlayersText != null)
+            maxPlayersText.SetDynamicTranslations("Slots: " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers, "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers);
 
         foreach (Transform child in playerListContainer)
         {
@@ -403,13 +425,14 @@ public class LobbyRoomManager : MonoBehaviour
         }
     }
 
-    private void HandleDisconnection(string reason)
+    private void HandleDisconnection(string reasonEN, string reasonFR)
     {
-        Debug.LogWarning("Déconnexion forcée : " + reason);
+        Debug.LogWarning("Déconnexion forcée : " + reasonFR);
         
         currentLobby = null; 
         
-        PlayerPrefs.SetString("DisconnectReason", reason);
+        PlayerPrefs.SetString("DisconnectReasonEN", reasonEN);
+        PlayerPrefs.SetString("DisconnectReasonFR", reasonFR);
         SceneManager.LoadScene("MultiplayerScene");
     }
 }

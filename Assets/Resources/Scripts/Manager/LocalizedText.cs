@@ -34,4 +34,12 @@ public class LocalizedText : MonoBehaviour
             textComponent.text = frenchText;
         }
     }
+
+    public void SetDynamicTranslations(string english, string french)
+    {
+        englishText = english;
+        frenchText = french;
+        
+        UpdateText();
+    }
 }

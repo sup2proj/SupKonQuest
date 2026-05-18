@@ -1069,7 +1069,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e50a4b705256c8498a5ced6217891aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultiplayerMenuManager
-  statusText: {fileID: 2088908081}
+  statusText: {fileID: 2088908083}
 --- !u!1 &1247562019
 GameObject:
   m_ObjectHideFlags: 0
@@ -1788,6 +1788,7 @@ GameObject:
   - component: {fileID: 2088908080}
   - component: {fileID: 2088908082}
   - component: {fileID: 2088908081}
+  - component: {fileID: 2088908083}
   m_Layer: 5
   m_Name: statusText
   m_TagString: Untagged
@@ -1914,6 +1915,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2088908079}
   m_CullTransparentMesh: 1
+--- !u!114 &2088908083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2088908079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: 
+  frenchText: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
