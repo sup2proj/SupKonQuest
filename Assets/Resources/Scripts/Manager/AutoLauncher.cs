@@ -90,17 +90,22 @@ public class AutoLauncher : MonoBehaviour
         Debug.Log($"1-{campAssignment.campAssignments[0].playerType}, 2-{campAssignment.campAssignments[1].playerType}");
 
         Camera mainCam = Camera.main;
-        if (mainCam != null)
+        if (mainCam == null)
         {
-            CameraMouvement camMovement = mainCam.GetComponent<CameraMouvement>();
-            if (camMovement == null)
-                camMovement = mainCam.gameObject.AddComponent<CameraMouvement>();
+            mainCam = Object.FindObjectOfType<Camera>();
+        }
 
-            camMovement.SetUpCamera(mapGenerator.mapWidth, mapGenerator.mapHeight, startCameraPositionX, startCameraPositionY);
-        }
-        else
+        if (mainCam == null)
         {
-            Debug.LogWarning("AutoLauncher : Impossible de trouver la caméra MainCamera !");
+            GameObject camObj = new GameObject("MainCamera");
+            mainCam = camObj.AddComponent<Camera>();
+            camObj.tag = "MainCamera";
         }
+
+        CameraMouvement camMovement = mainCam.GetComponent<CameraMouvement>();
+        if (camMovement == null)
+            camMovement = mainCam.gameObject.AddComponent<CameraMouvement>();
+
+        camMovement.SetUpCamera(mapGenerator.mapWidth, mapGenerator.mapHeight, startCameraPositionX, startCameraPositionY);
     }
 }
