@@ -535,6 +535,7 @@ GameObject:
   - component: {fileID: 451200215}
   - component: {fileID: 451200217}
   - component: {fileID: 451200216}
+  - component: {fileID: 451200218}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -661,6 +662,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 451200214}
   m_CullTransparentMesh: 1
+--- !u!114 &451200218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 451200214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Back
+  frenchText: Retour
 --- !u!1 &507180567
 GameObject:
   m_ObjectHideFlags: 0
@@ -1199,6 +1214,7 @@ GameObject:
   - component: {fileID: 1271762849}
   - component: {fileID: 1271762851}
   - component: {fileID: 1271762850}
+  - component: {fileID: 1271762852}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1325,6 +1341,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1271762848}
   m_CullTransparentMesh: 1
+--- !u!114 &1271762852
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271762848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Create lobby
+  frenchText: "Cr\xE9er un lobby"
 --- !u!1 &1319947078
 GameObject:
   m_ObjectHideFlags: 0
@@ -1336,6 +1366,7 @@ GameObject:
   - component: {fileID: 1319947079}
   - component: {fileID: 1319947081}
   - component: {fileID: 1319947080}
+  - component: {fileID: 1319947082}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -1462,6 +1493,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1319947078}
   m_CullTransparentMesh: 1
+--- !u!114 &1319947082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319947078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Join lobby
+  frenchText: Rejoindre un lobby
 --- !u!1 &1641883920
 GameObject:
   m_ObjectHideFlags: 0
