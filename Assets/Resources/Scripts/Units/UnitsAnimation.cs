@@ -39,7 +39,7 @@ public class UnitsAnimation : MonoBehaviour
             Debug.LogError("Impossible de charger DamageTable !");
         }
         if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar) {
-            cannonBallPrefab = Resources.Load<GameObject>("Prefabs/Units/CannonBall");
+            cannonBallPrefab = Resources.Load<GameObject>("Prefabs/Units/CannonBall/Cannonball");
             if (cannonBallPrefab == null)
                 Debug.LogError("[Mortar] CannonBall prefab introuvable dans Resources/Prefabs/");
         }
