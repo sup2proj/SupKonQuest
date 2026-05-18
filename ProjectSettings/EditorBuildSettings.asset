@@ -35,6 +35,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/TestNetwork/JoinLobbyScene.unity
     guid: 40f87980d8cb3374a98a80a83b498981
+  - enabled: 1
+    path: Assets/Scenes/Game.unity
+    guid: f0a58d0fc25b847fd9d38d3e4219af0a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

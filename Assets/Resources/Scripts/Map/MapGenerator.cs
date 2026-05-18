@@ -95,7 +95,7 @@ public class MapGenerator : MonoBehaviour
         MapJsonData jsonData = StructureInstance.LoadDataFromPath(path + "MapData");
         mapWidth = mapLayout.width;
         mapHeight = mapLayout.height;
-        
+
         if (mapLayout != null && jsonData != null)
         {
             GenerateWorld();

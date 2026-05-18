@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class LaunchingLocalNewGameManager : MonoBehaviour
 {
@@ -114,10 +115,13 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
         }
     }
 
-    public void StartGame()
-    {
-        SceneManager.LoadScene("MainMenu"); 
-    }
+     public void StartGame()
+     { 
+         string selectedMap = "TEST";
+
+         AutoLauncher.Request(selectedMap);
+         SceneManager.LoadScene("Game");
+     }
 
     public void Back()
     {
