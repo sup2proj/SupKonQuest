@@ -97,9 +97,14 @@ public class AutoLauncher : MonoBehaviour
 
         if (mainCam == null)
         {
-            GameObject camObj = new GameObject("MainCamera");
+            GameObject camObj = new GameObject("Main Camera");
             mainCam = camObj.AddComponent<Camera>();
             camObj.tag = "MainCamera";
+        }
+        else
+        {
+            mainCam.gameObject.name = "Main Camera";
+            mainCam.gameObject.tag = "MainCamera";
         }
 
         CameraMouvement camMovement = mainCam.GetComponent<CameraMouvement>();
