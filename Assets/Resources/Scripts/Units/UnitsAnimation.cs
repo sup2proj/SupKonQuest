@@ -194,7 +194,8 @@ public class UnitsAnimation : MonoBehaviour
                 StructureInstance targetStructureSnapshot = targetStructure;
                 UnitInstance attackerSnapshot = attackerUnit;
 
-                CannonBall.Spawn(cannonBallPrefab, transform.position, targetSnapshot, cannonBallSpeed, () =>
+                Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
+                CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, () =>
                 {
                     if (targetUnitSnapshot != null)
                     {
