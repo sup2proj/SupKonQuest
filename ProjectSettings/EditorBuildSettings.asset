@@ -6,8 +6,35 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Lobby.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/StartScreen.unity
+    guid: c229a6478af9fa849948cdec8dfb251e
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 535b8b4689e1fe645aa2471573da0d4d
+  - enabled: 1
+    path: Assets/Scenes/Options.unity
+    guid: 52c0421186eb0494cbf3e650c1656826
+  - enabled: 1
+    path: Assets/Scenes/NewGame.unity
+    guid: 4ab563d936e06e74b81eef946ecfbb02
+  - enabled: 1
+    path: Assets/Scenes/LaunchingLocalNewGame.unity
+    guid: 1ee87dc9b10c6cb4e9b3faaef00ae28d
+  - enabled: 1
+    path: Assets/TestNetwork/test.unity
+    guid: e04338d0783ccaf49a5696f0844cca41
+  - enabled: 1
+    path: Assets/TestNetwork/LoginScene.unity
+    guid: 64826db49dba3bf4fabf99eeb44d8510
+  - enabled: 1
+    path: Assets/TestNetwork/MultiplayerScene.unity
+    guid: e424bcd4c127abc4d8acb5046c999cea
+  - enabled: 1
+    path: Assets/TestNetwork/LobbyRoomScene.unity
+    guid: 9170f7f901935fd4396ed09c0bd06594
+  - enabled: 1
+    path: Assets/TestNetwork/JoinLobbyScene.unity
+    guid: 40f87980d8cb3374a98a80a83b498981
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
