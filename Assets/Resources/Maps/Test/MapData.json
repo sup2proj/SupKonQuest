@@ -21,7 +21,7 @@
         "territoryId" : 4 }
     ],
     "harbours": [
-      { "x": 15, "y": 16, "owner": -1 }
+      { "x": 15, "y": 16, "owner": -1, "territory" : "Harbour" }
     ],
     "special": [
       { "x": 29, "y": 4, "owner": -1 }
