@@ -292,6 +292,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Password
   frenchText: Mot de passe
+  italianoText: Password
 --- !u!1 &261737447
 GameObject:
   m_ObjectHideFlags: 0
@@ -444,6 +445,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Sign in
   frenchText: Se connecter
+  italianoText: Accedi
 --- !u!1 &326179165
 GameObject:
   m_ObjectHideFlags: 0
@@ -907,6 +909,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Login
   frenchText: Connexion
+  italianoText: Accedi
 --- !u!1 &442358767
 GameObject:
   m_ObjectHideFlags: 0
@@ -1259,6 +1262,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Back
   frenchText: Retour
+  italianoText: Indietro
 --- !u!1 &612503190
 GameObject:
   m_ObjectHideFlags: 0
@@ -1544,6 +1548,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Sign up
   frenchText: S'inscrire
+  italianoText: Iscriviti
 --- !u!1 &731660446
 GameObject:
   m_ObjectHideFlags: 0
@@ -2086,6 +2091,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Username
   frenchText: Nom
+  italianoText: Nome
 --- !u!1 &1611194469
 GameObject:
   m_ObjectHideFlags: 0
@@ -2427,6 +2433,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: 
   frenchText: 
+  italianoText: 
 --- !u!1 &1742374698
 GameObject:
   m_ObjectHideFlags: 0

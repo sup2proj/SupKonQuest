@@ -421,6 +421,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Fullscreen
   frenchText: "Plein \xE9cran"
+  italianoText: A schermo intero
 --- !u!1 &203118961
 GameObject:
   m_ObjectHideFlags: 0
@@ -710,6 +711,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Music Volume
   frenchText: Volume musique
+  italianoText: Volume musica
 --- !u!1 &472649344
 GameObject:
   m_ObjectHideFlags: 0
@@ -937,6 +939,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Back
   frenchText: Retour
+  italianoText: Indietro
 --- !u!1 &480608791
 GameObject:
   m_ObjectHideFlags: 0
@@ -2029,6 +2032,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: SFX volume
   frenchText: Volume effets sonore
+  italianoText: Volume degli effetti sonori
 --- !u!1 &1243840547
 GameObject:
   m_ObjectHideFlags: 0

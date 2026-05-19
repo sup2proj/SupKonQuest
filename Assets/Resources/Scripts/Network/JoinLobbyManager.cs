@@ -21,7 +21,7 @@ public class JoinLobbyManager : MonoBehaviour
 
     public async void RefreshLobbyList()
     {
-        if (statusText != null) statusText.SetDynamicTranslations("Searching for games...", "Recherche de parties...");
+        if (statusText != null) statusText.SetDynamicTranslations("Searching for games...", "Recherche de parties...","Ricerca di partite...");
         
         try
         {
@@ -38,13 +38,14 @@ public class JoinLobbyManager : MonoBehaviour
             if (statusText != null) 
                 statusText.SetDynamicTranslations(
                     response.Results.Count + " game(s) found", 
-                    response.Results.Count + " partie(s) trouvée(s)"
+                    response.Results.Count + " partie(s) trouvée(s)",
+                    response.Results.Count + " risultato(i) trovato(i)"
                 );
             UpdateLobbyUI(response.Results);
         }
         catch (LobbyServiceException e)
         {
-            if (statusText != null) statusText.SetDynamicTranslations("Search error.", "Erreur de recherche.");
+            if (statusText != null) statusText.SetDynamicTranslations("Search error.", "Erreur de recherche.","Errore di ricerca.");
             Debug.LogError(e);
         }
     }
@@ -76,7 +77,7 @@ public class JoinLobbyManager : MonoBehaviour
 
     public async void JoinLobby(string lobbyId)
     {
-        if (statusText != null) statusText.SetDynamicTranslations("Connecting to lobby...", "Connexion au lobby...");
+        if (statusText != null) statusText.SetDynamicTranslations("Connecting to lobby...", "Connexion au lobby...","Connessione alla lobby...");
         try
         {
             string myName = PlayerPrefs.GetString("PlayerName", "Joueur Inconnu");

@@ -404,6 +404,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Multiplayer
   frenchText: Multijoueur
+  italianoText: Multigiocatore
 --- !u!1 &442358767
 GameObject:
   m_ObjectHideFlags: 0
@@ -676,6 +677,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Back
   frenchText: Retour
+  italianoText: Indietro
 --- !u!1 &507180567
 GameObject:
   m_ObjectHideFlags: 0
@@ -766,6 +768,7 @@ GameObject:
   - component: {fileID: 616482520}
   - component: {fileID: 616482522}
   - component: {fileID: 616482521}
+  - component: {fileID: 616482523}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -892,6 +895,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 616482519}
   m_CullTransparentMesh: 1
+--- !u!114 &616482523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 616482519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Matchmaking
+  frenchText: Matchmaking
+  italianoText: Abbinamento
 --- !u!1 &882798233
 GameObject:
   m_ObjectHideFlags: 0
@@ -1355,6 +1373,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Create lobby
   frenchText: "Cr\xE9er un lobby"
+  italianoText: Crea una lobby
 --- !u!1 &1319947078
 GameObject:
   m_ObjectHideFlags: 0
@@ -1507,6 +1526,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Join lobby
   frenchText: Rejoindre un lobby
+  italianoText: Entrare in una lobby
 --- !u!1 &1641883920
 GameObject:
   m_ObjectHideFlags: 0
@@ -1929,6 +1949,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: 
   frenchText: 
+  italianoText: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

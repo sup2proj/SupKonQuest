@@ -648,6 +648,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Press any key to continue
   frenchText: Appuyer sur une touche pour continuer
+  italianoText: Premere un tasto per continuare
 --- !u!1 &1339218250
 GameObject:
   m_ObjectHideFlags: 0

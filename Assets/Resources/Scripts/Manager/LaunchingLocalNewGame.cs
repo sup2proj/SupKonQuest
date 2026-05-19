@@ -21,6 +21,7 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
     public TextMeshProUGUI diffDisplay;
     private string[] difficultiesEn = { "Easy", "Medium", "Hard" };
     private string[] difficultiesFr = { "Facile", "Moyen", "Difficile" };
+    private string[] difficultiesIT = { "Facile", "Medio", "Difficile" };
     private int currentDiffIndex = 0;
 
     void Start()
@@ -111,6 +112,10 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
         else if (currentLang == 1)
         {
             diffDisplay.text = difficultiesFr[currentDiffIndex];
+        }
+        else if (currentLang == 2)
+        {
+            diffDisplay.text = difficultiesIT[currentDiffIndex];
         }
     }
 

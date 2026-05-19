@@ -7,6 +7,7 @@ public class LocalizedText : MonoBehaviour
     [Header("Traductions")]
     public string englishText;
     public string frenchText;
+    public string italianoText;
 
     private TextMeshProUGUI textComponent;
 
@@ -33,12 +34,17 @@ public class LocalizedText : MonoBehaviour
         {
             textComponent.text = frenchText;
         }
+        else if (currentLang == 2)
+        {
+            textComponent.text = italianoText;
+        }
     }
 
-    public void SetDynamicTranslations(string english, string french)
+    public void SetDynamicTranslations(string english, string french, string  italiano)
     {
         englishText = english;
         frenchText = french;
+        italianoText = italiano;
         
         UpdateText();
     }

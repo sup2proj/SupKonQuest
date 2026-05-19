@@ -12,26 +12,29 @@ public class MultiplayerMenuManager : MonoBehaviour
 
     void Start()
     {
-        if (PlayerPrefs.HasKey("DisconnectReasonEN") && PlayerPrefs.HasKey("DisconnectReasonFR"))
+        if (PlayerPrefs.HasKey("DisconnectReasonEN") && PlayerPrefs.HasKey("DisconnectReasonFR") && PlayerPrefs.HasKey("DisconnectReasonIT"))
         {
             string errEN = PlayerPrefs.GetString("DisconnectReasonEN");
             string errFR = PlayerPrefs.GetString("DisconnectReasonFR");
+            string errIT = PlayerPrefs.GetString("DisconnectReasonIT");
 
             if (statusText != null)
             {
                 string formattedEN = "<color=red>" + errEN + "</color>";
                 string formattedFR = "<color=red>" + errFR + "</color>";
-                statusText.SetDynamicTranslations(formattedEN, formattedFR);
+                string formattedIT = "<color=red>" + errIT + "</color>";
+                statusText.SetDynamicTranslations(formattedEN, formattedFR, formattedIT);
             }
             
             PlayerPrefs.DeleteKey("DisconnectReasonEN");
             PlayerPrefs.DeleteKey("DisconnectReasonFR");
+            PlayerPrefs.DeleteKey("DisconnectReasonIT");
         }
         else
         {
             if (statusText != null)
             {
-                statusText.SetDynamicTranslations("Welcome to the multiplayer menu.", "Bienvenue dans le menu multijoueur.");
+                statusText.SetDynamicTranslations("Welcome to the multiplayer menu.", "Bienvenue dans le menu multijoueur.","Benvenuto nel menu multigiocatore.");
             }
         }
     }
@@ -53,7 +56,7 @@ public class MultiplayerMenuManager : MonoBehaviour
 
     public async void QuickMatchmaking()
     {
-        if (statusText != null) statusText.SetDynamicTranslations("Searching for a match...", "Recherche d'une partie en cours...");
+        if (statusText != null) statusText.SetDynamicTranslations("Searching for a match...", "Recherche d'une partie en cours...","Ricerca di una partita in corso...");
         try
         {
             string myName = PlayerPrefs.GetString("PlayerName", "Joueur");
@@ -71,7 +74,7 @@ public class MultiplayerMenuManager : MonoBehaviour
 
             Lobby joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync(options);
             Debug.Log("Partie trouvée ! Connexion en tant que Client.");
-            if (statusText != null) statusText.SetDynamicTranslations("Match found!", "Partie trouvée !");
+            if (statusText != null) statusText.SetDynamicTranslations("Match found!", "Partie trouvée !","Trovato !");
             LobbyRoomManager.IsHost = false;
             LobbyRoomManager.JoinedLobby = joinedLobby;
             SceneManager.LoadScene("LobbyRoomScene");
@@ -79,7 +82,7 @@ public class MultiplayerMenuManager : MonoBehaviour
         catch (LobbyServiceException e)
         {
             Debug.Log("Aucune partie trouvée. Je suis l'Hôte ! (" + e.Message + ")");
-            if (statusText != null) statusText.SetDynamicTranslations("No match found. Creating a lobby...", "Aucune partie. Création d'un salon...");
+            if (statusText != null) statusText.SetDynamicTranslations("No match found. Creating a lobby...", "Aucune partie. Création d'un salon...","Nessuna parte. Creazione di una chat room...");
 
             LobbyRoomManager.IsHost = true;
             SceneManager.LoadScene("LobbyRoomScene");

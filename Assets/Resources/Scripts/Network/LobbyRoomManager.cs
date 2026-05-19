@@ -49,7 +49,7 @@ public class LobbyRoomManager : MonoBehaviour
         if (IsHost)
         {
             hostControlsPanel.SetActive(true);
-            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Creating Lobby...", "Création du Lobby en cours...");
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Creating Lobby...", "Création du Lobby en cours...","Creazione della lobby in corso...");
                 
             await CreateLobby();
         }
@@ -57,7 +57,7 @@ public class LobbyRoomManager : MonoBehaviour
         {
             hostControlsPanel.SetActive(false);
             currentLobby = JoinedLobby;
-            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Connected to lobby", "Connecté au salon");
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Connected to lobby", "Connecté au salon","In collegamento con il salone");
                 
             RefreshUI();
         }
@@ -83,10 +83,27 @@ public class LobbyRoomManager : MonoBehaviour
         {
             string myName = PlayerPrefs.GetString("PlayerName", "Joueur Inconnu");
             
-            // 0 = Anglais, 1 = Français
+            // On vérifie la langue actuelle (0 = Anglais, 1 = Français, 2 = Italiano)
             int currentLang = PlayerPrefs.GetInt("Language", 0);
-            string lobbyName = (currentLang == 0 ? "Lobby of " : "Salon de ") + myName;
-            string welcomeMsg = (currentLang == 0 ? "Welcome to the lobby!\n" : "Bienvenue dans le salon !\n");
+            
+            string lobbyName = "";
+            string welcomeMsg = "";
+
+            if (currentLang == 1) // Français
+            {
+                lobbyName = "Salon de " + myName;
+                welcomeMsg = "Bienvenue dans le salon !\n";
+            }
+            else if (currentLang == 2) // Italiano
+            {
+                lobbyName = "Sala da " + myName;
+                welcomeMsg = "Benvenuti in salotto!\n";
+            }
+            else // Anglais (si currentLang == 0 ou autre)
+            {
+                lobbyName = "Lobby of " + myName;
+                welcomeMsg = "Welcome to the lobby!\n";
+            }
             
             CreateLobbyOptions options = new CreateLobbyOptions
             {
@@ -114,7 +131,7 @@ public class LobbyRoomManager : MonoBehaviour
             
             RefreshUI();
             
-            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Lobby Open! Waiting for players...", "Lobby Ouvert ! En attente de joueurs...");
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Lobby Open! Waiting for players...", "Lobby Ouvert ! En attente de joueurs...","Lobby aperta! In attesa dei giocatori...");
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
@@ -237,9 +254,9 @@ public class LobbyRoomManager : MonoBehaviour
                 if (btnText != null)
                 {
                     if (isLocalPlayerReady)
-                        btnText.SetDynamicTranslations("Cancel Ready", "Annuler Prêt");
+                        btnText.SetDynamicTranslations("Cancel Ready", "Annuler Prêt","Annulla Pronto");
                     else
-                        btnText.SetDynamicTranslations("Ready", "Être Prêt");
+                        btnText.SetDynamicTranslations("Ready", "Être Prêt","Essere pronti");
                 }
             }
         }
@@ -326,7 +343,7 @@ public class LobbyRoomManager : MonoBehaviour
 
                     if (!amIStillInLobby)
                     {
-                        HandleDisconnection("Kicked by host.", "Vous avez été expulsé du salon par l'hôte.");
+                        HandleDisconnection("Kicked by host.", "Vous avez été expulsé du salon par l'hôte.","Sei stato espulso dalla chat dall'amministratore.");
                         return; 
                     }
 
@@ -369,7 +386,7 @@ public class LobbyRoomManager : MonoBehaviour
                 catch (LobbyServiceException e)
                 {
                     Debug.LogWarning("Impossible de rafraîchir le salon. Erreur : " + e.Reason);
-                    HandleDisconnection("Connection lost.", "La connexion au salon a été perdue.");
+                    HandleDisconnection("Connection lost.", "La connexion au salon a été perdue.","La connessione con la sala è stata interrotta.");
                 }
             }
         }
@@ -380,10 +397,10 @@ public class LobbyRoomManager : MonoBehaviour
         if (currentLobby == null) return;
 
         if (mapNameText != null)
-            mapNameText.SetDynamicTranslations("Map: " + currentLobby.Data["Map"].Value, "Carte : " + currentLobby.Data["Map"].Value);
+            mapNameText.SetDynamicTranslations("Map: " + currentLobby.Data["Map"].Value, "Carte : " + currentLobby.Data["Map"].Value, "Mappa : "+currentLobby.Data["Map"].Value);
             
         if (maxPlayersText != null)
-            maxPlayersText.SetDynamicTranslations("Slots: " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers, "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers);
+            maxPlayersText.SetDynamicTranslations("Slots: " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers, "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers,"Posti : "+currentLobby.Players.Count + " / " + currentLobby.MaxPlayers);
 
         foreach (Transform child in playerListContainer)
         {
@@ -425,7 +442,7 @@ public class LobbyRoomManager : MonoBehaviour
         }
     }
 
-    private void HandleDisconnection(string reasonEN, string reasonFR)
+    private void HandleDisconnection(string reasonEN, string reasonFR, string reasonIT)
     {
         Debug.LogWarning("Déconnexion forcée : " + reasonFR);
         
@@ -433,6 +450,7 @@ public class LobbyRoomManager : MonoBehaviour
         
         PlayerPrefs.SetString("DisconnectReasonEN", reasonEN);
         PlayerPrefs.SetString("DisconnectReasonFR", reasonFR);
+        PlayerPrefs.SetString("DisconnectReasonIT", reasonIT);
         SceneManager.LoadScene("MultiplayerScene");
     }
 }
