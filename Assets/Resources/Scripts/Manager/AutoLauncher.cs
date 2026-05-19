@@ -7,6 +7,8 @@ public class AutoLauncher : MonoBehaviour
 
     private static bool launchRequested;
     private static string pendingMapFolder = "TEST";
+    private static int pendingAiCount = 1;
+    private static int pendingAiDifficulty = 2;
 
     private void Awake()
     {
@@ -36,9 +38,11 @@ public class AutoLauncher : MonoBehaviour
             Instance = null;
     }
 
-    public static void Request(string folder)
+    public static void Request(string folder, int aiCount = 1, int aiDifficulty = 2)
     {
         pendingMapFolder = string.IsNullOrWhiteSpace(folder) ? "TEST" : folder;
+        pendingAiCount = Mathf.Max(0, aiCount);
+        pendingAiDifficulty = Mathf.Clamp(aiDifficulty, 1, 2);
         launchRequested = true;
 
         if (Instance == null)
@@ -54,40 +58,25 @@ public class AutoLauncher : MonoBehaviour
             return;
 
         launchRequested = false;
-        CreateGame(pendingMapFolder);
+        CreateGame(pendingMapFolder, pendingAiCount, pendingAiDifficulty);
     }
 
     /// <summary>
     /// Crée et lance la partie : génère la map, configure les camps et la caméra.
     /// </summary>
-    public void CreateGame(string mapFolderName = "TEST")
+    public void CreateGame(string mapFolderName = "TEST", int aiCount = 1, int aiDifficulty = 2)
     {
-        Debug.Log($"AutoLauncher.CreateGame called with mapFolderName='{mapFolderName}'");
+        Debug.Log($"AutoLauncher.CreateGame called with mapFolderName='{mapFolderName}', aiCount={aiCount}, aiDifficulty={aiDifficulty}");
         string localPlayerName = "toto";
         string[] playerList = { "toto" };
 
-        MapGenerator mapGenerator = Object.FindAnyObjectByType<MapGenerator>();
+        StructureAttribution campAssignment = PrepareStructureAttribution(mapFolderName, aiCount);
+        LogStartPointOwnersAfterAttribution();
 
-        if (mapGenerator == null)
-        {
-            ManagerController.initializePermanentGameObject();
+        MapGenerator mapGenerator = CreateFreshMapGeneratorAndGenerate(mapFolderName);
 
-            GameObject mapContainer = new GameObject("AUTO_MAP_GENERATOR");
-            mapGenerator = mapContainer.AddComponent<MapGenerator>();
-            mapGenerator.LoadAndGenerate(mapFolderName);
-            Debug.Log($"AutoLauncher : Monde '{mapFolderName}' généré.");
-        }
-        else
-        {
-            Debug.Log("AutoLauncher: Found existing MapGenerator in scene, skipping creation.");
-        }
-
-        StructureAttribution campAssignment = new StructureAttribution();
-        campAssignment.Setup(mapFolderName);
         campAssignment.SetCampAssignment(playerList);
         (int startCameraPositionX, int startCameraPositionY) = campAssignment.GetPlayerCameraStartPosition(localPlayerName);
-        Debug.Log($"1-{campAssignment.campAssignments[0].playerName}, 2-{campAssignment.campAssignments[1].playerName}");
-        Debug.Log($"1-{campAssignment.campAssignments[0].playerType}, 2-{campAssignment.campAssignments[1].playerType}");
 
         Camera mainCam = Camera.main;
         if (mainCam == null)
@@ -112,5 +101,72 @@ public class AutoLauncher : MonoBehaviour
             camMovement = mainCam.gameObject.AddComponent<CameraMouvement>();
 
         camMovement.SetUpCamera(mapGenerator.mapWidth, mapGenerator.mapHeight, startCameraPositionX, startCameraPositionY);
+
+        InstantiateAIs(aiCount, aiDifficulty);
+    }
+
+    private StructureAttribution PrepareStructureAttribution(string mapFolderName, int aiCount)
+    {
+        var campAssignment = new StructureAttribution();
+        campAssignment.Setup(mapFolderName);
+
+        int totalPlayers = 1 + aiCount;
+        campAssignment.AssignRandomOwners(totalPlayers);
+        Debug.Log($"[AutoLauncher] Structures attribuees aleatoirement pour {totalPlayers} joueurs.");
+
+        return campAssignment;
+    }
+
+    private void LogStartPointOwnersAfterAttribution()
+    {
+        MapJsonData modifiedData = StructureAttribution.LastModifiedJsonData;
+        if (modifiedData == null || modifiedData.startPoints == null)
+            return;
+
+        Debug.Log("[AutoLauncher] Owners des startPoints apres attribution:");
+        for (int i = 0; i < modifiedData.startPoints.Count; i++)
+        {
+            Debug.Log($"  StartPoint {i}: owner = {modifiedData.startPoints[i].owner}");
+        }
+    }
+
+    private MapGenerator CreateFreshMapGeneratorAndGenerate(string mapFolderName)
+    {
+        MapGenerator mapGenerator = Object.FindAnyObjectByType<MapGenerator>();
+
+        if (mapGenerator != null)
+        {
+            Debug.Log("AutoLauncher: Found existing MapGenerator in scene - replacing it to apply new owners.");
+            Object.DestroyImmediate(mapGenerator.gameObject);
+        }
+
+        ManagerController.initializePermanentGameObject();
+
+        GameObject mapContainer = new GameObject("MAP);
+        mapGenerator = mapContainer.AddComponent<MapGenerator>();
+        mapGenerator.LoadAndGenerate(mapFolderName);
+        return mapGenerator;
+    }
+
+    private void InstantiateAIs(int aiCount, int aiDifficulty)
+    {
+        IAInstance[] existingAis = Object.FindObjectsByType<IAInstance>(FindObjectsSortMode.None);
+        for (int i = 0; i < existingAis.Length; i++)
+        {
+            Object.Destroy(existingAis[i].gameObject);
+        }
+
+        int safeAiCount = Mathf.Max(0, aiCount);
+        int safeDifficulty = Mathf.Clamp(aiDifficulty, 1, 2);
+        for (int i = 0; i < safeAiCount; i++)
+        {
+            int aiPlayerId = i + 2;
+            GameObject aiGO = new GameObject($"IAInstance_Player{aiPlayerId}");
+            IAInstance ia = aiGO.AddComponent<IAInstance>();
+            ia.Configure(aiPlayerId, safeDifficulty);
+        }
+
+        Debug.Log($"[AutoLauncher] Instantiated {safeAiCount} IA instances (difficulty={safeDifficulty}).");
     }
 }
+

@@ -37,8 +37,9 @@ public class MovementEasyNormal : MonoBehaviour
     {
         ScheduleNextMove(0f);
 
-        IAInstance iaInstance = FindFirstObjectByType<IAInstance>();
-        int difficulty = iaInstance != null ? iaInstance.DifficultyIA : 1;
+        int difficulty = 1;
+        if (unitInstance != null && IAInstance.TryGetAIForPlayer(unitInstance.playerId, out IAInstance iaInstance) && iaInstance != null)
+            difficulty = iaInstance.DifficultyIA;
 
         if (difficulty == 2)
         {

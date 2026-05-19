@@ -120,9 +120,9 @@ public class StructureManager : MonoBehaviour
             Debug.Log($"[StructureManager] MovementManager ajouté dynamiquement à {unitGO.name}");
         }
         
-        // Ajout automatique du système de déplacement IA pour le joueur IA (playerId == 1)
+        // Ajout automatique du système de déplacement IA pour les joueurs IA
         // Ajouter MovementEasyNormal uniquement pour les unités IA normales (pas les protecteurs)
-        if (playerId == 1 && !isProtector)
+        if (IAInstance.IsAIPlayer(playerId) && !isProtector)
         {
             if (unitGO.GetComponent<MovementEasyNormal>() == null)
             {

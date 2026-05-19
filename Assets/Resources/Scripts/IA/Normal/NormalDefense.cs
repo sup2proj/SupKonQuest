@@ -34,11 +34,7 @@ public class NormalDefense : MonoBehaviour
         if (structureInstance == null || attacker == null)
             return;
 
-        IAInstance ia = FindFirstObjectByType<IAInstance>();
-        if (ia == null || ia.DifficultyIA != 2)
-            return;
-
-        if (structureInstance.playerId != 1)
+        if (!IAInstance.IsDifficultyForPlayer(structureInstance.playerId, 2))
             return;
 
         Debug.Log($"[NormalDefense] {structureInstance.name} attacked by {attacker.name} (player {attacker.playerId}). Checking allies in radius...");

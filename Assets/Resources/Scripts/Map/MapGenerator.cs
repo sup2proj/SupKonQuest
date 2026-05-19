@@ -92,7 +92,15 @@ public class MapGenerator : MonoBehaviour
 
         string path = "Maps/" + folderName + "/";
         mapLayout = UnityEngine.Resources.Load<Texture2D>(path + "MapLayout");
-        MapJsonData jsonData = StructureInstance.LoadDataFromPath(path + "MapData");
+        
+        // Vérifier s'il y a des données modifiées stockées par StructureAttribution
+        MapJsonData jsonData = null;
+        if (StructureAttribution.LastModifiedJsonData != null)
+        {
+            jsonData = StructureAttribution.LastModifiedJsonData;
+            Debug.Log($"[MapGenerator] Utilisant le jsonData modifié par StructureAttribution avec les owners aléatoires.");
+        }
+        
         mapWidth = mapLayout.width;
         mapHeight = mapLayout.height;
 
@@ -236,6 +244,12 @@ public class MapGenerator : MonoBehaviour
                     si.InitializePlayerId(p.owner);
                     si.structureType = type;
                     si.neutralStructure = (type == StructureType.NeutralStructure);
+
+                    // Assurer qu'il y ait toujours un nom de territoire à afficher.
+                    if (string.IsNullOrWhiteSpace(p.territory))
+                    {
+                        p.territory = $"Territory_{p.territoryId}";
+                    }
 
                     if (StructureManager.Instance != null)
                     {

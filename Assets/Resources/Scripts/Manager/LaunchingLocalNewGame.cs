@@ -20,8 +20,8 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
 
     [Header("Difficulty Settings")]
     public TextMeshProUGUI diffDisplay;
-    private string[] difficultiesEn = { "Easy", "Medium", "Hard" };
-    private string[] difficultiesFr = { "Facile", "Moyen", "Difficile" };
+    private string[] difficultiesEn = { "Easy", "Medium"};
+    private string[] difficultiesFr = { "Facile", "Moyen"};
     private int currentDiffIndex = 0;
 
     void Start()
@@ -117,9 +117,10 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
 
      public void StartGame()
      { 
-         string selectedMap = "TEST";
+         string selectedMap = mapNames[currentMapIndex];
 
-         AutoLauncher.Request(selectedMap);
+         int selectedDifficulty = currentDiffIndex + 1;
+         AutoLauncher.Request(selectedMap, aiCount, selectedDifficulty);
          SceneManager.LoadScene("Game");
      }
 

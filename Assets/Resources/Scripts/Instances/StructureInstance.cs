@@ -212,9 +212,7 @@ public class StructureInstance : MonoBehaviour
         // enforce maxQueueSize to avoid infinite protector spawns.
         if (isProtector)
         {
-            var ia = FindFirstObjectByType<IAInstance>();
-            int iaPlayerId = ia != null ? ia.PlayerId : -1;
-            if (iaPlayerId == playerId)
+            if (IAInstance.IsAIPlayer(playerId))
             {
                 if (unitQueue.Count >= maxQueueSize)
                 {
@@ -468,8 +466,7 @@ public class StructureInstance : MonoBehaviour
        }
 
        // Déclenchement IA uniquement si le comportement IA niveau 2 est actif
-       IAInstance ia = FindFirstObjectByType<IAInstance>();
-       if (ia != null && ia.DifficultyIA == 2 && attacker != null && attacker.playerId != playerId)
+       if (IAInstance.IsDifficultyForPlayer(playerId, 2) && attacker != null && attacker.playerId != playerId)
        {
            // On regarde dans le rayon de la structure: s'il y a au moins une unité de combat alliée,
            // on autorise la création de protecteurs.

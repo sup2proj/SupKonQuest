@@ -1,37 +1,29 @@
 {
     "startPoints": [
       { "x": 8, "y": 8, 
-        "owner": 1,
+        "owner": -1,
         "territory": "Valombre", 
         "territoryId" : 1
       },
       { "x": 24, "y": 24, 
-        "owner": 2,
+        "owner": -1,
         "territory": "Briseterre",
         "territoryId" : 2
-      }
-    ],
-    "castles": [
-      { "x": 20, "y": 8, 
-        "owner": 3,
+      },
+      { "x": 20, "y": 8,
+        "owner": -1,
         "territory": "Sombrelune",
         "territoryId" : 3 },
-        { 
+      {
         "x": 16, "y": 8,
-        "owner": 3,
+        "owner": -1,
         "territory": "Ravenciel",
-        "territoryId" : 4 },
-        { 
-          "x": 12, "y": 8,
-          "owner": 3,
-          "territory": "Clairmont",
-          "territoryId" : 5 }
+        "territoryId" : 4 }
     ],
-  
     "harbours": [
-      { "x": 15, "y": 16, "owner": 2 }
+      { "x": 15, "y": 16, "owner": -1 }
     ],
     "special": [
-      { "x": 29, "y": 4, "owner": 1 }
+      { "x": 29, "y": 4, "owner": -1 }
     ]
   }
