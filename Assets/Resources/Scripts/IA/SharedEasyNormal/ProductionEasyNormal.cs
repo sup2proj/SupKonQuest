@@ -220,6 +220,7 @@ public class ProductionEasyNormal : MonoBehaviour
         {
             var s = structures[i];
             if (s == null) continue;
+            if (s.structureType == StructureType.Harbour) continue;
             if (s.playerId == playerId) result.Add(s);
         }
         return result;

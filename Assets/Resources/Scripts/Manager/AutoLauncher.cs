@@ -142,9 +142,10 @@ public class AutoLauncher : MonoBehaviour
 
         ManagerController.initializePermanentGameObject();
 
-        GameObject mapContainer = new GameObject("MAP);
+        GameObject mapContainer = new GameObject("MAP");
         mapGenerator = mapContainer.AddComponent<MapGenerator>();
         mapGenerator.LoadAndGenerate(mapFolderName);
+        
         return mapGenerator;
     }
 

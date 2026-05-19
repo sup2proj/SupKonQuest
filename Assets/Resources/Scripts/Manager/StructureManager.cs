@@ -91,8 +91,13 @@ public class StructureManager : MonoBehaviour
             runtimeData.isProtector = true;
         }
 
+        if (sourceStructure != null && sourceStructure.structureType == StructureType.Harbour)
+        {
+            return false;
+        }
+
         Vector3 position;
-        position = new Vector3(x, 0, z - 3);
+        position = new Vector3(x, 0, z - 3f);
 
         GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
 
