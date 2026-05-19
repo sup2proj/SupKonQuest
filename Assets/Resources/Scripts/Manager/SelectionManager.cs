@@ -591,7 +591,6 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         StructureInstance targetStructure = GetEnemyStructureUnderMouse(activePlayerId);
         if (targetStructure == null)
             return false;
-
         List<UnitInstance> groupUnits = CollectSelectedPlayerUnits(activePlayerId);
         if (!SelectionHasCombatUnit(groupUnits))
             return groupUnits.Count > 0;
@@ -604,7 +603,6 @@ private Vector3 SampleNavMesh(Vector3 candidate)
 
             float stopDistance = GetAttackStopDistance(unit);
             MovementManager.Instance.MoveBoatsUnitToTarget(unit, targetStructure.transform, stopDistance);
-            Debug.Log($"[SelectionManager] Ordre d'attaque structure: {unit.name} -> {targetStructure.name}");
         }
 
         return true;

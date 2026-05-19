@@ -74,7 +74,6 @@ public class NormalAttack : MonoBehaviour
                 var s = structures[i];
                 if (s == null) continue;
                 if (s.playerId == ownerPlayerId) continue;
-                if (s.structureType == StructureType.Harbour) continue;
 
                 Vector3 pos = s.StructurePosition;
                 float dSqr = (pos - origin).sqrMagnitude;
