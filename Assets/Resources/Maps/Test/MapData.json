@@ -18,7 +18,13 @@
         "x": 16, "y": 8,
         "owner": -1,
         "territory": "Ravenciel",
-        "territoryId" : 4 }
+        "territoryId" : 4},
+      {
+        "x": 24, "y": 8,
+        "owner": -1,
+        "territory": "test",
+        "territoryId" : 5
+      }
     ],
     "harbours": [
       { "x": 15, "y": 16, "owner": -1, "territory" : "Petroville"}
