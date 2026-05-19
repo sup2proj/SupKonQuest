@@ -23,6 +23,7 @@ public class MovementManager : MonoBehaviour
     private Vector3 targetPosition;
     private bool isMovingToTarget = false;
     private Transform followTarget;
+    private bool followTargetPosition = true;
     private float stuckTimer = 0f;
 
     private UnitInstance unitInstance;
@@ -99,7 +100,7 @@ public class MovementManager : MonoBehaviour
         if (!isMovingToTarget)
             return;
 
-        if (followTarget != null)
+        if (followTarget != null && followTargetPosition)
             agent.SetDestination(followTarget.position);
 
         if (HasReachedAgentDestination())
@@ -154,7 +155,7 @@ public class MovementManager : MonoBehaviour
             return;
         }
 
-        if (followTarget != null)
+        if (followTarget != null && followTargetPosition)
             targetPosition = followTarget.position;
 
         Vector3 toTarget = targetPosition - transform.position;
@@ -232,14 +233,35 @@ public class MovementManager : MonoBehaviour
     {
         BoatTransport.ClearPendingBoarding(unitInstance);
 
+        followTarget = target;
+        followTargetPosition = false;
+
         Vector3 destination = target != null ? target.position : transform.position;
-        if (target != null && !CanMoveOnWorldPosition(target.position))
+        if (target != null)
         {
-            if (!TryGetApproachDestinationForTarget(target, stopDistance, out destination))
+            StructureInstance structure = target.GetComponent<StructureInstance>();
+            if (structure == null)
+                structure = target.GetComponentInParent<StructureInstance>();
+            if (structure == null)
+                structure = target.GetComponentInChildren<StructureInstance>();
+
+            if (structure != null)
+            {
+                followTargetPosition = false;
+                if (!TryGetApproachDestinationForTarget(target, stopDistance, out destination))
+                    return;
+            }
+            else if (CanMoveOnWorldPosition(target.position))
+            {
+                followTargetPosition = true;
+                destination = target.position;
+            }
+            else if (!TryGetApproachDestinationForTarget(target, stopDistance, out destination))
+            {
                 return;
+            }
         }
 
-        followTarget = target;
         if (target != null)
             targetPosition = destination;
 
@@ -302,6 +324,7 @@ public class MovementManager : MonoBehaviour
             BoatTransport.ClearPendingBoarding(unitInstance);
 
         followTarget = null;
+        followTargetPosition = true;
         targetPosition = destination;
         StartMovement(stopDistance);
         ApplyAgentDestination(destination);
@@ -338,6 +361,7 @@ public class MovementManager : MonoBehaviour
         isMovingToTarget = false;
         movement = Vector3.zero;
         followTarget = null;
+        followTargetPosition = true;
 
         if (animator != null)
             animator.SetBool("isMoving", false);
