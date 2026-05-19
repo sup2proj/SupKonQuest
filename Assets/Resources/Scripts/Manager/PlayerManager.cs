@@ -29,11 +29,11 @@ public class PlayerManager : MonoBehaviour
         for (int i = 1; i <= autoCreatePlayerCount; i++)
         {
             if (!sessionsById.ContainsKey(i))
-                CreateSessionForPlayer(i, autoStartGold, startUnitCount: 0, startStructureCount: 2);
+                CreateSessionForPlayer(i, autoStartGold, startUnitCount: 0, startStructureCount: 1);
         }
         //TEMPORAIRRRREEEE
         if (!sessionsById.ContainsKey(1))
-            CreateSessionForPlayer(1, autoStartGold, startUnitCount: 0, startStructureCount: 2);
+            CreateSessionForPlayer(1, autoStartGold, startUnitCount: 0, startStructureCount: 1);
 
         SetActivePlayer(1);
 
@@ -73,7 +73,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    public PlayerSession CreateSessionForPlayer(int id, int startGold = 500, int startUnitCount = 1, int startStructureCount = 2)
+    public PlayerSession CreateSessionForPlayer(int id, int startGold = 500, int startUnitCount = 1, int startStructureCount = 1)
     {
         if (sessionsById.ContainsKey(id))
         {
@@ -94,7 +94,7 @@ public class PlayerManager : MonoBehaviour
         if (!sessionsById.ContainsKey(playerId))
         {
             Debug.LogWarning($"[PlayerManager] SetActivePlayer: aucune session pour playerId={playerId} (création auto).", this);
-            CreateSessionForPlayer(playerId, autoStartGold, startUnitCount: 0, startStructureCount: 2);
+            CreateSessionForPlayer(playerId, autoStartGold, startUnitCount: 0, startStructureCount: 0);
         }
         activePlayerId = playerId;
         var s = GetSession(activePlayerId);
@@ -113,12 +113,12 @@ public class PlayerManager : MonoBehaviour
 
     public void GetGoldForPlayer(int playerId)
     {
-        float goldAmount = 10;
+        float goldAmount = 5;
         int structureAmount = GetSession(playerId).StructureCount;
         if (structureAmount > 0)
         {
-            float multiplicator = (structureAmount / 10f) + 1;
-            goldAmount *= multiplicator;
+            float goldMultiplicatorBonus = (structureAmount / 10f) + 2;
+            goldAmount *= goldMultiplicatorBonus;
         }
         var pm = PlayerManager.Instance;
         var session = pm != null ? pm.GetSession(playerId) : null;

@@ -20,6 +20,7 @@ public class InterfaceInstance : MonoBehaviour
     
 	[Header("Player Statistics")]
 	[SerializeField] private StatisticsInterface statisticsInterface;
+	[SerializeField] private GameObject tabMenuStatistics;
     
     [Header("Buff (support/healer)")]
     [SerializeField] private Image[] buffSlots;
@@ -127,30 +128,50 @@ public class InterfaceInstance : MonoBehaviour
         Instance = this;
     }
 
-    void Start()
-    {
-        if (unitsQueue != null && unitsProtector != null)
-        {
-            SetGameObjectActive(unitsQueue, false);
-            SetGameObjectActive(unitsProtector, false);
-        }
-        
-        if (unitsQueue == null && unitsProtector == null)
-        {
-            Debug.LogWarning("[InterfaceInstance] unitsQueue ou unitsprotector n'est pas assigné dans l'Inspector.");
-            return;
-        }
+     void Start()
+     {
+         if (unitsQueue != null && unitsProtector != null)
+         {
+             SetGameObjectActive(unitsQueue, false);
+             SetGameObjectActive(unitsProtector, false);
+         }
+         
+         if (unitsQueue == null && unitsProtector == null)
+         {
+             Debug.LogWarning("[InterfaceInstance] unitsQueue ou unitsprotector n'est pas assigné dans l'Inspector.");
+             return;
+         }
 
-        ResolvePlayerManager();
-        HideProgressBarVisual(resetProgress: false);
-        hideBuffIcons();
-        HideBoatExitIcons();
-        WireBoatExitButtonClick();
-        WireBuffSlotClicks();
-        WirePlayersListClicks();
-        WireProtectorSlotClicks();
-        RefreshPlayerStatisticsUI();
-    }
+         ResolvePlayerManager();
+         HideProgressBarVisual(resetProgress: false);
+         hideBuffIcons();
+         HideBoatExitIcons();
+         WireBoatExitButtonClick();
+         WireBuffSlotClicks();
+         WirePlayersListClicks();
+         WireProtectorSlotClicks();
+         RefreshPlayerStatisticsUI();
+         
+         // Initialiser tabMenuStatistics masqué
+         if (tabMenuStatistics != null)
+             SetGameObjectActive(tabMenuStatistics, false);
+     }
+
+     void Update()
+     {
+         // Gestion de la touche TAB pour afficher/masquer les statistiques
+         if (Input.GetKeyDown(KeyCode.Tab))
+         {
+             if (tabMenuStatistics != null)
+                 SetGameObjectActive(tabMenuStatistics, true);
+         }
+         
+         if (Input.GetKeyUp(KeyCode.Tab))
+         {
+             if (tabMenuStatistics != null)
+                 SetGameObjectActive(tabMenuStatistics, false);
+         }
+     }
 
     public void showInterfaceForStructure()
     {

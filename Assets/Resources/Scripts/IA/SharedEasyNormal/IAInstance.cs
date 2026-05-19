@@ -80,7 +80,7 @@ public class IAInstance : MonoBehaviour
 
         if (playerManager != null)
         {
-            playerManager.CreateSessionForPlayer(playerId, 500, startUnitCount: 0, startStructureCount: 2);
+            playerManager.CreateSessionForPlayer(playerId, 500, startUnitCount: 0, startStructureCount: 1);
         }
 
         if (difficultyIA == 1 || difficultyIA == 2)

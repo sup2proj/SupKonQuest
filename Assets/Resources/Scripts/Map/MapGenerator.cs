@@ -303,7 +303,7 @@ public class MapGenerator : MonoBehaviour
 
                 if (tile.CanPlaceNature && tile.groundType != GroundType.Water)
                 {
-                    if (Random.value < 0.2f)
+                    if (Random.value < 0.13f)
                     {
                         GameObject treeObj = null;
                         if (tile.groundType == GroundType.Grass)
