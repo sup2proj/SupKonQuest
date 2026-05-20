@@ -17,6 +17,7 @@ public class StructureManager : MonoBehaviour
 
     [Header("Powered units")]
     [SerializeField] private float poweredStatsMultiplier = 1.20f;
+    [SerializeField] private float protectorHealthMultiplier = 2f;
 
     [System.Serializable]
     public class UnitPrefabMapping
@@ -89,6 +90,7 @@ public class StructureManager : MonoBehaviour
         if (isProtector)
         {
             runtimeData.isProtector = true;
+            runtimeData.maxHealth *= protectorHealthMultiplier;
         }
 
         if (sourceStructure != null && sourceStructure.structureType == StructureType.Harbour)
@@ -116,6 +118,8 @@ public class StructureManager : MonoBehaviour
         }
 
         instance.Initialize(runtimeData);
+        if (isProtector && sourceStructure != null)
+            instance.SetProtectorSourceStructure(sourceStructure);
         BoatTransport.GetOrAdd(instance);
         
         // S'assurer que le composant MovementManager est présent sur l'unité

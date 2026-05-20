@@ -17,6 +17,8 @@ public class UnitInstance : MonoBehaviour
     [Header("Runtime")]
     public float currentHealth;
     public int playerId;
+    private StructureInstance protectorSourceStructure;
+    private int lastAttackerPlayerId = -1;
 
     void Awake()
     {
@@ -113,10 +115,17 @@ public class UnitInstance : MonoBehaviour
         healthBar.transform.localPosition = (1.1f * Vector3.up);
     }
 
-    public void TakeDamage(float amount)
+    public void SetProtectorSourceStructure(StructureInstance sourceStructure)
+    {
+        protectorSourceStructure = sourceStructure;
+    }
+
+    public void TakeDamage(float amount, UnitInstance attacker = null)
     {
         if (unitData == null)
             return;
+
+        lastAttackerPlayerId = attacker != null ? attacker.playerId : -1;
 
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, unitData.maxHealth);
@@ -130,6 +139,12 @@ public class UnitInstance : MonoBehaviour
 
     void Die()
     {
+        if (unitData != null && unitData.isProtector && protectorSourceStructure != null)
+        {
+            protectorSourceStructure.HandleProtectorDeath(this, lastAttackerPlayerId);
+            protectorSourceStructure = null;
+        }
+
         Destroy(circleUnderFeet, 0f);
         Destroy(healthBar, 0f);
         Destroy(gameObject, 0f);

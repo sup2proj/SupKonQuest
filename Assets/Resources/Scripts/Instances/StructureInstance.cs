@@ -499,41 +499,74 @@ public class StructureInstance : MonoBehaviour
        }
 
        TryTriggerProtectorRetaliation(attacker);
-   
-       // if (currentHealth <= 0)
-       //     Die();
    }
 
-   private void CaptureStructure(int newOwnerId, int previousOwnerId)
+   private void CaptureStructure(int newOwnerId, int previousOwnerId, bool checkDefeat = true)
    {
-       playerId = newOwnerId;
-       currentHealth = health;
+         if (newOwnerId <= 0 || newOwnerId == playerId)
+             return;
 
-       if (healthBar != null)
-           healthBar.SetHealth(currentHealth);
+        playerId = newOwnerId;
+        currentHealth = health;
 
-       ApplyTerritoryName(territoryName);
-       UpdateStructureCounts(previousOwnerId, newOwnerId);
-       bool previousOwnerDefeated = Defeat.CheckDefeatAfterCapture(previousOwnerId, showPanel: false);
-       if (previousOwnerDefeated)
-       {
-           bool winnerDeclared = Victory.CheckVictoryAfterElimination(newOwnerId);
-           if (!winnerDeclared)
-               winnerDeclared = Victory.CheckVictoryAfterCapture(newOwnerId);
+        if (healthBar != null)
+            healthBar.SetHealth(currentHealth);
 
-           if (!winnerDeclared)
-               Defeat.ShowDefeatForPlayer(previousOwnerId);
-       }
-       else
-       {
-           Victory.CheckVictoryAfterCapture(newOwnerId);
-       }
+        ApplyTerritoryName(territoryName);
+        UpdateStructureCounts(previousOwnerId, newOwnerId);
+        
+        if (checkDefeat)
+        {
+            bool previousOwnerDefeated = Defeat.CheckDefeatAfterCapture(previousOwnerId, showPanel: false);
+            if (previousOwnerDefeated)
+            {
+                bool winnerDeclared = Victory.CheckVictoryAfterElimination(newOwnerId);
+                if (!winnerDeclared)
+                    winnerDeclared = Victory.CheckVictoryAfterCapture(newOwnerId);
 
-       if (currentlySelected == this && PlayerManager.Instance != null && PlayerManager.Instance.GetActivePlayerId() != playerId)
-           UnSelected();
+                if (!winnerDeclared)
+                    Defeat.ShowDefeatForPlayer(previousOwnerId);
+            }
+            else
+            {
+                Victory.CheckVictoryAfterCapture(newOwnerId);
+            }
+        }
 
-       Debug.Log($"[StructureInstance] {name} capturée par le joueur {newOwnerId} (ancien propriétaire: {previousOwnerId}).", this);
+        if (currentlySelected == this && PlayerManager.Instance != null && PlayerManager.Instance.GetActivePlayerId() != playerId)
+            UnSelected();
+
+        Debug.Log($"[StructureInstance] {name} capturée par le joueur {newOwnerId} (ancien propriétaire: {previousOwnerId}).", this);
+
+        StructureManager structureManager = StructureManager.Instance;
+        if (structureManager == null)
+            structureManager = FindFirstObjectByType<StructureManager>();
+
+        if (structureManager != null)
+        {
+            structureManager.SpawnUnitByTypeAtPosition(
+                newOwnerId,
+                UnitsType.Heavy,
+                transform.position.x,
+                transform.position.z,
+                false,
+                true,
+                this
+            );
+        }
    }
+
+     public void HandleProtectorDeath(UnitInstance protectorUnit, int killerPlayerId)
+     {
+         if (protectorUnit != null)
+             RemoveProtectorUnit(protectorUnit);
+
+         if (killerPlayerId <= 0 || killerPlayerId == playerId)
+             return;
+
+         int previousOwnerId = playerId;
+         CaptureStructure(killerPlayerId, previousOwnerId, checkDefeat: false);
+     }
 
    private void UpdateStructureCounts(int previousOwnerId, int newOwnerId)
    {

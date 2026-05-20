@@ -216,13 +216,13 @@ public class MapGenerator : MonoBehaviour
 
     void PlaceStructures(MapJsonData data)
     {
-        SpawnStructureGroup(data.startPoints, StructureCastle, StructureType.Structure, 1);
+        SpawnStructureGroup(data.startPoints, StructureCastle, StructureType.Structure, 1, spawnProtectorOnStart: true);
         SpawnStructureGroup(data.castles, StructureCastle, StructureType.Structure, 1);
         SpawnStructureGroup(data.harbours, StructureHarbour, StructureType.Harbour, 1);
-        SpawnStructureGroup(data.special, StructureSpecial, StructureType.NeutralStructure, 1);
+        SpawnStructureGroup(data.special, StructureSpecial, StructureType.NeutralStructure, 1, spawnProtectorOnStart: true);
     }
 
-    void SpawnStructureGroup(List<PointData> points, GameObject prefab, StructureType type, int income)
+    void SpawnStructureGroup(List<PointData> points, GameObject prefab, StructureType type, int income, bool spawnProtectorOnStart = false)
     {
         if (points == null || prefab == null) return;
         int h = mapLayout.height;
@@ -263,6 +263,19 @@ public class MapGenerator : MonoBehaviour
 
                     // Appliquer l'affichage / couleur
                     si.ApplyTerritoryName(p.territory);
+
+                    if (spawnProtectorOnStart && StructureManager.Instance != null)
+                    {
+                        StructureManager.Instance.SpawnUnitByTypeAtPosition(
+                            si.playerId,
+                            UnitsType.Heavy,
+                            si.transform.position.x,
+                            si.transform.position.z,
+                            false,
+                            true,
+                            si
+                        );
+                    }
 
                     BlockNature(p.x, unityY);
                 }

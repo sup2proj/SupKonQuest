@@ -386,22 +386,22 @@ public class UnitsAnimation : MonoBehaviour
         return Mathf.Max(0f, damage);
     }
 
-    private void ApplyAttackDamage(UnitInstance targetUnit, StructureInstance targetStructure, UnitInstance attackerUnit, float attack)
-    {
-        if (targetUnit != null)
-        {
-            targetUnit.TakeDamage(attack);
+     private void ApplyAttackDamage(UnitInstance targetUnit, StructureInstance targetStructure, UnitInstance attackerUnit, float attack)
+     {
+         if (targetUnit != null)
+         {
+             targetUnit.TakeDamage(attack, attackerUnit);
 
-            UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
-            if (targetAnimation != null && attackerUnit != null)
-                targetAnimation.AttackTheAttacker(transform);
+             UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
+             if (targetAnimation != null && attackerUnit != null)
+                 targetAnimation.AttackTheAttacker(transform);
 
-            return;
-        }
+             return;
+         }
 
-        if (targetStructure != null)
-            targetStructure.TakeDamage(attack, attackerUnit);
-    }
+         if (targetStructure != null)
+             targetStructure.TakeDamage(attack, attackerUnit);
+     }
 
     private void OnMovementCompleted(Transform target)
     {
