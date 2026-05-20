@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Enums.Environment;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -408,7 +407,7 @@ private Vector3 SampleNavMesh(Vector3 candidate)
             for (int y = 0; y < height; y++)
             {
                 TileData waterTile = map.allTiles[x, y];
-                if (!IsWaterTile(waterTile))
+                if (!MapTileUtility.IsNavigableWaterTile(waterTile))
                     continue;
 
                 TryEvaluateShorePair(map, waterTile, x + 1, y, landAnchor, boatPosition, ref landDestination, ref waterDestination, ref bestScore, ref found);
@@ -437,12 +436,12 @@ private Vector3 SampleNavMesh(Vector3 candidate)
             return;
 
         TileData landTile = map.allTiles[landX, landY];
-        if (!IsLandShoreTile(landTile))
+        if (!MapTileUtility.IsWalkableLandTile(landTile))
             return;
 
-        Vector3 candidateLand = TileToWorldPosition(map, landTile);
-        Vector3 candidateWater = TileToWorldPosition(map, waterTile);
-        float score = FlatDistanceSq(landAnchor, candidateLand) + FlatDistanceSq(boatPosition, candidateWater);
+        Vector3 candidateLand = MapTileUtility.TileToWorldPosition(map, landTile);
+        Vector3 candidateWater = MapTileUtility.TileToWorldPosition(map, waterTile);
+        float score = MapTileUtility.FlatDistanceSq(landAnchor, candidateLand) + MapTileUtility.FlatDistanceSq(boatPosition, candidateWater);
 
         if (score >= bestScore)
             return;
@@ -472,28 +471,6 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         }
 
         return count > 0 ? sum / count : Vector3.zero;
-    }
-
-    private Vector3 TileToWorldPosition(MapGenerator map, TileData tile)
-    {
-        return new Vector3(tile.coordX * map.tileSize, 0f, tile.coordY * map.tileSize);
-    }
-
-    private float FlatDistanceSq(Vector3 a, Vector3 b)
-    {
-        float dx = a.x - b.x;
-        float dz = a.z - b.z;
-        return dx * dx + dz * dz;
-    }
-
-    private bool IsWaterTile(TileData tile)
-    {
-        return tile != null && tile.groundType == GroundType.Water && tile.isNavigable;
-    }
-
-    private bool IsLandShoreTile(TileData tile)
-    {
-        return tile != null && tile.groundType != GroundType.Water && tile.isWalkable;
     }
 
     private void AnalyzeSelectableObjectsContinuously()

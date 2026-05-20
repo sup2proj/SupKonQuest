@@ -5,38 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f255f268-479c-4f68-8fb9-1c81ce841df1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Interface.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Interface/BoatCreationInterface.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Interface/BoatCreationInterface.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Interface/CreationQueue.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Interface/CreationQueue.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Interface/SpellInterface.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Interface/SpellInterface.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Interface/UnitsCreationInterface.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Interface/UnitsCreationInterface.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/InterfaceInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Interface/InterfaceInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/InterfaceInstance.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Interface/InterfaceInstance.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/StructureInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/StructureInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/StructureInstance.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/StructureInstance.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/UnitInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/UnitInstance.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitInstance.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/AutoLauncher.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/AutoLauncher.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/AutoLauncher.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/AutoLauncher.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/PlayerManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/PlayerManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/PlayerManager.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/PlayerManager.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/PlayerSession.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/PlayerSession.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/PlayerSession.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/PlayerSession.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/SelectionManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/SelectionManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/SelectionManager.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/SelectionManager.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StartScreenManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/StartScreenManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StartScreenManager.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/StartScreenManager.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StructureManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/StructureManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StructureManager.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/StructureManager.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/UnitsRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/UnitsRegistry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/UnitsRegistry.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameManager/UnitsRegistry.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Maps/Test/MapData.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Maps/Test/MapData.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/SelectionManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/SelectionManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/StartScreenManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StartScreenManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/StartScreenManager.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StartScreenManager.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/StructureManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/StructureManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +45,7 @@
             <option name="modeId" value="Agent" />
             <option name="modelType" value="builtin_family" />
             <option name="modelValue" value="auto" />
-            <option name="status" value="Completed" />
+            <option name="status" value="Stopped" />
             <option name="targetType" value="LOCAL" />
           </session>
         </option>
@@ -125,14 +99,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Data/Units/UnitsData/Heavy.asset" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Data/Units/UnitsData/Infantry.asset" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Data/Units/UnitsData/Mortar.asset" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalAttack.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/IA/Normal/NormalDefense.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/IA/SharedEasyNormal/MovementEasyNormal.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/IA/SharedEasyNormal/ProductionEasyNormal.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Manager/MovementManager.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Map/MapGenerator.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Map/MapJsonData.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Map/PointData.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/UI/HealthBar.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/UI/StatisticsInterface.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/UI/TerritoryStructureName.cs" root0="SKIP_HIGHLIGHTING" />
@@ -242,7 +209,7 @@
       <workItem from="1778586377021" duration="8311000" />
       <workItem from="1779221133538" duration="6237000" />
       <workItem from="1779266884364" duration="11312000" />
-      <workItem from="1779296638742" duration="3832000" />
+      <workItem from="1779296638742" duration="5518000" />
     </task>
     <task id="LOCAL-00001" summary="test">
       <option name="closed" value="true" />
@@ -372,7 +339,23 @@
       <option name="project" value="LOCAL" />
       <updated>1779297842389</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="refactor interface &amp; folders">
+      <option name="closed" value="true" />
+      <created>1779300535625</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1779300535625</updated>
+    </task>
+    <task id="LOCAL-00018" summary="architecture">
+      <option name="closed" value="true" />
+      <created>1779300682029</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1779300682029</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -401,7 +384,9 @@
     <MESSAGE value="Spawn units protector for structure" />
     <MESSAGE value="fix spells" />
     <MESSAGE value="Show defeat message when you loose in local" />
-    <option name="LAST_COMMIT_MESSAGE" value="Show defeat message when you loose in local" />
+    <MESSAGE value="refactor interface &amp; folders" />
+    <MESSAGE value="architecture" />
+    <option name="LAST_COMMIT_MESSAGE" value="architecture" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

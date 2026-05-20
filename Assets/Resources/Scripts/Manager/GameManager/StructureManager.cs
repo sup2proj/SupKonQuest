@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class StructureManager : MonoBehaviour
 {
     public static StructureManager Instance;
+    private const float DefaultSpawnZOffset = -3f;
+    private const int HarbourWaterSearchRadiusInTiles = 8;
     public List<UnitData> unitData;
 
     [Header("Sessions / Economy")]
@@ -93,13 +95,13 @@ public class StructureManager : MonoBehaviour
             runtimeData.maxHealth *= protectorHealthMultiplier;
         }
 
-        if (sourceStructure != null && sourceStructure.structureType == StructureType.Harbour)
+        if (sourceStructure != null && sourceStructure.structureType == StructureType.Harbour && !IsBoatType(type))
         {
+            Debug.LogWarning($"[StructureManager] Spawn refuse depuis un Harbour pour {type}: seuls les bateaux peuvent apparaitre depuis un port.");
             return false;
         }
 
-        Vector3 position;
-        position = new Vector3(x, 0, z - 3f);
+        Vector3 position = ResolveSpawnPosition(type, x, z, sourceStructure);
 
         GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
 
@@ -175,6 +177,86 @@ public class StructureManager : MonoBehaviour
             {
                 mat.color = tint;
             }
+        }
+    }
+
+    private Vector3 ResolveSpawnPosition(UnitsType type, float x, float z, StructureInstance sourceStructure)
+    {
+        Vector3 fallback = new Vector3(x, 0f, z + DefaultSpawnZOffset);
+
+        if (sourceStructure == null || sourceStructure.structureType != StructureType.Harbour || !IsBoatType(type))
+            return fallback;
+
+        if (TryFindNearestWaterSpawn(sourceStructure.transform.position, fallback, out Vector3 waterPosition))
+            return waterPosition;
+
+        Debug.LogWarning($"[StructureManager] Aucune tuile d'eau proche trouvee pour {type}; fallback sur {fallback}.");
+        return fallback;
+    }
+
+    private bool TryFindNearestWaterSpawn(Vector3 harbourPosition, Vector3 preferredPosition, out Vector3 spawnPosition)
+    {
+        spawnPosition = preferredPosition;
+
+        MapGenerator map = MapGenerator.Instance != null ? MapGenerator.Instance : FindFirstObjectByType<MapGenerator>();
+        if (map == null || map.allTiles == null || map.tileSize <= 0f)
+            return false;
+
+        if (map.TryGetTileAtWorldPosition(preferredPosition, out TileData preferredTile) && MapTileUtility.IsNavigableWaterTile(preferredTile))
+        {
+            spawnPosition = MapTileUtility.TileToWorldPosition(map, preferredTile);
+            return true;
+        }
+
+        float maxDistance = Mathf.Max(map.tileSize, HarbourWaterSearchRadiusInTiles * map.tileSize);
+        float maxDistanceSq = maxDistance * maxDistance;
+        float bestPreferredDistanceSq = float.MaxValue;
+        float bestHarbourDistanceSq = float.MaxValue;
+        bool found = false;
+
+        int width = map.allTiles.GetLength(0);
+        int height = map.allTiles.GetLength(1);
+
+        for (int tileX = 0; tileX < width; tileX++)
+        {
+            for (int tileY = 0; tileY < height; tileY++)
+            {
+                TileData tile = map.allTiles[tileX, tileY];
+                if (!MapTileUtility.IsNavigableWaterTile(tile))
+                    continue;
+
+                Vector3 candidate = MapTileUtility.TileToWorldPosition(map, tile);
+                float harbourDistanceSq = MapTileUtility.FlatDistanceSq(candidate, harbourPosition);
+                if (harbourDistanceSq > maxDistanceSq)
+                    continue;
+
+                float preferredDistanceSq = MapTileUtility.FlatDistanceSq(candidate, preferredPosition);
+                if (preferredDistanceSq > bestPreferredDistanceSq)
+                    continue;
+
+                if (Mathf.Approximately(preferredDistanceSq, bestPreferredDistanceSq) && harbourDistanceSq >= bestHarbourDistanceSq)
+                    continue;
+
+                bestPreferredDistanceSq = preferredDistanceSq;
+                bestHarbourDistanceSq = harbourDistanceSq;
+                spawnPosition = candidate;
+                found = true;
+            }
+        }
+
+        return found;
+    }
+
+    private bool IsBoatType(UnitsType type)
+    {
+        switch (type)
+        {
+            case UnitsType.Fregate:
+            case UnitsType.Destroyer:
+            case UnitsType.Transport:
+                return true;
+            default:
+                return false;
         }
     }
 }
