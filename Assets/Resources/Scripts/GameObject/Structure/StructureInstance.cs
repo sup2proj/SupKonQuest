@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 
-public class StructureInstance : MonoBehaviour
+public partial class StructureInstance : MonoBehaviour
 {
     private static StructureInstance currentlySelected = null;
     public static StructureInstance Instance;
@@ -92,7 +92,7 @@ public class StructureInstance : MonoBehaviour
             healthBar.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
         }
 
-        // Gestion centralisée des clics (une seule fois par frame)
+        // Gestion centralisee des clics (une seule fois par frame)
         if (Instance == this)
         {
             HandleGlobalStructureClick();
@@ -100,8 +100,8 @@ public class StructureInstance : MonoBehaviour
     }
 
     /// <summary>
-    /// Gestion centralisée des clics sur les structures
-    /// Cette méthode n'est exécutée qu'une fois par frame (par l'Instance principale)
+    /// Gestion centralisee des clics sur les structures
+    /// Cette methode n'est executee qu'une fois par frame (par l'Instance principale)
     /// </summary>
     private void HandleGlobalStructureClick()
     {
@@ -120,7 +120,7 @@ public class StructureInstance : MonoBehaviour
         // Utiliser RaycastAll pour trouver TOUS les colliders, y compris les Triggers
         RaycastHit[] hits = Physics.RaycastAll(ray);
         
-        Debug.Log($"[StructureClick] Raycasting détecté {hits.Length} colliders");
+        Debug.Log($"[StructureClick] Raycasting detecte {hits.Length} colliders");
 
         StructureInstance closestStructure = null;
         float closestDistance = float.MaxValue;
@@ -129,7 +129,7 @@ public class StructureInstance : MonoBehaviour
         for (int i = 0; i < hits.Length; i++)
         {
             RaycastHit hit = hits[i];
-            Debug.Log($"[StructureClick] Hit {i}: {hit.collider.gameObject.name} à distance {hit.distance}");
+            Debug.Log($"[StructureClick] Hit {i}: {hit.collider.gameObject.name} a distance {hit.distance}");
 
             // Chercher une StructureInstance sur ce collider ou ses parents
             StructureInstance structure = hit.collider.GetComponent<StructureInstance>();
@@ -141,7 +141,7 @@ public class StructureInstance : MonoBehaviour
             // Garder la structure la plus proche
             if (structure != null && hit.distance < closestDistance)
             {
-                Debug.Log($"[StructureClick] Structure trouvée: {structure.name} à distance {hit.distance}");
+                Debug.Log($"[StructureClick] Structure trouvee: {structure.name} a distance {hit.distance}");
                 closestStructure = structure;
                 closestDistance = hit.distance;
             }
@@ -149,13 +149,13 @@ public class StructureInstance : MonoBehaviour
 
         if (closestStructure != null)
         {
-            Debug.Log($"[StructureClick] Sélection: {closestStructure.name}");
+            Debug.Log($"[StructureClick] Selection: {closestStructure.name}");
             closestStructure.OnStructureClicked();
         }
         else
         {
-            // Le clic n'a touché aucune structure - désélectionner si une structure est sélectionnée
-            Debug.Log($"[StructureClick] Aucune structure trouvée");
+            // Le clic n'a touche aucune structure - deselectionner si une structure est selectionnee
+            Debug.Log($"[StructureClick] Aucune structure trouvee");
             if (currentlySelected != null)
             {
                 currentlySelected.UnSelected();
@@ -166,28 +166,28 @@ public class StructureInstance : MonoBehaviour
     }
 
     /// <summary>
-    /// Appelé quand cette structure est cliquée
+    /// Appele quand cette structure est cliquee
     /// </summary>
     private void OnStructureClicked()
     {
-        Debug.Log($"[{name}] Structure cliquée (PlayerId: {playerId})");
+        Debug.Log($"[{name}] Structure cliquee (PlayerId: {playerId})");
         int currentPlayerId = PlayerManager.Instance.GetActivePlayerId();
         Debug.Log($"[{name}] PlayerActif: {currentPlayerId}");
 
         if (Defeat.IsPlayerDefeated(currentPlayerId))
         {
-            Debug.Log($"[{name}] ✗ Sélection refusée: le joueur {currentPlayerId} est éliminé.");
+            Debug.Log($"[{name}] Selection refusee: le joueur {currentPlayerId} est elimine.");
             return;
         }
         
         if (playerId == currentPlayerId)
         {
-            Debug.Log($"[{name}] ✓ Sélection accordée!");
+            Debug.Log($"[{name}] Selection accordee!");
             Selected();
         }
         else
         {
-            Debug.Log($"[{name}] ✗ Sélection refusée (PlayerId: {playerId} != {currentPlayerId})");
+            Debug.Log($"[{name}] Selection refusee (PlayerId: {playerId} != {currentPlayerId})");
         }
     }
 
@@ -195,7 +195,7 @@ public class StructureInstance : MonoBehaviour
     {
         if (healthBar == null)
         {
-            Debug.LogWarning($"[StructureInstance] {name} : healthBar non assignée dans l'inspector.", this);
+            Debug.LogWarning($"[StructureInstance] {name} : healthBar non assignee dans l'inspector.", this);
             return;
         }
 
@@ -285,15 +285,15 @@ public class StructureInstance : MonoBehaviour
 
     public void Selected()
     {
-        Debug.Log($"Structure {name} sélectionnée (Type: {structureType}).");
+        Debug.Log($"Structure {name} selectionnee (Type: {structureType}).");
 
-        // Si une autre structure était déjà sélectionnée, on la désélectionne
+        // Si une autre structure etait deja selectionnee, on la deselectionne
         if (currentlySelected != null && currentlySelected != this)
         {
             currentlySelected.UnSelected();
         }
 
-        // Cette structure devient la structure sélectionnée
+        // Cette structure devient la structure selectionnee
         currentlySelected = this;
 
         if (outline != null)
@@ -301,13 +301,13 @@ public class StructureInstance : MonoBehaviour
         else
             Debug.LogWarning($"[StructureInstance] Composant Outline manquant sur {name}.");
 
-        // Transmettre les coordonnées de la structure à l'ActionInterface
+        // Transmettre les coordonnees de la structure a l'ActionInterface
         ActionInterface.SetSelectedStructure(this, structurePosition);
         ActionInterface.ShowStructureButtons(structureType);
 
         if (InterfaceInstance.Instance != null)
         {
-			InterfaceInstance.Instance.showInterfaceForStructure();
+            InterfaceInstance.Instance.showInterfaceForStructure();
             var nearbyUnits = GetUnitsWithinConfiguredRadius();
             var uniqueTypes = new HashSet<UnitsType>();
             foreach (var unit in nearbyUnits)
@@ -331,15 +331,15 @@ public class StructureInstance : MonoBehaviour
 
     public void UnSelected()
     {
-        Debug.Log($"Structure {name} désélectionnée.");
+        Debug.Log($"Structure {name} deselectionnee.");
 
-        // Si c'est la structure actuellement sélectionnée, on efface la référence
+        // Si c'est la structure actuellement selectionnee, on efface la reference
         if (currentlySelected == this)
         {
             currentlySelected = null;
         }
 
-        // Restaure la couleur du bâtiment
+        // Restaure la couleur du batiment
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)
             renderer.material.color = Color.white;
@@ -348,30 +348,6 @@ public class StructureInstance : MonoBehaviour
         {
             InterfaceInstance.Instance.HideStructureInterface();
         }
-    }
-
-    public void AddProtectorUnit(UnitInstance protectorUnit)
-    {
-        if (protectorUnit == null)
-            return;
-
-        CleanupProtectorUnits();
-        GameObject protectorObject = protectorUnit.gameObject;
-        if (!unitsProtectorTypes.Contains(protectorObject))
-            unitsProtectorTypes.Add(protectorObject);
-    }
-
-    public void RemoveProtectorUnit(UnitInstance protectorUnit)
-    {
-        if (protectorUnit == null)
-            return;
-
-        unitsProtectorTypes.Remove(protectorUnit.gameObject);
-    }
-
-    private void CleanupProtectorUnits()
-    {
-        unitsProtectorTypes.RemoveAll(unitObject => unitObject == null);
     }
 
     public static StructureInstance FindByInstanceId(int instanceId)
@@ -451,191 +427,4 @@ public class StructureInstance : MonoBehaviour
         }
         return null;
     }
-    
-   public void TakeDamage(float amount, UnitInstance attacker)
-   {
-       if (attacker != null && attacker.playerId == playerId)
-           return;
-
-       int previousOwnerId = playerId;
-
-       currentHealth -= Mathf.RoundToInt(amount);
-       currentHealth = Mathf.Clamp(currentHealth, 0, health);
-   
-       if (healthBar != null)
-           healthBar.SetHealth(currentHealth);
-
-       if (currentHealth <= 0 && attacker != null && attacker.playerId != previousOwnerId)
-       {
-           CaptureStructure(attacker.playerId, previousOwnerId);
-           return;
-       }
-
-       // Déclenchement IA uniquement si le comportement IA niveau 2 est actif
-       if (IAInstance.IsDifficultyForPlayer(playerId, 2) && attacker != null && attacker.playerId != playerId)
-       {
-           // On regarde dans le rayon de la structure: s'il y a au moins une unité de combat alliée,
-           // on autorise la création de protecteurs.
-           bool hasCombatAllyNearby = false;
-           var nearbyUnits = GetUnitsWithinConfiguredRadius();
-           for (int i = 0; i < nearbyUnits.Count; i++)
-           {
-               UnitInstance unit = nearbyUnits[i];
-               if (unit == null || unit.unitData == null)
-                   continue;
-
-               if (unit.playerId != playerId)
-                   continue;
-
-               if (unit.unitData is UnitCombatData)
-               {
-                   hasCombatAllyNearby = true;
-                   break;
-               }
-           }
-
-           if (hasCombatAllyNearby)
-           {
-               NormalDefense normalDefense = GetComponent<NormalDefense>();
-               if (normalDefense == null)
-                   normalDefense = gameObject.AddComponent<NormalDefense>();
-
-               normalDefense.MyStructureAttacked(attacker);
-           }
-       }
-
-       TryTriggerProtectorRetaliation(attacker);
-   }
-
-   private void CaptureStructure(int newOwnerId, int previousOwnerId, bool checkDefeat = true)
-   {
-         if (newOwnerId <= 0 || newOwnerId == playerId)
-             return;
-
-        playerId = newOwnerId;
-        currentHealth = health;
-
-        if (healthBar != null)
-            healthBar.SetHealth(currentHealth);
-
-        ApplyTerritoryName(territoryName);
-        UpdateStructureCounts(previousOwnerId, newOwnerId);
-        
-        if (checkDefeat)
-        {
-            bool previousOwnerDefeated = Defeat.CheckDefeatAfterCapture(previousOwnerId, showPanel: false);
-            if (previousOwnerDefeated)
-            {
-                bool winnerDeclared = Victory.CheckVictoryAfterElimination(newOwnerId);
-                if (!winnerDeclared)
-                    winnerDeclared = Victory.CheckVictoryAfterCapture(newOwnerId);
-            }
-            else
-            {
-                Victory.CheckVictoryAfterCapture(newOwnerId);
-            }
-        }
-
-        if (currentlySelected == this && PlayerManager.Instance != null && PlayerManager.Instance.GetActivePlayerId() != playerId)
-            UnSelected();
-
-        Debug.Log($"[StructureInstance] {name} capturée par le joueur {newOwnerId} (ancien propriétaire: {previousOwnerId}).", this);
-
-        StructureManager structureManager = StructureManager.Instance;
-        if (structureManager == null)
-            structureManager = FindFirstObjectByType<StructureManager>();
-
-        if (structureManager != null)
-        {
-            structureManager.SpawnUnitByTypeAtPosition(
-                newOwnerId,
-                UnitsType.Heavy,
-                transform.position.x,
-                transform.position.z,
-                false,
-                true,
-                this
-            );
-        }
-   }
-
-     public void HandleProtectorDeath(UnitInstance protectorUnit, int killerPlayerId)
-     {
-         if (protectorUnit != null)
-             RemoveProtectorUnit(protectorUnit);
-
-         if (killerPlayerId <= 0 || killerPlayerId == playerId)
-             return;
-
-         int previousOwnerId = playerId;
-         // Important: la capture par mort du protecteur doit aussi vérifier défaite/victoire.
-         CaptureStructure(killerPlayerId, previousOwnerId, checkDefeat: true);
-     }
-
-   private void UpdateStructureCounts(int previousOwnerId, int newOwnerId)
-   {
-       if (previousOwnerId == newOwnerId)
-           return;
-
-       PlayerManager playerManager = PlayerManager.Instance;
-       if (playerManager == null)
-           playerManager = FindFirstObjectByType<PlayerManager>();
-
-       if (playerManager == null)
-       {
-           Debug.LogWarning("[StructureInstance] PlayerManager introuvable, impossible de mettre à jour les compteurs de structures.", this);
-           return;
-       }
-
-       PlayerSession previousOwnerSession = previousOwnerId > 0 ? playerManager.GetSession(previousOwnerId) : null;
-       if (previousOwnerSession != null)
-           previousOwnerSession.removeStructure(1);
-
-       PlayerSession newOwnerSession = newOwnerId > 0 ? playerManager.GetSession(newOwnerId) : null;
-       if (newOwnerSession != null)
-           newOwnerSession.AddStructure(1);
-
-       if (StatisticsInterface.Instance != null)
-           StatisticsInterface.Instance.Refresh();
-   }
-
-   private void TryTriggerProtectorRetaliation(UnitInstance attacker)
-   {
-       if (attacker == null || attacker.transform == null)
-           return;
-       if (attacker.playerId == playerId)
-           return;
-
-       CleanupProtectorUnits();
-
-       for (int i = unitsProtectorTypes.Count - 1; i >= 0; i--)
-       {
-           GameObject protectorObject = unitsProtectorTypes[i];
-           if (protectorObject == null)
-           {
-               unitsProtectorTypes.RemoveAt(i);
-               continue;
-           }
-
-           UnitInstance protector = protectorObject.GetComponent<UnitInstance>();
-           if (protector == null || protector.unitData == null || !protector.unitData.isProtector)
-           {
-               unitsProtectorTypes.RemoveAt(i);
-               continue;
-           }
-
-           if (protector.playerId != playerId)
-               continue;
-
-           UnitsAnimation protectorAnimation = protectorObject.GetComponent<UnitsAnimation>();
-           if (protectorAnimation == null)
-               continue;
-
-           float stopDistance = 0.1f;
-           if (protector.unitData is UnitCombatData combatData)
-               stopDistance = Mathf.Max(0f, combatData.attackRange);
-
-           protectorAnimation.EngageTarget(attacker.transform, stopDistance);
-       }
-   }
 }

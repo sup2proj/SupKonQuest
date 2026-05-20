@@ -5,12 +5,30 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f255f268-479c-4f68-8fb9-1c81ce841df1" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/Capture.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/Capture.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/Protector.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/Protector.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Maps/Test/MapData.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Maps/Test/MapData.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/SelectionManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/SelectionManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/StartScreenManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StartScreenManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/StartScreenManager.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StartScreenManager.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/StructureManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/GameManager/StructureManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/BoatTransport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/BoatTransport.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/BoatTransport.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/BoatTransport.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/Buffs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/Buffs.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/Buffs.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/Buffs.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/DamageTable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/DamageTable.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/DamageTable.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/DamageTable.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/NeutralUnits.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/NeutralUnits.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/NeutralUnits.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/NeutralUnits.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/Spells.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/Spells.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/Spells.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/Spells.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/StructureInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/StructureInstance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/StructureInstance.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/StructureInstance.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/UnitInstance.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitInstance.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/UnitInstance.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitsAnimation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/UnitsAnimation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitsAnimation.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/UnitsAnimation.cs.meta" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,9 +121,6 @@
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/UI/HealthBar.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/UI/StatisticsInterface.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/UI/TerritoryStructureName.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Units/BoatTransport.cs.meta" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Units/NeutralUnits.cs.meta" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitsAnimation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scenes/LaunchingLocalNewGame.unity" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/_Recovery/0 (7).unity" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ai.navigation@78534c21b27d/Editor/NavMeshAssetManager.cs" root0="SKIP_HIGHLIGHTING" />
@@ -209,7 +224,7 @@
       <workItem from="1778586377021" duration="8311000" />
       <workItem from="1779221133538" duration="6237000" />
       <workItem from="1779266884364" duration="11312000" />
-      <workItem from="1779296638742" duration="5518000" />
+      <workItem from="1779296638742" duration="6460000" />
     </task>
     <task id="LOCAL-00001" summary="test">
       <option name="closed" value="true" />
@@ -355,7 +370,15 @@
       <option name="project" value="LOCAL" />
       <updated>1779300682029</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="fix spawn boats">
+      <option name="closed" value="true" />
+      <created>1779302357481</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1779302357481</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -386,7 +409,8 @@
     <MESSAGE value="Show defeat message when you loose in local" />
     <MESSAGE value="refactor interface &amp; folders" />
     <MESSAGE value="architecture" />
-    <option name="LAST_COMMIT_MESSAGE" value="architecture" />
+    <MESSAGE value="fix spawn boats" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix spawn boats" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
