@@ -4,6 +4,7 @@ using TMPro;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using System.Collections.Generic;
+using Unity.Services.Authentication;
 
 public class MultiplayerMenuManager : MonoBehaviour
 {
@@ -49,8 +50,18 @@ public class MultiplayerMenuManager : MonoBehaviour
         SceneManager.LoadScene("JoinLobbyScene"); 
     }
 
-    public void BackToLogin()
+    public void BackToMainMenu()
     {
+        SceneManager.LoadScene("MainMenu"); 
+    }
+
+    public void SignOutAndLeave()
+    {
+        if (AuthenticationService.Instance.IsSignedIn)
+        {
+            AuthenticationService.Instance.SignOut();
+            Debug.Log("Déconnexion réussie.");
+        }
         SceneManager.LoadScene("LoginScene"); 
     }
 

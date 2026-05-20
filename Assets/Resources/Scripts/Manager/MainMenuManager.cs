@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Services.Core;
+using Unity.Services.Authentication;
 
 public class MainMenuManager : MonoBehaviour
 {
@@ -8,9 +10,31 @@ public class MainMenuManager : MonoBehaviour
         SceneManager.LoadScene("LaunchingLocalNewGame"); 
     }
     
-    public void Multi() 
+    public async void Multi() 
     { 
-        SceneManager.LoadScene("LoginScene"); 
+        try
+        {
+            if (UnityServices.State == ServicesInitializationState.Uninitialized)
+            {
+                await UnityServices.InitializeAsync();
+            }
+
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                Debug.Log("Joueur déjà connecté");
+                SceneManager.LoadScene("MultiplayerScene");
+            }
+            else
+            {
+                Debug.Log("Aucune session trouvée");
+                SceneManager.LoadScene("LoginScene");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Erreur lors de la vérification de session : " + e);
+            SceneManager.LoadScene("LoginScene"); 
+        }
     }
     
     public void Options()  
