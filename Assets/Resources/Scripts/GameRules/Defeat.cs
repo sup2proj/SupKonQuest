@@ -5,10 +5,18 @@ public class Defeat : MonoBehaviour
 {
     private static readonly HashSet<int> defeatedPlayers = new HashSet<int>();
 
+    [SerializeField, Min(0.1f)] private float globalDefeatCheckInterval = 0.5f;
+    private float nextGlobalDefeatCheckAt;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetDefeatedPlayers()
     {
         defeatedPlayers.Clear();
+    }
+
+    public static bool IsPlayerDefeated(int playerId)
+    {
+        return playerId > 0 && defeatedPlayers.Contains(playerId);
     }
 
     public static bool CheckDefeatAfterCapture(int playerIdToCheck, bool showPanel = true)
@@ -22,23 +30,14 @@ public class Defeat : MonoBehaviour
         if (PlayerStillHasStructure(playerIdToCheck))
             return false;
 
-        defeatedPlayers.Add(playerIdToCheck);
-        Debug.Log($"[Defeat] Le joueur {playerIdToCheck} a perdu : il n'a plus de structures.");
-
-        if (showPanel)
-            ShowDefeatForPlayer(playerIdToCheck);
-
+        ApplyDefeat(playerIdToCheck);
         return true;
     }
 
     public static void ShowDefeatForPlayer(int playerId)
     {
-        InterfaceInstance interfaceInstance = InterfaceInstance.Instance;
-        if (interfaceInstance == null)
-            interfaceInstance = FindFirstObjectByType<InterfaceInstance>(FindObjectsInactive.Include);
-
-        if (interfaceInstance != null)
-            interfaceInstance.ShowDefeatPanel(playerId);
+        if (playerId <= 0)
+            return;
     }
 
     private static bool PlayerStillHasStructure(int playerId)
@@ -63,5 +62,79 @@ public class Defeat : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void Update()
+    {
+        if (Time.time < nextGlobalDefeatCheckAt)
+            return;
+
+        nextGlobalDefeatCheckAt = Time.time + globalDefeatCheckInterval;
+        CheckDefeatForAllPlayers();
+    }
+
+    private static void CheckDefeatForAllPlayers()
+    {
+        PlayerSession[] sessions = Object.FindObjectsByType<PlayerSession>(FindObjectsSortMode.None);
+        if (sessions == null)
+            return;
+
+        for (int i = 0; i < sessions.Length; i++)
+        {
+            PlayerSession session = sessions[i];
+            if (session == null)
+                continue;
+
+            int playerId = session.Id;
+            if (playerId <= 0)
+                continue;
+
+            // Règle globale: 0 structure = défaite.
+            CheckDefeatAfterCapture(playerId, showPanel: false);
+        }
+    }
+
+    private static void ApplyDefeat(int playerId)
+    {
+        defeatedPlayers.Add(playerId);
+        Debug.Log($"[Defeat] Le joueur {playerId} a perdu : il n'a plus de structures.");
+
+        bool defeatedPlayerWasAi = IAInstance.IsAIPlayer(playerId);
+        NeutralUnits.ConvertPlayerUnitsToNeutral(playerId, defeatedPlayerWasAi);
+
+
+        TryDeclareWinnerFromRemainingPlayers();
+    }
+
+    private static void TryDeclareWinnerFromRemainingPlayers()
+    {
+        PlayerSession[] sessions = Object.FindObjectsByType<PlayerSession>(FindObjectsSortMode.None);
+        if (sessions == null || sessions.Length == 0)
+            return;
+
+        int aliveCount = 0;
+        int lastAlivePlayerId = -1;
+
+        for (int i = 0; i < sessions.Length; i++)
+        {
+            PlayerSession session = sessions[i];
+            if (session == null)
+                continue;
+
+            int playerId = session.Id;
+            if (playerId <= 0)
+                continue;
+
+            if (!PlayerStillHasStructure(playerId))
+                continue;
+
+            aliveCount++;
+            lastAlivePlayerId = playerId;
+            if (aliveCount > 1)
+                return;
+        }
+
+        if (aliveCount == 1 && lastAlivePlayerId > 0)
+            Victory.CheckVictoryAfterElimination(lastAlivePlayerId);
     }
 }

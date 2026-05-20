@@ -17,6 +17,7 @@ public class UnitInstance : MonoBehaviour
     [Header("Runtime")]
     public float currentHealth;
     public int playerId;
+    public bool isNeutral;
     private StructureInstance protectorSourceStructure;
     private int lastAttackerPlayerId = -1;
 
@@ -76,6 +77,7 @@ public class UnitInstance : MonoBehaviour
         }
 
         playerId = unitData.playerId;
+        isNeutral = unitData.isNeutral;
         currentHealth = unitData.maxHealth;
 
         if (healthBar != null)
@@ -83,6 +85,15 @@ public class UnitInstance : MonoBehaviour
             healthBar.SetMaxHealth(unitData.maxHealth);
             healthBar.SetHealth(currentHealth);
         }
+    }
+
+    public void SetNeutralState(bool neutral)
+    {
+        isNeutral = neutral;
+
+        // Reste compatible avec les systèmes qui lisent encore l'info depuis UnitData.
+        if (unitData != null)
+            unitData.isNeutral = neutral;
     }
 
     void InitSelectionCircle()

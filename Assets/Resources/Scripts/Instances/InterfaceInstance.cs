@@ -214,10 +214,6 @@ public class InterfaceInstance : MonoBehaviour
 
     public void ShowDefeatPanel(int defeatedPlayerId)
     {
-        if (!TryPreparePanelInMiddle())
-            return;
-
-        panelInMiddle.ShowDefeat(defeatedPlayerId);
     }
 
     public void HideVictoryPanel()

@@ -523,9 +523,6 @@ public class StructureInstance : MonoBehaviour
                 bool winnerDeclared = Victory.CheckVictoryAfterElimination(newOwnerId);
                 if (!winnerDeclared)
                     winnerDeclared = Victory.CheckVictoryAfterCapture(newOwnerId);
-
-                if (!winnerDeclared)
-                    Defeat.ShowDefeatForPlayer(previousOwnerId);
             }
             else
             {
@@ -565,7 +562,8 @@ public class StructureInstance : MonoBehaviour
              return;
 
          int previousOwnerId = playerId;
-         CaptureStructure(killerPlayerId, previousOwnerId, checkDefeat: false);
+         // Important: la capture par mort du protecteur doit aussi vérifier défaite/victoire.
+         CaptureStructure(killerPlayerId, previousOwnerId, checkDefeat: true);
      }
 
    private void UpdateStructureCounts(int previousOwnerId, int newOwnerId)
