@@ -31,6 +31,12 @@ public class SelectionManager : MonoBehaviour
         if (Mouse.current == null)
             return;
 
+        if (IsActivePlayerDefeated())
+        {
+            ClearCurrentSelection();
+            return;
+        }
+
         AnalyzeSelectableObjectsContinuously();
 
         if (Mouse.current.rightButton.wasPressedThisFrame)
@@ -106,6 +112,31 @@ public class SelectionManager : MonoBehaviour
             SelectionBox.gameObject.SetActive(false);
     }
 
+    public void ClearCurrentSelection()
+    {
+        if (CurrentlySelectedObjects != null)
+        {
+            for (int i = CurrentlySelectedObjects.Count - 1; i >= 0; i--)
+            {
+                SelectableObject so = CurrentlySelectedObjects[i];
+                if (so != null)
+                    so.DeselectMe();
+            }
+
+            CurrentlySelectedObjects.Clear();
+        }
+
+        ResetSelectionDrag();
+    }
+
+    private bool IsActivePlayerDefeated()
+    {
+        if (PlayerManager.Instance == null)
+            return false;
+
+        return Defeat.IsPlayerDefeated(PlayerManager.Instance.GetActivePlayerId());
+    }
+
     private bool IsPointerOverUi()
     {
         if (EventSystem.current == null)
@@ -119,6 +150,9 @@ public class SelectionManager : MonoBehaviour
 
     private void TryIssueGroupMoveOrder()
 {
+    if (IsActivePlayerDefeated())
+        return;
+
     if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0 || Camera.main == null)
         return;
 
@@ -212,6 +246,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
 
     private bool TryIssueBoatShoreOrder()
     {
+        if (IsActivePlayerDefeated())
+            return false;
+
         if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0 || Camera.main == null)
             return false;
 
@@ -489,6 +526,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
 
     private void SelectUnits()
     {
+        if (IsActivePlayerDefeated())
+            return;
+
         if (Camera.main == null)
             return;
 
@@ -554,6 +594,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
     //   vers la cible ennemie. Les unités de combat s'arrêtent à leur attackRange, les autres suivent sans portée propre.
     private bool TryIssueAttackMoveOrder()
     {
+        if (IsActivePlayerDefeated())
+            return false;
+
         if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0 || Camera.main == null)
             return false;
 
@@ -565,6 +608,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
 
     private bool TryIssueUnitAttackOrder()
     {
+        if (IsActivePlayerDefeated())
+            return false;
+
         int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
         UnitInstance targetUnit = GetEnemyUnitUnderMouse(activePlayerId);
         if (targetUnit == null)
@@ -590,6 +636,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
 
     private bool TryIssueStructureAttackOrder()
     {
+        if (IsActivePlayerDefeated())
+            return false;
+
         int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
         StructureInstance targetStructure = GetEnemyStructureUnderMouse(activePlayerId);
         if (targetStructure == null)

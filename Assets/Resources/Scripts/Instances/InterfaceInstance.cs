@@ -175,6 +175,10 @@ public class InterfaceInstance : MonoBehaviour
 
     public void showInterfaceForStructure()
     {
+        int activePlayerId = GetSelectedPlayerId();
+        if (Defeat.IsPlayerDefeated(activePlayerId))
+            return;
+
         SetGameObjectActive(unitsQueue, true);
         SetGameObjectActive(unitsProtector, true);
         hideUnitsProtectorSlots();
@@ -214,6 +218,10 @@ public class InterfaceInstance : MonoBehaviour
 
     public void ShowDefeatPanel(int defeatedPlayerId)
     {
+        if (!TryPreparePanelInMiddle())
+            return;
+
+        panelInMiddle.ShowDefeat(defeatedPlayerId);
     }
 
     public void HideVictoryPanel()
@@ -280,6 +288,9 @@ public class InterfaceInstance : MonoBehaviour
     public bool InitUnitsCreation(int unitIndex, UnitsType type, float x, float z, bool isPoweredUnit, bool isProtector)
     {
         int playerId = GetSelectedPlayerId();
+        if (Defeat.IsPlayerDefeated(playerId))
+            return false;
+
         var actionInterface = ActionInterface.Instance;
         UnitData unitData = actionInterface.unitDatas[unitIndex];
         float multiplier = isPoweredUnit ? 1.20f : 1f;
@@ -287,7 +298,13 @@ public class InterfaceInstance : MonoBehaviour
         cost = Mathf.Max(0, cost);
 
         ResolvePlayerManager();
+        if (playerManager == null)
+            return false;
+
         PlayerSession session = playerManager.GetSession(playerId);
+        if (session == null)
+            return false;
+
         if (!session.SpendGold(cost))
         {
             Debug.Log($"[InterfaceInstance] Pas assez d'or pour demander la création: joueur={playerId}, gold={session.Gold}, coût={cost}.", this);
@@ -416,6 +433,12 @@ public class InterfaceInstance : MonoBehaviour
 
         if (playerManager != null)
             playerManager.SetActivePlayer(playerId);
+
+        if (Defeat.IsPlayerDefeated(playerId))
+        {
+            ShowDefeatPanel(playerId);
+            return;
+        }
 
         int gold = -1;
         if (playerManager != null)
@@ -640,6 +663,9 @@ public class InterfaceInstance : MonoBehaviour
     private void OnBoatExitClicked()
     {
         int activePlayerId = PlayerManager.Instance != null ? PlayerManager.Instance.GetActivePlayerId() : GetSelectedPlayerId();
+        if (Defeat.IsPlayerDefeated(activePlayerId))
+            return;
+
         int unloadedBoats = 0;
 
         if (SelectionManager.Instance != null && SelectionManager.Instance.CurrentlySelectedObjects != null)

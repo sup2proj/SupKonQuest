@@ -38,6 +38,13 @@ public class Defeat : MonoBehaviour
     {
         if (playerId <= 0)
             return;
+
+        PlayerManager playerManager = PlayerManager.Instance;
+        if (playerManager != null && playerManager.GetActivePlayerId() != playerId)
+            return;
+
+        if (InterfaceInstance.Instance != null)
+            InterfaceInstance.Instance.ShowDefeatPanel(playerId);
     }
 
     private static bool PlayerStillHasStructure(int playerId)
@@ -101,6 +108,12 @@ public class Defeat : MonoBehaviour
 
         bool defeatedPlayerWasAi = IAInstance.IsAIPlayer(playerId);
         NeutralUnits.ConvertPlayerUnitsToNeutral(playerId, defeatedPlayerWasAi);
+
+        PlayerManager playerManager = PlayerManager.Instance;
+        if (playerManager != null && playerManager.GetActivePlayerId() == playerId && SelectionManager.Instance != null)
+            SelectionManager.Instance.ClearCurrentSelection();
+
+        ShowDefeatForPlayer(playerId);
 
 
         TryDeclareWinnerFromRemainingPlayers();

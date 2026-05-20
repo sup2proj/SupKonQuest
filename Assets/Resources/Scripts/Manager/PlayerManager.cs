@@ -65,6 +65,9 @@ public class PlayerManager : MonoBehaviour
     private void Update()
     {
         int playerId = GetActivePlayerId();
+        if (Defeat.IsPlayerDefeated(playerId))
+            return;
+
         timer += Time.deltaTime;
         if (timer >= 1f)
         {
@@ -113,15 +116,22 @@ public class PlayerManager : MonoBehaviour
 
     public void GetGoldForPlayer(int playerId)
     {
+        if (Defeat.IsPlayerDefeated(playerId))
+            return;
+
         float goldAmount = 5;
-        int structureAmount = GetSession(playerId).StructureCount;
+        PlayerSession session = GetSession(playerId);
+        if (session == null)
+            return;
+
+        int structureAmount = session.StructureCount;
         if (structureAmount > 0)
         {
             float goldMultiplicatorBonus = (structureAmount / 10f) + 2;
             goldAmount *= goldMultiplicatorBonus;
         }
         var pm = PlayerManager.Instance;
-        var session = pm != null ? pm.GetSession(playerId) : null;
+        session = pm != null ? pm.GetSession(playerId) : null;
         if (session)
         {
             session.AddGold((int)goldAmount);

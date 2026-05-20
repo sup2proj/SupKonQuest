@@ -173,6 +173,12 @@ public class StructureInstance : MonoBehaviour
         Debug.Log($"[{name}] Structure cliquée (PlayerId: {playerId})");
         int currentPlayerId = PlayerManager.Instance.GetActivePlayerId();
         Debug.Log($"[{name}] PlayerActif: {currentPlayerId}");
+
+        if (Defeat.IsPlayerDefeated(currentPlayerId))
+        {
+            Debug.Log($"[{name}] ✗ Sélection refusée: le joueur {currentPlayerId} est éliminé.");
+            return;
+        }
         
         if (playerId == currentPlayerId)
         {

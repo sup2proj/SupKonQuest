@@ -6,12 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="f255f268-479c-4f68-8fb9-1c81ce841df1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Controller/SelectableObjectController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Controller/SelectableObjectController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/GameRules/Defeat.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameRules/Defeat.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/InterfaceInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/InterfaceInstance.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/StructureInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/StructureInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/UnitInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Instances/UnitInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StructureManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/StructureManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Map/MapGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Map/MapGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitsAnimation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitsAnimation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/LaunchingLocalNewGame.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/LaunchingLocalNewGame.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/PlayerManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/PlayerManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/SelectionManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Manager/SelectionManager.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,6 +119,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/UI/StatisticsInterface.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/UI/TerritoryStructureName.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Units/BoatTransport.cs.meta" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Units/NeutralUnits.cs.meta" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitsAnimation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scenes/LaunchingLocalNewGame.unity" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/_Recovery/0 (7).unity" root0="FORCE_HIGHLIGHTING" />
@@ -222,7 +223,8 @@
       <workItem from="1778402571118" duration="5306000" />
       <workItem from="1778586377021" duration="8311000" />
       <workItem from="1779221133538" duration="6237000" />
-      <workItem from="1779266884364" duration="1848000" />
+      <workItem from="1779266884364" duration="11312000" />
+      <workItem from="1779296638742" duration="926000" />
     </task>
     <task id="LOCAL-00001" summary="test">
       <option name="closed" value="true" />
@@ -328,7 +330,23 @@
       <option name="project" value="LOCAL" />
       <updated>1779228650317</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Spawn units protector for structure">
+      <option name="closed" value="true" />
+      <created>1779268900150</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1779268900150</updated>
+    </task>
+    <task id="LOCAL-00015" summary="fix spells">
+      <option name="closed" value="true" />
+      <created>1779276402594</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1779276402594</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -354,7 +372,9 @@
     <MESSAGE value="Add territory name on game &amp; edit prefab" />
     <MESSAGE value="Add flag to interface for territory counter" />
     <MESSAGE value="Tab menu" />
-    <option name="LAST_COMMIT_MESSAGE" value="Tab menu" />
+    <MESSAGE value="Spawn units protector for structure" />
+    <MESSAGE value="fix spells" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix spells" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -371,6 +391,19 @@
           <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
           <option name="timeStamp" value="3" />
         </breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Assets/Resources/Scripts/GameRules/Defeat.cs</url>
+          <line>134</line>
+          <properties documentPath="C:\Users\Louis\Desktop\SupKonQuest\Assets\Resources\Scripts\GameRules\Defeat.cs" containingFunctionPresentation="Method 'TryDeclareWinnerFromRemainingPlayers'">
+            <startOffsets>
+              <option value="4208" />
+            </startOffsets>
+            <endOffsets>
+              <option value="4217" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
