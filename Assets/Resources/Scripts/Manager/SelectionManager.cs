@@ -543,6 +543,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
 
             }
         }
+
+        if (InterfaceInstance.Instance != null)
+            InterfaceInstance.Instance.RefreshBuffIconsForSelection();
     }
 
     // Règle d'ordre d'attaque/déplacement :

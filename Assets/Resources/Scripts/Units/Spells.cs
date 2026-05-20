@@ -21,6 +21,8 @@ public class Spells : MonoBehaviour
     private float circleHideAtTime = -1f;
     private Color currentCircleColor = Color.red;
     public float spellLockedUntil = -1f;
+    private float healerSpellLockedUntil = -1f;
+    private float supportSpellLockedUntil = -1f;
 
     private UnitInstance casterUnit;
 
@@ -41,8 +43,11 @@ public class Spells : MonoBehaviour
     {
         get
         {
-            if (casterUnit.unitData is UnitHealerData || casterUnit.unitData is UnitSupportData)
-                return spellLockedUntil > Time.time;
+            if (casterUnit.unitData is UnitHealerData)
+                return healerSpellLockedUntil > Time.time;
+            
+            if (casterUnit.unitData is UnitSupportData)
+                return supportSpellLockedUntil > Time.time;
 
             return false;
         }
@@ -83,7 +88,10 @@ public class Spells : MonoBehaviour
             anim.StartAttackAnimationFromSpell();
             iconHideCooldown = GetHealerCooldwon();
             if (iconHideCooldown > 0f)
-                spellLockedUntil = Time.time + iconHideCooldown;
+            {
+                healerSpellLockedUntil = Time.time + iconHideCooldown;
+                spellLockedUntil = healerSpellLockedUntil;
+            }
             shouldHideIcon = true;
         }
 
@@ -93,7 +101,10 @@ public class Spells : MonoBehaviour
             anim.StartAttackAnimationFromSpell();
             iconHideCooldown = GetSupportCooldwon();
             if (iconHideCooldown > 0f)
-                spellLockedUntil = Time.time + iconHideCooldown;
+            {
+                supportSpellLockedUntil = Time.time + iconHideCooldown;
+                spellLockedUntil = supportSpellLockedUntil;
+            }
             shouldHideIcon = true;
         }
         if (choice == 1 && casterUnit.unitData is UnitSupportData)
@@ -102,7 +113,10 @@ public class Spells : MonoBehaviour
             anim.StartAttackAnimationFromSpell();
             iconHideCooldown = GetSupportCooldwon();
             if (iconHideCooldown > 0f)
-                spellLockedUntil = Time.time + iconHideCooldown;
+            {
+                supportSpellLockedUntil = Time.time + iconHideCooldown;
+                spellLockedUntil = supportSpellLockedUntil;
+            }
             shouldHideIcon = true;
         }
         if (choice == 2 && casterUnit.unitData is UnitSupportData)
@@ -111,7 +125,10 @@ public class Spells : MonoBehaviour
             anim.StartAttackAnimationFromSpell();
             iconHideCooldown = GetSupportCooldwon();
             if (iconHideCooldown > 0f)
-                spellLockedUntil = Time.time + iconHideCooldown;
+            {
+                supportSpellLockedUntil = Time.time + iconHideCooldown;
+                spellLockedUntil = supportSpellLockedUntil;
+            }
             shouldHideIcon = true;
         }
 
@@ -311,16 +328,21 @@ public class Spells : MonoBehaviour
         int casterPlayerId = casterUnit.playerId;
         int totalUnitsFound = 0;
         int friendlyUnitsFound = 0;
+        float scanRadiusSq = scanRadius * scanRadius;
+        Vector3 casterPosition = casterUnit.transform.position;
 
-        Collider[] hits = Physics.OverlapSphere(transform.position, scanRadius, Physics.AllLayers, QueryTriggerInteraction.Ignore);
-
-        for (int i = 0; i < hits.Length; i++)
+        List<UnitInstance> units = UnitsRegistry.GetSnapshot();
+        for (int i = 0; i < units.Count; i++)
         {
-            UnitInstance unit = hits[i].GetComponentInParent<UnitInstance>();
+            UnitInstance unit = units[i];
             if (unit == null)
                 continue;
-            if (!unit.CompareTag("Units"))
+
+            Vector3 delta = unit.transform.position - casterPosition;
+            delta.y = 0f;
+            if (delta.sqrMagnitude > scanRadiusSq)
                 continue;
+
             totalUnitsFound++;
             if (unit.playerId != casterPlayerId)
                 continue;
