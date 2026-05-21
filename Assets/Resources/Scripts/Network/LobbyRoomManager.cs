@@ -83,7 +83,6 @@ public class LobbyRoomManager : MonoBehaviour
         {
             string myName = PlayerPrefs.GetString("PlayerName", "Joueur Inconnu");
             
-            // On vérifie la langue actuelle (0 = Anglais, 1 = Français, 2 = Italiano)
             int currentLang = PlayerPrefs.GetInt("Language", 0);
             
             string lobbyName = "";
@@ -154,14 +153,27 @@ public class LobbyRoomManager : MonoBehaviour
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
-
-    public async void ChangeMaxPlayers(int newMax)
+    
+    public async void UpMaxPlayers()
     {
         if (currentLobby == null || !IsHost) return;
-
+        if (currentMaxPlayers >= 8) return; 
         try
         {
-            currentMaxPlayers = newMax;
+            currentMaxPlayers++; 
+            UpdateLobbyOptions options = new UpdateLobbyOptions { MaxPlayers = currentMaxPlayers };
+            currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
+        }
+        catch (LobbyServiceException e) { Debug.LogError(e); }
+    }
+    
+    public async void DownMaxPlayers()
+    {
+        if (currentLobby == null || !IsHost) return;
+        if (currentMaxPlayers <= 2) return; 
+        try
+        {
+            currentMaxPlayers--; 
             UpdateLobbyOptions options = new UpdateLobbyOptions { MaxPlayers = currentMaxPlayers };
             currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
         }
@@ -256,7 +268,7 @@ public class LobbyRoomManager : MonoBehaviour
                     if (isLocalPlayerReady)
                         btnText.SetDynamicTranslations("Cancel Ready", "Annuler Prêt","Annulla Pronto");
                     else
-                        btnText.SetDynamicTranslations("Ready", "Être Prêt","Essere pronti");
+                        btnText.SetDynamicTranslations("Ready", "Prêt","Pronto");
                 }
             }
         }
