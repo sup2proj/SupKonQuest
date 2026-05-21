@@ -636,6 +636,7 @@ GameObject:
   - component: {fileID: 357757429}
   - component: {fileID: 357757428}
   - component: {fileID: 357757427}
+  - component: {fileID: 357757430}
   m_Layer: 5
   m_Name: LoginBtn
   m_TagString: Untagged
@@ -661,7 +662,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 400, y: -250}
-  m_SizeDelta: {x: 200, y: 30}
+  m_SizeDelta: {x: 400, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &357757427
 MonoBehaviour:
@@ -757,6 +758,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 357757425}
   m_CullTransparentMesh: 1
+--- !u!114 &357757430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 357757425}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &363535081
 GameObject:
   m_ObjectHideFlags: 0
@@ -1275,6 +1288,7 @@ GameObject:
   - component: {fileID: 612503194}
   - component: {fileID: 612503193}
   - component: {fileID: 612503192}
+  - component: {fileID: 612503195}
   m_Layer: 5
   m_Name: CreateAccountBtn
   m_TagString: Untagged
@@ -1300,7 +1314,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -400, y: -250}
-  m_SizeDelta: {x: 200, y: 30}
+  m_SizeDelta: {x: 400, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &612503192
 MonoBehaviour:
@@ -1396,6 +1410,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 612503190}
   m_CullTransparentMesh: 1
+--- !u!114 &612503195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 612503190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &698905457
 GameObject:
   m_ObjectHideFlags: 0
@@ -1561,6 +1587,7 @@ GameObject:
   - component: {fileID: 731660450}
   - component: {fileID: 731660449}
   - component: {fileID: 731660448}
+  - component: {fileID: 731660451}
   m_Layer: 5
   m_Name: BackBtn
   m_TagString: Untagged
@@ -1586,7 +1613,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -250}
-  m_SizeDelta: {x: 200, y: 30}
+  m_SizeDelta: {x: 400, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &731660448
 MonoBehaviour:
@@ -1682,6 +1709,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 731660446}
   m_CullTransparentMesh: 1
+--- !u!114 &731660451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731660446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &968956627
 GameObject:
   m_ObjectHideFlags: 0

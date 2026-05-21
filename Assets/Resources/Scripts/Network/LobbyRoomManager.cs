@@ -49,7 +49,7 @@ public class LobbyRoomManager : MonoBehaviour
         if (IsHost)
         {
             hostControlsPanel.SetActive(true);
-            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Creating Lobby...", "Création du Lobby en cours...","Creazione della lobby in corso...");
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Creating Lobby...", "Creation du Lobby en cours...","Creazione della lobby in corso...");
                 
             await CreateLobby();
         }
@@ -57,7 +57,7 @@ public class LobbyRoomManager : MonoBehaviour
         {
             hostControlsPanel.SetActive(false);
             currentLobby = JoinedLobby;
-            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Connected to lobby", "Connecté au salon","In collegamento con il salone");
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Connected to lobby", "Connecte au salon","In collegamento con il salone");
                 
             RefreshUI();
         }
@@ -96,12 +96,12 @@ public class LobbyRoomManager : MonoBehaviour
             else if (currentLang == 2) // Italiano
             {
                 lobbyName = "Sala da " + myName;
-                welcomeMsg = "Benvenuti in salotto!\n";
+                welcomeMsg = "Benvenuti in salotto !\n";
             }
             else // Anglais (si currentLang == 0 ou autre)
             {
                 lobbyName = "Lobby of " + myName;
-                welcomeMsg = "Welcome to the lobby!\n";
+                welcomeMsg = "Welcome to the lobby !\n";
             }
             
             CreateLobbyOptions options = new CreateLobbyOptions
@@ -130,7 +130,7 @@ public class LobbyRoomManager : MonoBehaviour
             
             RefreshUI();
             
-            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Lobby Open! Waiting for players...", "Lobby Ouvert ! En attente de joueurs...","Lobby aperta! In attesa dei giocatori...");
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Lobby Open ! Waiting for players...", "Lobby Ouvert ! En attente de joueurs...","Lobby aperta ! In attesa dei giocatori...");
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
@@ -266,9 +266,9 @@ public class LobbyRoomManager : MonoBehaviour
                 if (btnText != null)
                 {
                     if (isLocalPlayerReady)
-                        btnText.SetDynamicTranslations("Cancel Ready", "Annuler Prêt","Annulla Pronto");
+                        btnText.SetDynamicTranslations("Cancel Ready", "Annuler Pret","Annulla Pronto");
                     else
-                        btnText.SetDynamicTranslations("Ready", "Prêt","Pronto");
+                        btnText.SetDynamicTranslations("Ready", "Pret","Pronto");
                 }
             }
         }
@@ -355,7 +355,7 @@ public class LobbyRoomManager : MonoBehaviour
 
                     if (!amIStillInLobby)
                     {
-                        HandleDisconnection("Kicked by host.", "Vous avez été expulsé du salon par l'hôte.","Sei stato espulso dalla chat dall'amministratore.");
+                        HandleDisconnection("Kicked by host.", "Vous avez ete expulse du salon par l'hôte.","Sei stato espulso dalla chat dall'amministratore.");
                         return; 
                     }
 

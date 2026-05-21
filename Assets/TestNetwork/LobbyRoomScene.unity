@@ -3008,7 +3008,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Ready
-  frenchText: "Pr\xEAt"
+  frenchText: Pret
   italianoText: Pronto
 --- !u!1 &1188243872
 GameObject:

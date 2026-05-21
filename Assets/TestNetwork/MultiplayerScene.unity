@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 207674090}
   - component: {fileID: 207674089}
   - component: {fileID: 207674088}
+  - component: {fileID: 207674091}
   m_Layer: 5
   m_Name: CreateLobbyBtn
   m_TagString: Untagged
@@ -252,6 +253,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 207674086}
   m_CullTransparentMesh: 1
+--- !u!114 &207674091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207674086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &363535081
 GameObject:
   m_ObjectHideFlags: 0
@@ -986,6 +999,7 @@ GameObject:
   - component: {fileID: 882798237}
   - component: {fileID: 882798236}
   - component: {fileID: 882798235}
+  - component: {fileID: 882798238}
   m_Layer: 5
   m_Name: BackBtn
   m_TagString: Untagged
@@ -1107,6 +1121,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 882798233}
   m_CullTransparentMesh: 1
+--- !u!114 &882798238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 882798233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &1008551692
 GameObject:
   m_ObjectHideFlags: 0
@@ -1317,6 +1343,7 @@ GameObject:
   - component: {fileID: 1247562023}
   - component: {fileID: 1247562022}
   - component: {fileID: 1247562021}
+  - component: {fileID: 1247562024}
   m_Layer: 5
   m_Name: MatchmakingBtn
   m_TagString: Untagged
@@ -1438,6 +1465,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1247562019}
   m_CullTransparentMesh: 1
+--- !u!114 &1247562024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1247562019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &1271762848
 GameObject:
   m_ObjectHideFlags: 0
@@ -1589,7 +1628,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Create lobby
-  frenchText: "Cr\xE9er un lobby"
+  frenchText: Creer un lobby
   italianoText: Crea una lobby
 --- !u!1 &1319947078
 GameObject:
@@ -1893,6 +1932,7 @@ GameObject:
   - component: {fileID: 1653275055}
   - component: {fileID: 1653275054}
   - component: {fileID: 1653275053}
+  - component: {fileID: 1653275056}
   m_Layer: 5
   m_Name: LogoutBtn
   m_TagString: Untagged
@@ -2014,6 +2054,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1653275051}
   m_CullTransparentMesh: 1
+--- !u!114 &1653275056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653275051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &2008233972
 GameObject:
   m_ObjectHideFlags: 0
@@ -2026,6 +2078,7 @@ GameObject:
   - component: {fileID: 2008233976}
   - component: {fileID: 2008233975}
   - component: {fileID: 2008233974}
+  - component: {fileID: 2008233977}
   m_Layer: 5
   m_Name: JoinLobbyBtn
   m_TagString: Untagged
@@ -2147,6 +2200,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2008233972}
   m_CullTransparentMesh: 1
+--- !u!114 &2008233977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2008233972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &2088908079
 GameObject:
   m_ObjectHideFlags: 0
