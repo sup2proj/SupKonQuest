@@ -134,86 +134,76 @@ public class UnitsAnimation : MonoBehaviour
     }
 
     private IEnumerator AttackLoopCoroutine()
+{
+    while (true)
     {
-        while (true)
-        {
-            if (attackTarget == null)
-                break;
+        if (attackTarget == null)
+            break;
 
-            UnitInstance attackerUnit = cachedUnit;
-            if (attackerUnit == null || attackerUnit.currentHealth <= 0)
-                break;
+        UnitInstance attackerUnit = cachedUnit;
+        if (attackerUnit == null || attackerUnit.currentHealth <= 0)
+            break;
 
-            if (!isRetaliating && !IsTargetWithinAttackRange())
-                break;
+        if (!isRetaliating && !IsTargetWithinAttackRange())
+            break;
 
-            AnimationClip attackClip = GetAttackClip();
-            float attackDuration = attackClip != null ? attackClip.length : 1f;
-            float halfDuration = Mathf.Max(0.05f, attackDuration * 0.5f);
-            SetAttackAnimationState(true);
-            yield return new WaitForSeconds(halfDuration);
+        AnimationClip attackClip = GetAttackClip();
+        float attackDuration = attackClip != null ? attackClip.length : 1f;
+        float halfDuration = Mathf.Max(0.05f, attackDuration * 0.5f);
+        SetAttackAnimationState(true);
+        yield return new WaitForSeconds(halfDuration);
 
-            if (!isRetaliating && !IsTargetWithinAttackRange())
-                break;
+        if (!isRetaliating && !IsTargetWithinAttackRange())
+            break;
 
-            UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
-            StructureInstance targetStructure = null;
+        UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+        StructureInstance targetStructure = null;
 
-            if (targetUnit == null)
-                targetStructure = attackTarget.GetComponent<StructureInstance>();
+        if (targetUnit == null)
+            targetStructure = attackTarget.GetComponent<StructureInstance>();
 
-            // Vérifier si la cible existe et est encore en vie
-            if (targetUnit == null && targetStructure == null)
-                break;
+        if (targetUnit == null && targetStructure == null)
+            break;
 
-            // Vérifier si la cible est encore en vie
-            if (targetUnit != null && targetUnit.currentHealth <= 0)
-                break;
-            if (targetStructure != null && targetStructure.currentHealth <= 0)
-                break;
+        if (targetUnit != null && targetUnit.currentHealth <= 0)
+            break;
+        if (targetStructure != null && targetStructure.currentHealth <= 0)
+            break;
 
-            float attack = GetAttackDamage();
+        float attack = GetAttackDamage();
 
-            // Mortar : spawn un boulet qui applique les dégâts à l'arrivée
         if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar)
         {
-            Debug.Log($"[Mortar] cannonBallPrefab={cannonBallPrefab}, attackTarget={attackTarget}");
-            
             if (cannonBallPrefab != null && attackTarget != null)
             {
-                Debug.Log($"[Mortar] Spawn boulet depuis {transform.position} vers {attackTarget.position}");
-            }
-            else
-            {
-                Debug.LogError($"[Mortar] PAS DE SPAWN - prefab null={cannonBallPrefab == null}, target null={attackTarget == null}");
-            }
-            if (cannonBallPrefab != null && attackTarget != null)
-            {
-                Transform targetSnapshot = attackTarget; // capture pour la lambda
+                Transform targetSnapshot = attackTarget;
                 UnitInstance targetUnitSnapshot = targetUnit;
                 StructureInstance targetStructureSnapshot = targetStructure;
                 UnitInstance attackerSnapshot = attackerUnit;
+                Transform launcherTransform = transform; // ← capture sécurisée
 
                 Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
                 CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, () =>
                 {
+                    if (attackerSnapshot == null || attackerSnapshot.currentHealth <= 0)
+                        return;
+
                     if (targetUnitSnapshot != null)
                     {
                         targetUnitSnapshot.TakeDamage(attack);
                         UnitsAnimation targetAnimation = targetUnitSnapshot.GetComponent<UnitsAnimation>();
-                        if (targetAnimation != null)
-                            targetAnimation.AttackTheAttacker(transform);
+                        if (targetAnimation != null && launcherTransform != null)
+                            targetAnimation.AttackTheAttacker(launcherTransform);
                     }
                     else if (targetStructureSnapshot != null)
                     {
                         targetStructureSnapshot.TakeDamage(attack, attackerSnapshot);
                     }
-                });
+                }, transform); // ← lanceur passé à Spawn
             }
         }
         else
         {
-            // Comportement normal pour les autres unités
             if (targetUnit != null)
             {
                 targetUnit.TakeDamage(attack);
@@ -227,11 +217,11 @@ public class UnitsAnimation : MonoBehaviour
             }
         }
 
-                    yield return new WaitForSeconds(halfDuration);
-                }
+        yield return new WaitForSeconds(halfDuration);
+    }
 
-                StopAttackInternal();
-            }
+    StopAttackInternal();
+}
 
     private AnimationClip GetAttackClip()
     {
