@@ -172,7 +172,7 @@ public class UnitsAnimation : MonoBehaviour
 
         float attack = GetAttackDamage();
 
-        if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar)
+        if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar || cachedUnit.unitData.type == UnitsType.Fregate)
         {
             if (cannonBallPrefab != null && attackTarget != null)
             {
@@ -180,26 +180,55 @@ public class UnitsAnimation : MonoBehaviour
                 UnitInstance targetUnitSnapshot = targetUnit;
                 StructureInstance targetStructureSnapshot = targetStructure;
                 UnitInstance attackerSnapshot = attackerUnit;
-                Transform launcherTransform = transform; // ← capture sécurisée
-
+                Transform launcherTransform = transform;
                 Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
-                CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, () =>
-                {
-                    if (attackerSnapshot == null || attackerSnapshot.currentHealth <= 0)
-                        return;
+                float impactRadius = 1.5f;
 
-                    if (targetUnitSnapshot != null)
+                CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, (impactPos) => {
+
+                    GameObject impactZone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    impactZone.transform.position = impactPos;
+                    impactZone.transform.localScale = new Vector3(impactRadius * 2f, 0.05f, impactRadius * 2f);
+                    impactZone.GetComponent<Collider>().enabled = false;
+                    impactZone.GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f, 0.5f);
+                    Destroy(impactZone, 1f);
+                    UnitInstance[] allUnits = FindObjectsByType<UnitInstance>(FindObjectsSortMode.None);
+                    foreach (UnitInstance hitUnit in allUnits)
                     {
-                        targetUnitSnapshot.TakeDamage(attack);
-                        UnitsAnimation targetAnimation = targetUnitSnapshot.GetComponent<UnitsAnimation>();
-                        if (targetAnimation != null && launcherTransform != null)
-                            targetAnimation.AttackTheAttacker(launcherTransform);
+                        if (hitUnit == null || hitUnit == attackerSnapshot)
+                            continue;
+
+                        if (hitUnit.playerId == attackerSnapshot.playerId)
+                            continue;
+
+                        if (hitUnit.currentHealth <= 0)
+                            continue;
+
+                        float dist = Vector3.Distance(hitUnit.transform.position, impactPos);
+                        if (dist <= impactRadius)
+                        {
+                            Debug.Log($"[Mortar] Dégâts sur {hitUnit.name} (dist={dist:F2})");
+                            float damageMultiplier = 1f + (impactRadius - dist);
+                            hitUnit.TakeDamage(attack * damageMultiplier);
+                            UnitsAnimation anim = hitUnit.GetComponent<UnitsAnimation>();
+                            if (anim != null)
+                                anim.AttackTheAttacker(transform);
+                        }
                     }
-                    else if (targetStructureSnapshot != null)
+
+                    // Structures
+                    StructureInstance[] allStructures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+                    foreach (StructureInstance hitStructure in allStructures)
                     {
-                        targetStructureSnapshot.TakeDamage(attack, attackerSnapshot);
+                        if (hitStructure == null || hitStructure.playerId == attackerSnapshot.playerId)
+                            continue;
+
+                        float dist = Vector3.Distance(hitStructure.transform.position, impactPos);
+                        if (dist <= impactRadius)
+                            hitStructure.TakeDamage(attack, attackerSnapshot);
                     }
-                }, transform); // ← lanceur passé à Spawn
+
+                }, transform);
             }
         }
         else

@@ -5,26 +5,27 @@ public class CannonBall : MonoBehaviour
     private Vector3 startPosition;
     private Vector3 endPosition;
     private float speed;
-    private System.Action onArrival;
+    private System.Action<Vector3> onArrival; // passe la position d'impact
     private bool arrived = false;
     private float progress = 0f;
     [SerializeField] private float arcHeight = 3f;
-
     private Transform target;
     private Transform launcher;
 
-    public static CannonBall Spawn(GameObject prefab, Vector3 from, Transform target, float speed, System.Action onArrival, Transform launcher = null)
+    public static CannonBall Spawn(GameObject prefab, Vector3 from, Transform target, float speed, System.Action<Vector3> onArrival, Transform launcher = null)
     {
         GameObject go = Instantiate(prefab, from, Quaternion.identity);
         CannonBall ball = go.GetComponent<CannonBall>();
         if (ball == null)
             ball = go.AddComponent<CannonBall>();
+
         ball.startPosition = from;
-        ball.endPosition = target.position;
+        ball.endPosition = target.position; // position figée au moment du tir
         ball.speed = speed;
         ball.onArrival = onArrival;
         ball.target = target;
         ball.launcher = launcher;
+
         return ball;
     }
 
@@ -45,7 +46,7 @@ public class CannonBall : MonoBehaviour
         }
 
         float distance = Vector3.Distance(startPosition, endPosition);
-        progress += (speed / distance) * Time.deltaTime;
+        progress += speed / distance * Time.deltaTime;
         progress = Mathf.Clamp01(progress);
 
         Vector3 linearPos = Vector3.Lerp(startPosition, endPosition, progress);
@@ -54,12 +55,13 @@ public class CannonBall : MonoBehaviour
 
         if (newPos != transform.position)
             transform.LookAt(newPos + (newPos - transform.position));
+
         transform.position = newPos;
 
         if (progress >= 1f)
         {
             arrived = true;
-            onArrival?.Invoke();
+            onArrival?.Invoke(endPosition);
             Destroy(gameObject);
         }
     }
