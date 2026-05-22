@@ -8,11 +8,14 @@ public class UnitsAnimation : MonoBehaviour
     private Transform attackTarget;
     private UnitInstance cachedUnit;
     private Coroutine attackCoroutine;
+    private bool isRetaliating;
     private DamageTable damageTable;
 
     private MovementManager movementManager;
 
     public Transform AttackTarget => attackTarget;
+    public GameObject cannonBallPrefab;
+    public float cannonBallSpeed = 3f;
 
     void Awake()
     {
@@ -24,7 +27,13 @@ public class UnitsAnimation : MonoBehaviour
         damageTable = UnityEngine.Resources.Load<DamageTable>("Scripts/Data/Units/UnitsSO/DamageTable");
         if (damageTable == null)
             Debug.LogError("Impossible de charger DamageTable !");
-
+        
+        if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar) {
+            cannonBallPrefab = Resources.Load<GameObject>("Prefabs/Units/CannonBall/Cannonball");
+            if (cannonBallPrefab == null)
+                Debug.LogError("[Mortar] CannonBall prefab introuvable dans Resources/Prefabs/");
+        }
+        
         if (movementManager != null)
             movementManager.OnMovementComplete += OnMovementCompleted;
     }
@@ -98,11 +107,14 @@ public class UnitsAnimation : MonoBehaviour
     {
         while (true)
         {
-            UnitInstance attackerUnit = cachedUnit;
-            if (attackTarget == null || attackerUnit == null || attackerUnit.currentHealth <= 0)
+            if (attackTarget == null)
                 break;
 
-            if (!IsTargetWithinAttackRange())
+            UnitInstance attackerUnit = cachedUnit;
+            if (attackerUnit == null || attackerUnit.currentHealth <= 0)
+                break;
+
+            if (!isRetaliating && !IsTargetWithinAttackRange())
                 break;
 
             AnimationClip attackClip = GetAttackClip();
@@ -111,15 +123,98 @@ public class UnitsAnimation : MonoBehaviour
             SetAttackAnimationState(true);
             yield return new WaitForSeconds(halfDuration);
 
-            if (!IsTargetWithinAttackRange())
+            if (!isRetaliating && !IsTargetWithinAttackRange())
                 break;
-            if (!TryGetCurrentTarget(out UnitInstance targetUnit, out StructureInstance targetStructure))
+
+            UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+            StructureInstance targetStructure = null;
+
+            if (targetUnit == null)
+                targetStructure = attackTarget.GetComponent<StructureInstance>();
+
+            if (targetUnit == null && targetStructure == null)
                 break;
-            if (IsFriendlyStructureTarget(targetStructure, attackerUnit))
+
+            if (targetUnit != null && targetUnit.currentHealth <= 0)
+                break;
+            if (targetStructure != null && targetStructure.currentHealth <= 0)
                 break;
 
             float attack = GetAttackDamage(targetUnit, targetStructure);
-            ApplyAttackDamage(targetUnit, targetStructure, attackerUnit, attack);
+
+            if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar || cachedUnit.unitData.type == UnitsType.Fregate)
+            {
+                if (cannonBallPrefab != null && attackTarget != null)
+                {
+                    Transform targetSnapshot = attackTarget;
+                    UnitInstance targetUnitSnapshot = targetUnit;
+                    StructureInstance targetStructureSnapshot = targetStructure;
+                    UnitInstance attackerSnapshot = attackerUnit;
+                    Transform launcherTransform = transform;
+                    Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
+                    float impactRadius = 1.5f;
+
+                    CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, (impactPos) => {
+
+                        GameObject impactZone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                        impactZone.transform.position = impactPos;
+                        impactZone.transform.localScale = new Vector3(impactRadius * 2f, 0.05f, impactRadius * 2f);
+                        impactZone.GetComponent<Collider>().enabled = false;
+                        impactZone.GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f, 0.5f);
+                        Destroy(impactZone, 1f);
+                        UnitInstance[] allUnits = FindObjectsByType<UnitInstance>(FindObjectsSortMode.None);
+                        foreach (UnitInstance hitUnit in allUnits)
+                        {
+                            if (hitUnit == null || hitUnit == attackerSnapshot)
+                                continue;
+
+                            if (hitUnit.playerId == attackerSnapshot.playerId)
+                                continue;
+
+                            if (hitUnit.currentHealth <= 0)
+                                continue;
+
+                            float dist = Vector3.Distance(hitUnit.transform.position, impactPos);
+                            if (dist <= impactRadius)
+                            {
+                                Debug.Log($"[Mortar] Dégâts sur {hitUnit.name} (dist={dist:F2})");
+                                float damageMultiplier = 1f + (impactRadius - dist);
+                                hitUnit.TakeDamage(attack * damageMultiplier);
+                                UnitsAnimation anim = hitUnit.GetComponent<UnitsAnimation>();
+                                if (anim != null)
+                                    anim.AttackTheAttacker(transform);
+                            }
+                        }
+
+                        // Structures
+                        StructureInstance[] allStructures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+                        foreach (StructureInstance hitStructure in allStructures)
+                        {
+                            if (hitStructure == null || hitStructure.playerId == attackerSnapshot.playerId)
+                                continue;
+
+                            float dist = Vector3.Distance(hitStructure.transform.position, impactPos);
+                            if (dist <= impactRadius)
+                                hitStructure.TakeDamage(attack, attackerSnapshot);
+                        }
+
+                    }, transform);
+                }
+            }
+            else
+            {
+                if (targetUnit != null)
+                {
+                    targetUnit.TakeDamage(attack);
+                    UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
+                    if (targetAnimation != null && attackerUnit != null)
+                        targetAnimation.AttackTheAttacker(transform);
+                }
+                else
+                {
+                    targetStructure.TakeDamage(attack, attackerUnit);
+                }
+            }
 
             yield return new WaitForSeconds(halfDuration);
         }
