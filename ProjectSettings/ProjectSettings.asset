@@ -924,11 +924,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 6e14eab8-0a3e-4bdd-a7e4-bcba8f44d050
+  cloudProjectId: eca193ca-1885-4abd-bcda-76985369e7ce
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: SupKonQuest
-  organizationId: trinytex
+  organizationId: louis7034
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

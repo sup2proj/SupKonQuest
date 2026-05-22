@@ -2651,9 +2651,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: b2ecab5f3a916874296b97a4611d015f, type: 3}
   - {fileID: 21300000, guid: 6cce9babf42dac94f817677da0d509ae, type: 3}
   mapNames:
-  - Dark Vador
-  - Oui-Oui
-  - Teemo
+  - TEST
+  - LOL
+  - Europe
   aiCountDisplay: {fileID: 1641345798}
   maxAi: 7
   diffDisplay: {fileID: 176130712}

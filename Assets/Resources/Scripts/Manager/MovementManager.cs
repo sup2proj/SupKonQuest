@@ -23,6 +23,7 @@ public class MovementManager : MonoBehaviour
     private Vector3 targetPosition;
     private bool isMovingToTarget = false;
     private Transform followTarget;
+    private bool followTargetPosition = true;
     private float stuckTimer = 0f;
 
     private UnitInstance unitInstance;
@@ -99,7 +100,7 @@ public class MovementManager : MonoBehaviour
         if (!isMovingToTarget)
             return;
 
-        if (followTarget != null)
+        if (followTarget != null && followTargetPosition)
             agent.SetDestination(followTarget.position);
 
         if (HasReachedAgentDestination())
@@ -154,7 +155,7 @@ public class MovementManager : MonoBehaviour
             return;
         }
 
-        if (followTarget != null)
+        if (followTarget != null && followTargetPosition)
             targetPosition = followTarget.position;
 
         Vector3 toTarget = targetPosition - transform.position;
@@ -230,19 +231,91 @@ public class MovementManager : MonoBehaviour
 
     private void MoveToTargetInternal(Transform target, float stopDistance)
     {
-        if (target != null && !CanMoveOnWorldPosition(target.position))
-            return;
-
         BoatTransport.ClearPendingBoarding(unitInstance);
 
         followTarget = target;
+        followTargetPosition = false;
+
+        Vector3 destination = target != null ? target.position : transform.position;
         if (target != null)
-            targetPosition = target.position;
+        {
+            StructureInstance structure = target.GetComponent<StructureInstance>();
+            if (structure == null)
+                structure = target.GetComponentInParent<StructureInstance>();
+            if (structure == null)
+                structure = target.GetComponentInChildren<StructureInstance>();
+
+            if (structure != null)
+            {
+                followTargetPosition = false;
+                if (!TryGetApproachDestinationForTarget(target, stopDistance, out destination))
+                    return;
+            }
+            else if (CanMoveOnWorldPosition(target.position))
+            {
+                followTargetPosition = true;
+                destination = target.position;
+            }
+            else if (!TryGetApproachDestinationForTarget(target, stopDistance, out destination))
+            {
+                return;
+            }
+        }
+
+        if (target != null)
+            targetPosition = destination;
 
         StartMovement(GetUnitAttackRange(stopDistance));
 
         if (target != null)
-            ApplyAgentDestination(target.position);
+            ApplyAgentDestination(destination);
+    }
+    
+    // On va chercher le point le plus proche pour que les unités n'aillent pas dans l'eau.
+    private bool TryGetApproachDestinationForTarget(Transform target, float stopDistance, out Vector3 destination)
+    {
+        destination = target != null ? target.position : transform.position;
+
+        if (target == null)
+            return false;
+
+        StructureInstance structure = target.GetComponent<StructureInstance>();
+        if (structure == null)
+            structure = target.GetComponentInParent<StructureInstance>();
+        if (structure == null)
+            structure = target.GetComponentInChildren<StructureInstance>();
+
+        if (structure == null)
+            return false;
+
+        int areaMask = agent != null ? agent.areaMask : NavMesh.AllAreas;
+        Vector3 center = structure.StructurePosition;
+        float baseRadius = Mathf.Max(0.75f, stopDistance);
+        float maxRadius = baseRadius + 8f;
+        const int directionCount = 8;
+
+        for (float radius = baseRadius; radius <= maxRadius; radius += 1f)
+        {
+            for (int i = 0; i < directionCount; i++)
+            {
+                float angle = (Mathf.PI * 2f * i) / directionCount;
+                Vector3 candidate = center + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+
+                if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, NavMeshSampleDistance, areaMask))
+                {
+                    destination = hit.position;
+                    return true;
+                }
+            }
+        }
+
+        if (NavMesh.SamplePosition(center, out NavMeshHit centerHit, NavMeshSampleDistance * 2f, areaMask))
+        {
+            destination = centerHit.position;
+            return true;
+        }
+
+        return false;
     }
 
     private void SetPositionDestination(Vector3 destination, float stopDistance, bool clearPendingBoarding)
@@ -251,6 +324,7 @@ public class MovementManager : MonoBehaviour
             BoatTransport.ClearPendingBoarding(unitInstance);
 
         followTarget = null;
+        followTargetPosition = true;
         targetPosition = destination;
         StartMovement(stopDistance);
         ApplyAgentDestination(destination);
@@ -287,6 +361,7 @@ public class MovementManager : MonoBehaviour
         isMovingToTarget = false;
         movement = Vector3.zero;
         followTarget = null;
+        followTargetPosition = true;
 
         if (animator != null)
             animator.SetBool("isMoving", false);
@@ -403,10 +478,11 @@ public class MovementManager : MonoBehaviour
 
     public void MoveBoatsUnitToTarget(UnitInstance unit, Transform target, float stopDistance)
     {
-        if (target == null)
+        if (unit == null || target == null)
             return;
 
-        if (!TryGetMovementForUnit(unit, target.position, out MovementManager movement))
+        MovementManager movement = unit.GetComponent<MovementManager>();
+        if (movement == null)
             return;
 
         movement.MoveToTarget(target, stopDistance);
