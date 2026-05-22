@@ -16,11 +16,15 @@ public class UnitsAnimation : MonoBehaviour
     public Transform AttackTarget => attackTarget;
     public GameObject cannonBallPrefab;
     public float cannonBallSpeed = 3f;
+ 	private float oldSpeedAnimation;
 
     void Awake()
     {
         if (animator == null)
-            animator = GetComponent<Animator>();
+			{
+            	animator = GetComponent<Animator>();
+				 oldSpeedAnimation = animator.speed;
+			}
         cachedUnit = GetComponent<UnitInstance>();
         movementManager = GetComponent<MovementManager>();
 
@@ -122,7 +126,7 @@ public class UnitsAnimation : MonoBehaviour
             float attackSpeed = GetAttackSpeed();
 
             if (animator != null)
-                animator.speed = attackSpeed;
+                	animator.speed = attackSpeed;
 
             float attackDuration = attackClip != null
                 ? attackClip.length / attackSpeed
@@ -132,7 +136,7 @@ public class UnitsAnimation : MonoBehaviour
 
             SetAttackAnimationState(true);
             yield return new WaitForSeconds(halfDuration);
-
+		
             if (!isRetaliating && !IsTargetWithinAttackRange())
                 break;
 
@@ -227,7 +231,6 @@ public class UnitsAnimation : MonoBehaviour
             }
             yield return new WaitForSeconds(halfDuration);
         }
-
         StopAttackInternal();
     }
 
@@ -338,13 +341,16 @@ public class UnitsAnimation : MonoBehaviour
     }
 
     private void StopAttackCoroutine()
-    {
-        if (attackCoroutine == null)
-            return;
+{
+    if (attackCoroutine == null)
+        return;
 
-        StopCoroutine(attackCoroutine);
-        attackCoroutine = null;
-    }
+    StopCoroutine(attackCoroutine);
+    attackCoroutine = null;
+
+    if (animator != null)
+        animator.speed = oldSpeedAnimation;
+}
 
     private bool TryGetCurrentTarget(out UnitInstance targetUnit, out StructureInstance targetStructure)
     {
