@@ -118,8 +118,18 @@ public class UnitsAnimation : MonoBehaviour
                 break;
 
             AnimationClip attackClip = GetAttackClip();
-            float attackDuration = attackClip != null ? attackClip.length : 1f;
+
+            float attackSpeed = GetAttackSpeed();
+
+            if (animator != null)
+                animator.speed = attackSpeed;
+
+            float attackDuration = attackClip != null
+                ? attackClip.length / attackSpeed
+                : 1f;
+
             float halfDuration = Mathf.Max(0.05f, attackDuration * 0.5f);
+
             SetAttackAnimationState(true);
             yield return new WaitForSeconds(halfDuration);
 
@@ -215,7 +225,6 @@ public class UnitsAnimation : MonoBehaviour
                     targetStructure.TakeDamage(attack, attackerUnit);
                 }
             }
-
             yield return new WaitForSeconds(halfDuration);
         }
 
@@ -539,5 +548,13 @@ public class UnitsAnimation : MonoBehaviour
         yield return new WaitForSeconds(duration);
 
         SetAttackVisuals(false);
+    }
+    
+    private float GetAttackSpeed()
+    {
+        if (cachedUnit != null && cachedUnit.unitData is UnitCombatData combatData)
+            return Mathf.Max(0.1f, combatData.attackSpeed);
+
+        return 1f;
     }
 }
