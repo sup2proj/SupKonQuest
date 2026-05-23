@@ -4,6 +4,7 @@ using UnityEngine.Audio;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class OptionsManager : MonoBehaviour
 {
@@ -15,22 +16,15 @@ public class OptionsManager : MonoBehaviour
     [Header("Language")]
     public TextMeshProUGUI languageText;
     public GameObject languageRow;
-    public TextMeshProUGUI langLeftArrow;
-    public TextMeshProUGUI langRightArrow;
-    private string[] languages = { "English", "Français", "italiano" };
+    private string[] languages = { "English", "Français", "Deutsch" };
     private int currentLanguage = 0;
 
     [Header("Resolution")]
-    public TextMeshProUGUI resolutionText;
-    public GameObject resolutionRow;
-    public TextMeshProUGUI resLeftArrow;
-    public TextMeshProUGUI resRightArrow;
+    public TMP_Dropdown resolutionDropdown; 
     private Resolution[] resolutions;
-    private int currentResolution = 0;
 
     [Header("Fullscreen")]
     public Toggle fullscreenToggle;
-    public TextMeshProUGUI fullscreenText;
 
     void Start()
     {
@@ -38,14 +32,11 @@ public class OptionsManager : MonoBehaviour
         sfxSlider.value = PlayerPrefs.GetFloat("SFXVolume", 1f);
         currentLanguage = PlayerPrefs.GetInt("Language", 0);
         fullscreenToggle.isOn = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
-        resolutions = Screen.resolutions;
-        currentResolution = PlayerPrefs.GetInt("Resolution", resolutions.Length - 1);
 
         ApplyMusicVolume(musicSlider.value);
         ApplySFXVolume(sfxSlider.value);
-
         UpdateLanguageText();
-        UpdateResolutionText();
+        InitializeResolutionDropdown();
 
         EventSystem.current.SetSelectedGameObject(musicSlider.gameObject);
     }
@@ -64,43 +55,32 @@ public class OptionsManager : MonoBehaviour
 
     void ApplyMusicVolume(float value)
     {
-        if (value <= 0)
-            audioMixer.SetFloat("MusicVolume", -80f);
-        else
-            audioMixer.SetFloat("MusicVolume", Mathf.Log10(value) * 80f);
+        if (value <= 0) audioMixer.SetFloat("MusicVolume", -80f);
+        else audioMixer.SetFloat("MusicVolume", Mathf.Log10(value) * 80f);
     }
  
     void ApplySFXVolume(float value)
     {
-        if (value <= 0)
-            audioMixer.SetFloat("SFXVolume", -80f);
-        else
-            audioMixer.SetFloat("SFXVolume", Mathf.Log10(value) * 80f);
+        if (value <= 0) audioMixer.SetFloat("SFXVolume", -80f);
+        else audioMixer.SetFloat("SFXVolume", Mathf.Log10(value) * 80f);
     }
 
     public void NextLanguage()
     {
         currentLanguage = currentLanguage + 1;
-        
-        if (currentLanguage > languages.Length - 1)
-        {
-            currentLanguage = 0;
-        }
-
-        PlayerPrefs.SetInt("Language", currentLanguage);
-        UpdateLanguageText();
-        RefreshTranslationsInScene();
+        if (currentLanguage > languages.Length - 1) currentLanguage = 0;
+        SaveAndApplyLanguage();
     }
 
     public void PreviousLanguage()
     {
         currentLanguage = currentLanguage - 1;
-        
-        if (currentLanguage < 0)
-        {
-            currentLanguage = languages.Length - 1;
-        }
+        if (currentLanguage < 0) currentLanguage = languages.Length - 1;
+        SaveAndApplyLanguage();
+    }
 
+    void SaveAndApplyLanguage()
+    {
         PlayerPrefs.SetInt("Language", currentLanguage);
         UpdateLanguageText();
         RefreshTranslationsInScene();
@@ -113,43 +93,49 @@ public class OptionsManager : MonoBehaviour
 
     void RefreshTranslationsInScene()
     {
-        LocalizedText[] allLocalizedTexts = FindObjectsOfType<LocalizedText>(); 
+        LocalizedText[] allLocalizedTexts = FindObjectsByType<LocalizedText>(FindObjectsSortMode.None); 
         for (int i = 0; i < allLocalizedTexts.Length; i++)
         {
             allLocalizedTexts[i].UpdateText();
         }
     }
 
-    public void NextResolution()
+    void InitializeResolutionDropdown()
     {
-        currentResolution = currentResolution + 1;
-        if (currentResolution > resolutions.Length - 1)
-            currentResolution = 0;
+        if (resolutionDropdown == null) return;
 
-        ApplyResolution();
+        resolutions = Screen.resolutions;
+        resolutionDropdown.ClearOptions();
+
+        List<string> options = new List<string>();
+        int currentResolutionIndex = 0;
+
+        for (int i = 0; i < resolutions.Length; i++)
+        {
+            string option = resolutions[i].width + " x " + resolutions[i].height;
+            options.Add(option);
+
+            if (PlayerPrefs.HasKey("Resolution"))
+            {
+                if (i == PlayerPrefs.GetInt("Resolution")) currentResolutionIndex = i;
+            }
+            else if (resolutions[i].width == Screen.width && resolutions[i].height == Screen.height)
+            {
+                currentResolutionIndex = i;
+            }
+        }
+
+        resolutionDropdown.AddOptions(options);
+        resolutionDropdown.value = currentResolutionIndex;
+        resolutionDropdown.RefreshShownValue();
+        resolutionDropdown.onValueChanged.AddListener(SetResolution);
     }
 
-    public void PreviousResolution()
+    public void SetResolution(int resolutionIndex)
     {
-        currentResolution = currentResolution - 1;
-        if (currentResolution < 0)
-            currentResolution = resolutions.Length - 1;
-
-        ApplyResolution();
-    }
-
-    void ApplyResolution()
-    {
-        Resolution res = resolutions[currentResolution];
-        Screen.SetResolution(res.width, res.height, fullscreenToggle.isOn);
-        PlayerPrefs.SetInt("Resolution", currentResolution);
-        UpdateResolutionText();
-    }
-
-    void UpdateResolutionText()
-    {
-        Resolution res = resolutions[currentResolution];
-        resolutionText.text = res.width + " x " + res.height;
+        Resolution res = resolutions[resolutionIndex];
+        Screen.SetResolution(res.width, res.height, Screen.fullScreen);
+        PlayerPrefs.SetInt("Resolution", resolutionIndex);
     }
 
     public void OnFullscreenChanged(bool isFullscreen)
