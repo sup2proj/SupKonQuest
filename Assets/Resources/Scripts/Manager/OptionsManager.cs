@@ -16,7 +16,7 @@ public class OptionsManager : MonoBehaviour
     [Header("Language")]
     public TextMeshProUGUI languageText;
     public GameObject languageRow;
-    private string[] languages = { "English", "Français", "Deutsch" };
+    private string[] languages = { "English", "Français", "Italiano" };
     private int currentLanguage = 0;
 
     [Header("Resolution")]

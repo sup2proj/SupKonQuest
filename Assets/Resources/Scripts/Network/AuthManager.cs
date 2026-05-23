@@ -14,6 +14,7 @@ public class AuthManager : MonoBehaviour
 
     async void Start()
     {
+        usernameInput.Select();
         try
         {
             await UnityServices.InitializeAsync();
@@ -21,14 +22,40 @@ public class AuthManager : MonoBehaviour
         }
         catch (System.Exception e)
         {
-            if (statusText != null) statusText.SetDynamicTranslations("Server initialization error.", "Erreur d'initialisation des serveurs.","Errore durante l'inizializzazione dei server.");
+            if (statusText != null) statusText.SetDynamicTranslations("Server initialization error.", "Erreur d'initialisation des serveurs.", "Errore durante l'inizializzazione dei server.");
             Debug.LogError(e);
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            if (usernameInput.isFocused)
+            {
+                passwordInput.Select();
+            }
+            else if (passwordInput.isFocused)
+            {
+                usernameInput.Select();
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            SignIn();
         }
     }
 
     public async void SignUp()
     {
-        if (statusText != null) statusText.SetDynamicTranslations("Creating account...", "Création du compte en cours...","Creazione dell'account in corso...");
+        if (string.IsNullOrWhiteSpace(usernameInput.text) || string.IsNullOrWhiteSpace(passwordInput.text))
+        {
+            if (statusText != null) statusText.SetDynamicTranslations("Please fill all fields.", "Veuillez remplir tous les champs.", "Si prega di compilare tutti i campi.");
+            return;
+        }
+
+        if (statusText != null) statusText.SetDynamicTranslations("Creating account...", "Création du compte en cours...", "Creazione dell'account in corso...");
             
         try
         {
@@ -36,14 +63,14 @@ public class AuthManager : MonoBehaviour
 
             PlayerPrefs.SetString("PlayerName", usernameInput.text);
             
-            if (statusText != null) statusText.SetDynamicTranslations("Account created and connected successfully!", "Compte créé et connecté avec succès !", "Account creato e accesso effettuato con successo !");
+            if (statusText != null) statusText.SetDynamicTranslations("Account created and connected successfully!", "Compte créé et connecté avec succès !", "Account creato e accesso effettuato con successo!");
                 
             SceneManager.LoadScene("MultiplayerScene");
             Debug.Log("Compte créé. ID Unique du joueur : " + AuthenticationService.Instance.PlayerId);
         }
         catch (AuthenticationException ex)
         {
-            if (statusText != null) statusText.SetDynamicTranslations("Creation error: " + ex.Message, "Erreur de création : " + ex.Message,"Errore durante la creazione : " + ex.Message);
+            if (statusText != null) statusText.SetDynamicTranslations("Creation error: " + ex.Message, "Erreur de création : " + ex.Message, "Errore durante la creazione : " + ex.Message);
             Debug.LogError(ex);
         }
         catch (RequestFailedException ex)
@@ -55,7 +82,13 @@ public class AuthManager : MonoBehaviour
 
     public async void SignIn()
     {
-        if (statusText != null) statusText.SetDynamicTranslations("Signing in...", "Connexion en cours...","Accesso in corso...");
+        if (string.IsNullOrWhiteSpace(usernameInput.text) || string.IsNullOrWhiteSpace(passwordInput.text))
+        {
+            if (statusText != null) statusText.SetDynamicTranslations("Invalid credentials.", "Identifiants incorrects.", "Dati di accesso non corretti.");
+            return;
+        }
+
+        if (statusText != null) statusText.SetDynamicTranslations("Signing in...", "Connexion en cours...", "Accesso in corso...");
             
         try
         {
@@ -67,16 +100,15 @@ public class AuthManager : MonoBehaviour
                 
             SceneManager.LoadScene("MultiplayerScene");
             Debug.Log("Connexion réussie. ID Unique : " + AuthenticationService.Instance.PlayerId);
-            
         }
         catch (AuthenticationException ex)
         {
-            if (statusText != null) statusText.SetDynamicTranslations("Invalid credentials.", "Identifiants incorrects.","Dati di accesso non corretti.");
+            if (statusText != null) statusText.SetDynamicTranslations("Invalid credentials.", "Identifiants incorrects.", "Dati di accesso non corretti.");
             Debug.LogError(ex);
         }
         catch (RequestFailedException ex)
         {
-            if (statusText != null) statusText.SetDynamicTranslations("Network error.", "Erreur réseau.","Errore di rete.");
+            if (statusText != null) statusText.SetDynamicTranslations("Network error.", "Erreur réseau.", "Errore di rete.");
             Debug.LogError(ex);
         }
     }
