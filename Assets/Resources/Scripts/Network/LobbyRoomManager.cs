@@ -74,6 +74,14 @@ public class LobbyRoomManager : MonoBehaviour
     void Update()
     {
         HandleLobbyPolling();
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            if (chatInputField != null && !chatInputField.isFocused)
+            {
+                chatInputField.Select();
+                chatInputField.ActivateInputField();
+            }
+        }
     }
 
 
