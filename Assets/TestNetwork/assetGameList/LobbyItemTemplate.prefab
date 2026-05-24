@@ -566,6 +566,7 @@ GameObject:
   - component: {fileID: 4311304518241485853}
   - component: {fileID: 265210847329312308}
   - component: {fileID: 5128062955935992547}
+  - component: {fileID: 6270233559154730447}
   m_Layer: 5
   m_Name: JoinBtn
   m_TagString: Untagged
@@ -695,3 +696,15 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &6270233559154730447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7949053609156531283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
