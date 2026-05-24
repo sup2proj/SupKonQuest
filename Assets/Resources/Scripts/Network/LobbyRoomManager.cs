@@ -78,6 +78,7 @@ public class LobbyRoomManager : MonoBehaviour
         {
             if (chatInputField != null && !chatInputField.isFocused)
             {
+                UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
                 chatInputField.Select();
                 chatInputField.ActivateInputField();
             }
