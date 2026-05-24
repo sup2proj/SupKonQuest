@@ -299,6 +299,8 @@ GameObject:
   - component: {fileID: 3629185328892896}
   - component: {fileID: 6643030263641176717}
   - component: {fileID: 1472559391920358697}
+  - component: {fileID: 5704565281457894752}
+  - component: {fileID: -6657260633255296689}
   m_Layer: 0
   m_Name: Fregate
   m_TagString: Untagged
@@ -369,6 +371,7 @@ MonoBehaviour:
   healthBar: {fileID: 7814307443549164786}
   currentHealth: 0
   playerId: 0
+  isNeutral: 0
 --- !u!114 &3629185328892896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -422,6 +425,43 @@ MonoBehaviour:
   moveSpeed: 3.5
   stoppingDistance: 0.2
   rotationSpeed: 12
+--- !u!95 &5704565281457894752
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7976404171854096219}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 1
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-6657260633255296689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7976404171854096219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64cb831562a6bdf41a4a4ca58a11e281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
+  animator: {fileID: 0}
+  cannonBallPrefab: {fileID: 0}
+  cannonBallSpeed: 3
 --- !u!1 &8597381470903094485
 GameObject:
   m_ObjectHideFlags: 0

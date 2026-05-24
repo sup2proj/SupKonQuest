@@ -31,15 +31,25 @@ public class UnitsAnimation : MonoBehaviour
         damageTable = UnityEngine.Resources.Load<DamageTable>("Scripts/Data/Units/UnitsSO/DamageTable");
         if (damageTable == null)
             Debug.LogError("Impossible de charger DamageTable !");
-        
-        if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar) {
+
+        bool isProjectileUnit = cachedUnit != null && cachedUnit.unitData != null && (
+        cachedUnit.unitData.type == UnitsType.Fregate
+        || cachedUnit.unitData.type == UnitsType.Destroyer);
+
+        if (isProjectileUnit)
+        {
             cannonBallPrefab = Resources.Load<GameObject>("Prefabs/Units/CannonBall/Cannonball");
             if (cannonBallPrefab == null)
-                Debug.LogError("[Mortar] CannonBall prefab introuvable dans Resources/Prefabs/");
+                Debug.LogError("[Projectile] CannonBall prefab introuvable !");
         }
-        
+    }
+
+    void Start()
+    {
         if (movementManager != null)
+        {
             movementManager.OnMovementComplete += OnMovementCompleted;
+        }
     }
 
     void Update()
@@ -75,9 +85,11 @@ public class UnitsAnimation : MonoBehaviour
         }
 
         if (attackTarget == null)
+        {
+            Debug.LogWarning("[StartAttackWithDamage] attackTarget null");
             return;
+        }
 
-        Debug.Log($"[UnitsAnimation] {gameObject.name} commence l'attaque contre {attackTarget.name}");
         BeginAttackLoop();
     }
 
@@ -156,64 +168,9 @@ public class UnitsAnimation : MonoBehaviour
 
             float attack = GetAttackDamage(targetUnit, targetStructure);
 
-            if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar || cachedUnit.unitData.type == UnitsType.Fregate)
+            if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar)
             {
-                if (cannonBallPrefab != null && attackTarget != null)
-                {
-                    Transform targetSnapshot = attackTarget;
-                    UnitInstance targetUnitSnapshot = targetUnit;
-                    StructureInstance targetStructureSnapshot = targetStructure;
-                    UnitInstance attackerSnapshot = attackerUnit;
-                    Transform launcherTransform = transform;
-                    Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
-                    float impactRadius = 1.5f;
-
-                    CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, (impactPos) => {
-
-                        GameObject impactZone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                        impactZone.transform.position = impactPos;
-                        impactZone.transform.localScale = new Vector3(impactRadius * 2f, 0.05f, impactRadius * 2f);
-                        impactZone.GetComponent<Collider>().enabled = false;
-                        impactZone.GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f, 0.5f);
-                        Destroy(impactZone, 1f);
-                        UnitInstance[] allUnits = FindObjectsByType<UnitInstance>(FindObjectsSortMode.None);
-                        foreach (UnitInstance hitUnit in allUnits)
-                        {
-                            if (hitUnit == null || hitUnit == attackerSnapshot)
-                                continue;
-
-                            if (hitUnit.playerId == attackerSnapshot.playerId)
-                                continue;
-
-                            if (hitUnit.currentHealth <= 0)
-                                continue;
-
-                            float dist = Vector3.Distance(hitUnit.transform.position, impactPos);
-                            if (dist <= impactRadius)
-                            {
-                                Debug.Log($"[Mortar] Dégâts sur {hitUnit.name} (dist={dist:F2})");
-                                float damageMultiplier = 1f + (impactRadius - dist);
-                                hitUnit.TakeDamage(attack * damageMultiplier);
-                                UnitsAnimation anim = hitUnit.GetComponent<UnitsAnimation>();
-                                if (anim != null)
-                                    anim.AttackTheAttacker(transform);
-                            }
-                        }
-
-                        // Structures
-                        StructureInstance[] allStructures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
-                        foreach (StructureInstance hitStructure in allStructures)
-                        {
-                            if (hitStructure == null || hitStructure.playerId == attackerSnapshot.playerId)
-                                continue;
-
-                            float dist = Vector3.Distance(hitStructure.transform.position, impactPos);
-                            if (dist <= impactRadius)
-                                hitStructure.TakeDamage(attack, attackerSnapshot);
-                        }
-
-                    }, transform);
-                }
+                SpawnMortarProjectile(attackerUnit, targetUnit, targetStructure, attack);
             }
             else
             {
@@ -231,6 +188,33 @@ public class UnitsAnimation : MonoBehaviour
             }
             yield return new WaitForSeconds(halfDuration);
         }
+        StopAttackInternal();
+    }
+
+    private IEnumerator BoatAttackLoopCoroutine()
+    {
+        while (true)
+        {
+            if (attackTarget == null) break;
+
+            UnitInstance attackerUnit = cachedUnit;
+            if (attackerUnit == null || attackerUnit.currentHealth <= 0) break;
+
+            if (!IsTargetWithinAttackRange()) break;
+
+            UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+            StructureInstance targetStructure = targetUnit == null ? attackTarget.GetComponent<StructureInstance>() : null;
+
+            if (targetUnit == null && targetStructure == null) break;
+            if (targetUnit != null && targetUnit.currentHealth <= 0) break;
+            if (targetStructure != null && targetStructure.currentHealth <= 0) break;
+
+            float attack = GetAttackDamage(targetUnit, targetStructure);
+            float attackSpeed = GetAttackSpeed();
+
+            yield return HandleProjectileAttack(attackerUnit, targetUnit, targetStructure, attack, attackSpeed);
+        }
+
         StopAttackInternal();
     }
 
@@ -337,7 +321,14 @@ public class UnitsAnimation : MonoBehaviour
     {
         SetAttackVisuals(true);
         StopAttackCoroutine();
-        attackCoroutine = StartCoroutine(AttackLoopCoroutine());
+
+        bool isProjectileUnit = cachedUnit != null && cachedUnit.unitData != null && (
+            cachedUnit.unitData.type == UnitsType.Fregate
+            || cachedUnit.unitData.type == UnitsType.Destroyer);
+
+        attackCoroutine = isProjectileUnit
+            ? StartCoroutine(BoatAttackLoopCoroutine())
+            : StartCoroutine(AttackLoopCoroutine());
     }
 
     private void StopAttackCoroutine()
@@ -469,7 +460,6 @@ public class UnitsAnimation : MonoBehaviour
             if (targetStructure.playerId == attacker.playerId)
                 return 0f;
 
-            Debug.Log($"[Attaque] {attacker.name} frappe structure pour {combatData.attack} degats");
             return Mathf.Max(0f, combatData.attack);
         }
 
@@ -492,7 +482,6 @@ public class UnitsAnimation : MonoBehaviour
         }
 
         float damage = combatData.attack * damageTable.GetMultiplier(attacker, targetUnit);
-        Debug.Log($"[Attaque] {attacker.name} frappe {targetUnit.name} pour {damage} degats");
         return Mathf.Max(0f, damage);
     }
 
@@ -521,6 +510,8 @@ public class UnitsAnimation : MonoBehaviour
         attackTarget = target;
         if (CanAttackWithDamage(cachedUnit))
             StartAttackWithDamage();
+        else
+        Debug.LogWarning($"[OnMovementCompleted] {gameObject.name} ne peut pas attaquer !");
     }
 
 
@@ -562,5 +553,86 @@ public class UnitsAnimation : MonoBehaviour
             return Mathf.Max(0.1f, combatData.attackSpeed);
 
         return 1f;
+    }
+
+    private IEnumerator HandleProjectileAttack(UnitInstance attackerUnit, UnitInstance targetUnit, StructureInstance targetStructure, float attack, float attackSpeed)
+    {
+        float halfDuration = Mathf.Max(0.05f, attackSpeed * 0.5f);
+
+        yield return new WaitForSeconds(halfDuration);
+
+        if (cannonBallPrefab == null || attackTarget == null)
+            yield break;
+
+        Transform targetSnapshot = attackTarget;
+        UnitInstance attackerSnapshot = attackerUnit;
+        Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
+
+        CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, (impactPos) =>
+        {
+            if (targetUnit != null && targetUnit.currentHealth > 0)
+            {
+                targetUnit.TakeDamage(attack);
+                UnitsAnimation anim = targetUnit.GetComponent<UnitsAnimation>();
+                if (anim != null)
+                    anim.AttackTheAttacker(transform);
+            }
+            else if (targetStructure != null && targetStructure.currentHealth > 0)
+            {
+                targetStructure.TakeDamage(attack, attackerSnapshot);
+            }
+
+        }, transform);
+
+        yield return new WaitForSeconds(halfDuration);
+    }
+
+    private void SpawnMortarProjectile(UnitInstance attackerUnit, UnitInstance targetUnit, StructureInstance targetStructure, float attack)
+    {
+        if (cannonBallPrefab == null || attackTarget == null)
+            return;
+
+        Transform targetSnapshot = attackTarget;
+        UnitInstance attackerSnapshot = attackerUnit;
+        Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
+        float impactRadius = 1.5f;
+
+        CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, (impactPos) =>
+        {
+            GameObject impactZone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            impactZone.transform.position = impactPos;
+            impactZone.transform.localScale = new Vector3(impactRadius * 2f, 0.05f, impactRadius * 2f);
+            impactZone.GetComponent<Collider>().enabled = false;
+            impactZone.GetComponent<Renderer>().material = Resources.Load<Material>("Materials/ImpactZone");
+            Destroy(impactZone, 1f);
+
+            UnitInstance[] allUnits = FindObjectsByType<UnitInstance>(FindObjectsSortMode.None);
+            foreach (UnitInstance hitUnit in allUnits)
+            {
+                if (hitUnit == null || hitUnit == attackerSnapshot || hitUnit.playerId == attackerSnapshot.playerId || hitUnit.currentHealth <= 0)
+                    continue;
+
+                float dist = Vector3.Distance(hitUnit.transform.position, impactPos);
+                if (dist <= impactRadius)
+                {
+                    float damageMultiplier = 1f + (impactRadius - dist);
+                    hitUnit.TakeDamage(attack * damageMultiplier);
+                    UnitsAnimation anim = hitUnit.GetComponent<UnitsAnimation>();
+                    if (anim != null)
+                        anim.AttackTheAttacker(transform);
+                }
+            }
+
+            StructureInstance[] allStructures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+            foreach (StructureInstance hitStructure in allStructures)
+            {
+                if (hitStructure == null || hitStructure.playerId == attackerSnapshot.playerId)
+                    continue;
+
+                float dist = Vector3.Distance(hitStructure.transform.position, impactPos);
+                if (dist <= impactRadius)
+                    hitStructure.TakeDamage(attack, attackerSnapshot);
+            }
+        }, transform);
     }
 }
