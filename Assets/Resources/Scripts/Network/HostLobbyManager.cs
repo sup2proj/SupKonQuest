@@ -38,7 +38,7 @@ public class HostLobbyManager : MonoBehaviour
         try
         {
             string myName = PlayerPrefs.GetString("PlayerName", "Joueur Inconnu");
-            string lobbyName = myName; 
+            string lobbyName = "[NOUVEAU] " + myName;
             
             CreateLobbyOptions options = new CreateLobbyOptions
             {
