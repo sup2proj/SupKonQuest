@@ -5,14 +5,14 @@ public class CannonBall : MonoBehaviour
     private Vector3 startPosition;
     private Vector3 endPosition;
     private float speed;
-    private System.Action<Vector3> onArrival; // passe la position d'impact
+    private System.Action<Vector3> onArrival;
     private bool arrived = false;
     private float progress = 0f;
     [SerializeField] private float arcHeight = 3f;
     private Transform target;
     private Transform launcher;
 
-    public static CannonBall Spawn(GameObject prefab, Vector3 from, Transform target, float speed, System.Action<Vector3> onArrival, Transform launcher = null)
+    public static CannonBall Spawn(GameObject prefab, Vector3 from, Transform target, float speed, System.Action<Vector3> onArrival, Transform launcher = null, float arcHeight = 3f, float scale = 1f)
     {
         GameObject go = Instantiate(prefab, from, Quaternion.identity);
         CannonBall ball = go.GetComponent<CannonBall>();
@@ -20,11 +20,14 @@ public class CannonBall : MonoBehaviour
             ball = go.AddComponent<CannonBall>();
 
         ball.startPosition = from;
-        ball.endPosition = target.position; // position figée au moment du tir
+        ball.endPosition = target.position;
         ball.speed = speed;
         ball.onArrival = onArrival;
         ball.target = target;
         ball.launcher = launcher;
+        ball.arcHeight = arcHeight;
+        go.transform.localScale = Vector3.one * scale;
+
 
         return ball;
     }

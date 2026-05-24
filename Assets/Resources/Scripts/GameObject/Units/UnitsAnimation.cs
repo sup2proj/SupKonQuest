@@ -566,7 +566,7 @@ public class UnitsAnimation : MonoBehaviour
 
         Transform targetSnapshot = attackTarget;
         UnitInstance attackerSnapshot = attackerUnit;
-        Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
+        Vector3 spawnPos = transform.position;
 
         CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, (impactPos) =>
         {
@@ -582,7 +582,7 @@ public class UnitsAnimation : MonoBehaviour
                 targetStructure.TakeDamage(attack, attackerSnapshot);
             }
 
-        }, transform);
+        }, transform, 0f, 0.5f);
 
         yield return new WaitForSeconds(halfDuration);
     }
@@ -633,6 +633,6 @@ public class UnitsAnimation : MonoBehaviour
                 if (dist <= impactRadius)
                     hitStructure.TakeDamage(attack, attackerSnapshot);
             }
-        }, transform);
+        }, transform, 5f);
     }
 }
