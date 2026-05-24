@@ -63,7 +63,19 @@ public class JoinLobbyManager : MonoBehaviour
             
             TextMeshProUGUI[] texts = item.GetComponentsInChildren<TextMeshProUGUI>();
             
-            texts[0].text = lobby.Name + " (" + lobby.Players.Count + "/" + lobby.MaxPlayers + ")";
+            int currentLang = PlayerPrefs.GetInt("Language", 0);
+            string prefix = "Lobby of "; // 0 = Anglais par défaut
+
+            if (currentLang == 1) 
+            {
+                prefix = "Salon de ";    // 1 = Français
+            }
+            else if (currentLang == 2) 
+            {
+                prefix = "Lobby di ";    // 2 = Italien
+            }
+
+            texts[0].text = prefix + lobby.Name + " (" + lobby.Players.Count + "/" + lobby.MaxPlayers + ")";
             
             if (lobby.Data != null && lobby.Data.ContainsKey("Map"))
             {

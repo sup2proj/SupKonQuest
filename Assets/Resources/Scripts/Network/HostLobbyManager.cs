@@ -37,7 +37,8 @@ public class HostLobbyManager : MonoBehaviour
     {
         try
         {
-            string lobbyName = "Salon de " + AuthenticationService.Instance.PlayerId;
+            string myName = PlayerPrefs.GetString("PlayerName", "Joueur Inconnu");
+            string lobbyName = myName; 
             
             CreateLobbyOptions options = new CreateLobbyOptions
             {
