@@ -75,7 +75,9 @@ public class JoinLobbyManager : MonoBehaviour
                 prefix = "Lobby di ";    // 2 = Italien
             }
 
-            texts[0].text = prefix + lobby.Name + " (" + lobby.Players.Count + "/" + lobby.MaxPlayers + ")";
+            //texts[0].text = prefix + lobby.Name + " (" + lobby.Players.Count + "/" + lobby.MaxPlayers + ")";
+            texts[0].text = "NOM BRUT : " + lobby.Name;
+            
             
             if (lobby.Data != null && lobby.Data.ContainsKey("Map"))
             {
