@@ -38,6 +38,9 @@ public class HostLobbyManager : MonoBehaviour
         try
         {
             string myName = PlayerPrefs.GetString("PlayerName", "Joueur Inconnu");
+
+            Debug.Log("==== PSEUDO EXACT UTILISE POUR LA CREATION : " + myName + " ====");
+
             string lobbyName = "[NOUVEAU] " + myName;
             
             CreateLobbyOptions options = new CreateLobbyOptions
