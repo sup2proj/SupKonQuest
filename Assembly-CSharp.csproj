@@ -146,7 +146,6 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitData.cs" />
-    <Compile Include="Assets\Resources\Scripts\Network\HostLobbyManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Network\PlayerListItem.cs" />
     <Compile Include="Assets\Resources\Scripts\GameRules\StructureAttribution.cs" />
     <Compile Include="Assets\Resources\Scripts\IA\Normal\NormalDefense.cs" />
