@@ -5,6 +5,9 @@ using TMPro;
 using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Gère l'interface de connexion et d'inscription du joueur en utilisant les services d'authentification d'Unity (Unity Services).
+/// </summary>
 public class AuthManager : MonoBehaviour
 {
     [Header("UI - Interface")]
@@ -47,6 +50,10 @@ public class AuthManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Tente de créer un nouveau compte joueur sur les serveurs Unity avec le nom d'utilisateur et le mot de passe saisis.
+    /// En cas de succès, sauvegarde le pseudo localement et charge la scène multijoueur.
+    /// </summary>
     public async void SignUp()
     {
         if (string.IsNullOrWhiteSpace(usernameInput.text) || string.IsNullOrWhiteSpace(passwordInput.text))
@@ -80,6 +87,10 @@ public class AuthManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Tente de connecter un compte joueur existant sur les serveurs Unity avec les identifiants saisis.
+    /// En cas de succès, met à jour le pseudo localement et charge la scène multijoueur.
+    /// </summary>
     public async void SignIn()
     {
         if (string.IsNullOrWhiteSpace(usernameInput.text) || string.IsNullOrWhiteSpace(passwordInput.text))
@@ -113,6 +124,9 @@ public class AuthManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Annule le processus de connexion et retourne au menu principal du jeu.
+    /// </summary>
     public void Back()
     {
         SceneManager.LoadScene("MainMenu"); 
