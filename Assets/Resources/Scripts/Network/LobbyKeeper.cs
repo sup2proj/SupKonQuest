@@ -1,6 +1,9 @@
 using UnityEngine;
 using Unity.Services.Lobbies;
 
+/// <summary>
+/// Objet persistant (Singleton) chargé de maintenir le salon actif en envoyant des pings en arrière-plan, empêchant la fermeture de la partie par les serveurs lors des changements de scène.
+/// </summary>
 public class LobbyKeeper : MonoBehaviour
 {
     public static LobbyKeeper Instance;
@@ -19,6 +22,10 @@ public class LobbyKeeper : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    /// <summary>
+    /// Enregistre l'identifiant du salon et démarre le compte à rebours pour l'envoi régulier des signaux de présence (heartbeat).
+    /// </summary>
+    /// <param name="lobbyId">L'identifiant unique du salon à maintenir ouvert.</param>
     public void StartKeepingLobbyAlive(string lobbyId)
     {
         currentLobbyId = lobbyId;
@@ -26,6 +33,9 @@ public class LobbyKeeper : MonoBehaviour
         Debug.Log("LobbyKeeper good");
     }
 
+    /// <summary>
+    /// Interrompt la boucle de maintien en vie, vide l'identifiant du salon et détruit cet objet de la scène.
+    /// </summary>
     public void StopKeepingLobby()
     {
         currentLobbyId = null;
