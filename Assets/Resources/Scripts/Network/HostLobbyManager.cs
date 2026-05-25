@@ -6,6 +6,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
+/// <summary>
+/// Gère la création, la configuration et le maintien actif d'un salon (Lobby) multijoueur sur les serveurs d'Unity en tant qu'hôte.
+/// </summary>
 public class HostLobbyManager : MonoBehaviour
 {
     private Lobby hostLobby;
@@ -33,6 +36,9 @@ public class HostLobbyManager : MonoBehaviour
         HandleLobbyPolling();
     }
 
+    /// <summary>
+    /// Crée un nouveau salon public sur les serveurs d'Unity en utilisant le pseudo du joueur comme nom, et y associe les paramètres par défaut (Carte, etc.).
+    /// </summary>
     private async System.Threading.Tasks.Task CreateLobby()
     {
         try
@@ -63,6 +69,10 @@ public class HostLobbyManager : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Met à jour les données du salon sur le serveur pour changer la carte sélectionnée.
+    /// </summary>
+    /// <param name="newMap">Le nom de la nouvelle carte à appliquer.</param>
     public async void ChangeMap(string newMap)
     {
         if (hostLobby == null) return;
@@ -84,6 +94,10 @@ public class HostLobbyManager : MonoBehaviour
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
 
+    /// <summary>
+    /// Modifie le nombre maximum de joueurs autorisés à rejoindre ce salon et met à jour le serveur.
+    /// </summary>
+    /// <param name="newMax">La nouvelle limite de joueurs.</param>
     public async void ChangeMaxPlayers(int newMax)
     {
         if (hostLobby == null) return;
@@ -101,6 +115,9 @@ public class HostLobbyManager : MonoBehaviour
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
 
+    /// <summary>
+    /// Supprime définitivement le salon des serveurs d'Unity et retourne au menu multijoueur.
+    /// </summary>
     public async void LeaveLobby()
     {
         if (hostLobby != null)
@@ -115,6 +132,9 @@ public class HostLobbyManager : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Envoie un signal (ping) au serveur Unity toutes les 15 secondes pour indiquer que l'hôte est toujours là, empêchant ainsi le serveur de fermer le salon pour inactivité.
+    /// </summary>
     private async void HandleLobbyHeartbeat()
     {
         if (hostLobby != null)
@@ -128,6 +148,9 @@ public class HostLobbyManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Interroge les serveurs d'Unity toutes les 1,5 secondes pour récupérer les dernières modifications du salon (ex: un nouveau joueur a rejoint ou quitté).
+    /// </summary>
     private async void HandleLobbyPolling()
     {
         if (hostLobby != null)
@@ -142,6 +165,9 @@ public class HostLobbyManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Met à jour les textes de l'interface utilisateur avec les données actuelles du salon (carte, places disponibles, liste des identifiants des joueurs).
+    /// </summary>
     private void RefreshUI()
     {
         if (hostLobby == null) return;
