@@ -6,6 +6,9 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Gère la recherche, l'affichage sous forme de liste et la connexion aux salons (lobbies) existants sur les serveurs d'Unity.
+/// </summary>
 public class JoinLobbyManager : MonoBehaviour
 {
     [Header("Interface (UI)")]
@@ -19,6 +22,9 @@ public class JoinLobbyManager : MonoBehaviour
         RefreshLobbyList();
     }
 
+    /// <summary>
+    /// Lance une requête aux serveurs d'Unity pour récupérer jusqu'à 25 salons publics disposant d'au moins une place libre, puis déclenche la mise à jour de l'interface.
+    /// </summary>
     public async void RefreshLobbyList()
     {
         if (statusText != null) statusText.SetDynamicTranslations("Searching for games...", "Recherche de parties...","Ricerca di partite...");
@@ -50,6 +56,10 @@ public class JoinLobbyManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Nettoie la liste actuelle à l'écran, puis instancie un nouveau bloc (prefab) pour chaque salon trouvé. Applique automatiquement la traduction du préfixe ("Salon de", "Lobby of") selon la langue du joueur.
+    /// </summary>
+    /// <param name="lobbies">La liste des salons renvoyée par la requête au serveur.</param>
     private void UpdateLobbyUI(List<Lobby> lobbies)
     {
         foreach (Transform child in lobbyListContainer)
@@ -88,6 +98,10 @@ public class JoinLobbyManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Tente de rejoindre un salon spécifique, prépare les données initiales du joueur (son pseudo et son statut "Non Prêt") et charge la scène de la salle d'attente en cas de succès.
+    /// </summary>
+    /// <param name="lobbyId">L'identifiant unique (ID) du salon que le joueur souhaite rejoindre.</param>
     public async void JoinLobby(string lobbyId)
     {
         if (statusText != null) statusText.SetDynamicTranslations("Connecting to lobby...", "Connexion au lobby...","Connessione alla lobby...");
@@ -117,6 +131,9 @@ public class JoinLobbyManager : MonoBehaviour
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
 
+    /// <summary>
+    /// Interrompt la recherche de salons et retourne à l'écran principal du multijoueur.
+    /// </summary>
     public void BackToMenu()
     {
         SceneManager.LoadScene("MultiplayerScene");
