@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 
+/// <summary>
+/// Gère l'écran de démarrage initial du jeu, affiche un texte clignotant et attend que le joueur presse une touche pour charger le menu principal.
+/// </summary>
 public class StartScreenManager : MonoBehaviour
 {
     public TextMeshProUGUI pressKeyText;
@@ -23,6 +26,9 @@ public class StartScreenManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Coroutine qui crée un effet de clignotement sur le texte d'invite en alternant sa visibilité à intervalles réguliers (0.7s allumé, 0.4s éteint).
+    /// </summary>
     IEnumerator Blink()
     {
         while (isBlinking)
