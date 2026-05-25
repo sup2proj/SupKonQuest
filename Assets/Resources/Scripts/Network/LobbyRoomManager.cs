@@ -94,22 +94,19 @@ public class LobbyRoomManager : MonoBehaviour
             
             int currentLang = PlayerPrefs.GetInt("Language", 0);
             
-            string lobbyName = "";
+            string lobbyName = myName;
             string welcomeMsg = "";
 
             if (currentLang == 1) // Français
             {
-                lobbyName = "Salon de " + myName;
                 welcomeMsg = "Bienvenue dans le salon !\n";
             }
             else if (currentLang == 2) // Italiano
             {
-                lobbyName = "Sala da " + myName;
                 welcomeMsg = "Benvenuti in salotto !\n";
             }
             else // Anglais (si currentLang == 0 ou autre)
             {
-                lobbyName = "Lobby of " + myName;
                 welcomeMsg = "Welcome to the lobby !\n";
             }
             
