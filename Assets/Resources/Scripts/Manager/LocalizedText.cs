@@ -1,6 +1,9 @@
 using UnityEngine;
 using TMPro;
 
+/// <summary>
+/// Composant attaché à un élément TextMeshProUGUI pour gérer automatiquement sa traduction en plusieurs langues (Anglais, Français, Italien) selon les préférences du joueur.
+/// </summary>
 [RequireComponent(typeof(TextMeshProUGUI))]
 public class LocalizedText : MonoBehaviour
 {
@@ -17,6 +20,9 @@ public class LocalizedText : MonoBehaviour
         UpdateText();
     }
 
+    /// <summary>
+    /// Récupère la langue actuellement sauvegardée dans les paramètres (PlayerPrefs) et applique le texte correspondant au composant TextMeshPro.
+    /// </summary>
     public void UpdateText()
     {
         if (textComponent == null)
@@ -40,6 +46,12 @@ public class LocalizedText : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Permet de modifier les textes traduits directement depuis un autre script puis met à jour l'affichage immédiatement.
+    /// </summary>
+    /// <param name="english">Le texte dynamique à afficher en anglais.</param>
+    /// <param name="french">Le texte dynamique à afficher en français.</param>
+    /// <param name="italiano">Le texte dynamique à afficher en italien.</param>
     public void SetDynamicTranslations(string english, string french, string  italiano)
     {
         englishText = english;
