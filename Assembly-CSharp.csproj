@@ -43,7 +43,7 @@
     <UnityVersion>6000.3.0f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="C:\Users\kaliq\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.2.2\Analyzers\Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="C:\Users\stani\.vscode\extensions\visualstudiotoolsforunity.vstuc-1.2.2\Analyzers\Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.SourceGenerators.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.3.0f1\Editor\Data\Tools\BuildPipeline\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
@@ -52,8 +52,8 @@
     <Compile Include="Assets\Resources\Scripts\Game\Rules\Defeat.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\StructureButtons\ActionButton.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\SceneManager\LocalizedText.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
-    <Compile Include="Assets\Resources\Scripts\Manager\MainMenuManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitBoat.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
     <Compile Include="Assets\Resources\Scripts\GameObject\Units\UnitsAnimation.cs" />
@@ -66,7 +66,6 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
     <Compile Include="Assets\Resources\Scripts\Audio\SceneMusicChanger.cs" />
     <Compile Include="Assets\Resources\Scripts\Network\LobbyKeeper.cs" />
-    <Compile Include="Assets\Resources\Scripts\Manager\OptionsManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\Rules\Conditions.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\ProgressBar.cs" />
     <Compile Include="Assets\Resources\Scripts\GameObject\Units\Buffs.cs" />
@@ -76,14 +75,15 @@
     <Compile Include="Assets\Resources\Scripts\Game\IA\Easy\EasyProduction.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\IA\SharedEasyNormal\ProductionEasyNormal.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\GameManager\UnitsRegistry.cs" />
-    <Compile Include="Assets\Resources\Scripts\Manager\StartScreenManager.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\SceneManager\LaunchingLocalNewGame.cs" />
     <Compile Include="Assets\Resources\Scripts\Enums\StructureType.cs" />
     <Compile Include="Assets\Resources\Scripts\GameObject\Structure\Capture.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
+    <Compile Include="Assets\Resources\Scripts\UI\Hover\TMPHoverUnderline.cs" />
     <Compile Include="Assets\Resources\Scripts\Controller\ManagerController.cs" />
-    <Compile Include="Assets\Resources\Scripts\Manager\LocalizedText.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\SceneManager\OptionsManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitSupportData.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitCombatData.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\Rules\Victory.cs" />
@@ -118,13 +118,10 @@
     <Compile Include="Assets\Resources\Scripts\Network\JoinLobbyManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\Rules\StructureAttribution.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\Interface\InterfaceInstance.cs" />
-    <Compile Include="Assets\Resources\Scripts\Manager\LaunchingLocalNewGame.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
-    <Compile Include="Assets\Resources\Scripts\Game\IA\Easy\EasyMovement.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
-    <Compile Include="Assets\Resources\Scripts\Manager\NewGameManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_DigitValidator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_FrameRateCounter.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\Map\MapGenerator.cs" />
@@ -140,13 +137,15 @@
     <Compile Include="Assets\Resources\Scripts\GameObject\Structure\StructureInstance.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\Map\MapJsonData.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\HealthBar.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\SceneManager\MainMenuManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\Map\PointData.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\Resources\Scripts\Data\Units\UnitsSO\UnitData.cs" />
-    <Compile Include="Assets\Resources\Scripts\Network\HostLobbyManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Network\PlayerListItem.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\SceneManager\StartScreenManager.cs" />
     <Compile Include="Assets\Resources\Scripts\UI\TabMenuStatistics.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\GameManager\MovementManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\IA\SharedEasyNormal\StructureDetector.cs" />
@@ -159,11 +158,11 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\Map\MapTileUtility.cs" />
+    <Compile Include="Assets\Resources\Scripts\Manager\SceneManager\NewGameManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\GameManager\SelectionManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\GameManager\PlayerSession.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\Assignment\Assignment.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
-    <Compile Include="Assets\Resources\Scripts\Manager\MovementManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\GameManager\StructureManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Camera\CameraMouvement.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\IA\SharedEasyNormal\MovementEasyNormal.cs" />
