@@ -1,13 +1,22 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.AI;
 
 public class UnitsAnimation : MonoBehaviour
 {
     public Animator animator;
 
     private Transform attackTarget;
+    private int activeGroupMoveId = -1;
+    private bool isGroupLeader = false;
+
+    private static readonly HashSet<int> completedGroupMoves = new HashSet<int>();
+
     private UnitInstance cachedUnit;
     private Coroutine attackCoroutine;
+    private Coroutine spellAttackResetCoroutine;
+    private Coroutine ensureAttackAnimationCoroutine;
     private bool isRetaliating;
     private DamageTable damageTable;
 
@@ -16,207 +25,233 @@ public class UnitsAnimation : MonoBehaviour
     public Transform AttackTarget => attackTarget;
     public GameObject cannonBallPrefab;
     public float cannonBallSpeed = 3f;
- 	private float oldSpeedAnimation;
 
     void Awake()
     {
         if (animator == null)
-			{
-            	animator = GetComponent<Animator>();
-				 oldSpeedAnimation = animator.speed;
-			}
+            animator = GetComponent<Animator>();
         cachedUnit = GetComponent<UnitInstance>();
         movementManager = GetComponent<MovementManager>();
 
-        damageTable = UnityEngine.Resources.Load<DamageTable>("Scripts/Data/Units/UnitsSO/DamageTable");
+        damageTable = Resources.Load<DamageTable>("Scripts/Data/Units/UnitsSO/DamageTable");
         if (damageTable == null)
-            Debug.LogError("Impossible de charger DamageTable !");
-
-        bool isProjectileUnit = cachedUnit != null && cachedUnit.unitData != null && (
-        cachedUnit.unitData.type == UnitsType.Fregate
-        || cachedUnit.unitData.type == UnitsType.Destroyer);
-
-        if (isProjectileUnit)
         {
+            Debug.LogError("Impossible de charger DamageTable !");
+        }
+        if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar) {
             cannonBallPrefab = Resources.Load<GameObject>("Prefabs/Units/CannonBall/Cannonball");
             if (cannonBallPrefab == null)
-                Debug.LogError("[Projectile] CannonBall prefab introuvable !");
+                Debug.LogError("[Mortar] CannonBall prefab introuvable dans Resources/Prefabs/");
         }
-    }
 
-    void Start()
-    {
+        // Connecter le callback de fin de mouvement
         if (movementManager != null)
         {
             movementManager.OnMovementComplete += OnMovementCompleted;
         }
     }
 
+    void Start()
+    {
+        // Le MovementManager gère maintenant l'initialisation du NavMeshAgent
+    }
+
     void Update()
     {
         HandleAutoAttack();
-        RefreshMovingArcherModel();
+
+        // L'animation de mouvement est maintenant gérée par MovementManager
+        // On ne gère plus que l'animation spécifique aux archers
+        if (animator != null && movementManager != null)
+        {
+            UnitInstance unit = cachedUnit;
+            if (unit != null && unit.objectModel != null && unit.unitData != null)
+            {
+                if (unit.unitData.type == UnitsType.Archer && movementManager.IsMoving())
+                {
+                    unit.objectModel.SetActive(true);
+                }
+            }
+        }
     }
 
     public void AttackTheAttacker(Transform attacker = null)
     {
+        UnitInstance selfUnit = cachedUnit;
         if (attacker != null)
+        {
             attackTarget = attacker;
-
-        if (attackTarget == null || !CanAttackWithDamage(cachedUnit))
+        }
+        if (attackTarget == null)
             return;
 
         if (attackCoroutine != null)
         {
-            SetAttackVisuals(true);
-            return;
+            UnitInstance currentTargetUnit = attackTarget.GetComponent<UnitInstance>();
+            if (currentTargetUnit != null)
+            {
+                if (animator != null)
+                    animator.SetBool("isAttacking", true);
+                if (selfUnit != null && selfUnit.objectModel != null)
+                    selfUnit.objectModel.SetActive(true);
+                return;
+            }
         }
-
-        BeginAttackLoop();
+        if (animator != null && selfUnit != null && selfUnit.objectModel != null)
+        {
+            animator.SetBool("isAttacking", true);
+            selfUnit.objectModel.SetActive(true);
+        }
+        if (attackCoroutine != null)
+        {
+            StopCoroutine(attackCoroutine);
+            attackCoroutine = null;
+        }
+        attackCoroutine = StartCoroutine(AttackLoopCoroutine());
     }
 
     public void StartAttackWithDamage()
     {
         UnitInstance unit = cachedUnit;
-        if (!CanAttackWithDamage(unit))
+        if (unit != null && unit.unitData != null && (unit.unitData.type == UnitsType.Support || unit.unitData.type == UnitsType.Healer))
         {
             Debug.Log("[UnitsAnimation] StartAttackWithDamage ignored for support/healer " + gameObject.name, this);
             return;
         }
 
-        if (attackTarget == null)
+        isRetaliating = false;
+        SetAttackAnimationState(true);
+
+        if (unit != null && unit.objectModel != null)
+            unit.objectModel.SetActive(true);
+
+        if (attackCoroutine != null)
         {
-            Debug.LogWarning("[StartAttackWithDamage] attackTarget null");
-            return;
+            StopCoroutine(attackCoroutine);
+            attackCoroutine = null;
         }
-
-        BeginAttackLoop();
-    }
-
-    public bool TryStartAttackTargetIfInRange(Transform target)
-    {
-        if (target == null)
-            return false;
-
-        if (attackTarget == target && attackCoroutine != null)
-            return true;
-
-        if (!CanAttackWithDamage(cachedUnit))
-            return false;
-
-        Transform previousTarget = attackTarget;
-        attackTarget = target;
-        if (!IsTargetWithinAttackRange())
-        {
-            attackTarget = previousTarget;
-            return false;
-        }
-
-        if (movementManager != null)
-            movementManager.StopMovement();
-
-        StartAttackWithDamage();
-        return true;
+        attackCoroutine = StartCoroutine(AttackLoopCoroutine());
     }
 
     private IEnumerator AttackLoopCoroutine()
+{
+    while (true)
     {
-        while (true)
+        if (attackTarget == null)
+            break;
+
+        UnitInstance attackerUnit = cachedUnit;
+        if (attackerUnit == null || attackerUnit.currentHealth <= 0)
+            break;
+
+        if (!isRetaliating && !IsTargetWithinAttackRange())
+            break;
+
+        AnimationClip attackClip = GetAttackClip();
+        float attackDuration = attackClip != null ? attackClip.length : 1f;
+        float halfDuration = Mathf.Max(0.05f, attackDuration * 0.5f);
+        SetAttackAnimationState(true);
+        yield return new WaitForSeconds(halfDuration);
+
+        if (!isRetaliating && !IsTargetWithinAttackRange())
+            break;
+
+        UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+        StructureInstance targetStructure = null;
+
+        if (targetUnit == null)
+            targetStructure = attackTarget.GetComponent<StructureInstance>();
+
+        if (targetUnit == null && targetStructure == null)
+            break;
+
+        if (targetUnit != null && targetUnit.currentHealth <= 0)
+            break;
+        if (targetStructure != null && targetStructure.currentHealth <= 0)
+            break;
+
+        float attack = GetAttackDamage();
+
+        if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar || cachedUnit.unitData.type == UnitsType.Fregate)
         {
-            if (attackTarget == null)
-                break;
-
-            UnitInstance attackerUnit = cachedUnit;
-            if (attackerUnit == null || attackerUnit.currentHealth <= 0)
-                break;
-
-            if (!isRetaliating && !IsTargetWithinAttackRange())
-                break;
-
-            AnimationClip attackClip = GetAttackClip();
-
-            float attackSpeed = GetAttackSpeed();
-
-            if (animator != null)
-                	animator.speed = attackSpeed;
-
-            float attackDuration = attackClip != null
-                ? attackClip.length / attackSpeed
-                : 1f;
-
-            float halfDuration = Mathf.Max(0.05f, attackDuration * 0.5f);
-
-            SetAttackAnimationState(true);
-            yield return new WaitForSeconds(halfDuration);
-		
-            if (!isRetaliating && !IsTargetWithinAttackRange())
-                break;
-
-            UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
-            StructureInstance targetStructure = null;
-
-            if (targetUnit == null)
-                targetStructure = attackTarget.GetComponent<StructureInstance>();
-
-            if (targetUnit == null && targetStructure == null)
-                break;
-
-            if (targetUnit != null && targetUnit.currentHealth <= 0)
-                break;
-            if (targetStructure != null && targetStructure.currentHealth <= 0)
-                break;
-
-            float attack = GetAttackDamage(targetUnit, targetStructure);
-
-            if (cachedUnit != null && cachedUnit.unitData != null && cachedUnit.unitData.type == UnitsType.Mortar)
+            if (cannonBallPrefab != null && attackTarget != null)
             {
-                SpawnMortarProjectile(attackerUnit, targetUnit, targetStructure, attack);
+                Transform targetSnapshot = attackTarget;
+                UnitInstance targetUnitSnapshot = targetUnit;
+                StructureInstance targetStructureSnapshot = targetStructure;
+                UnitInstance attackerSnapshot = attackerUnit;
+                Transform launcherTransform = transform;
+
+                Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
+                float impactRadius = 1.5f;
+
+                CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, (impactPos) => {
+
+                    GameObject impactZone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    impactZone.transform.position = impactPos;
+                    impactZone.transform.localScale = new Vector3(impactRadius * 2f, 0.05f, impactRadius * 2f);
+                    impactZone.GetComponent<Collider>().enabled = false;
+                    impactZone.GetComponent<Renderer>().material.color = new Color(1f, 0f, 0f, 0.5f);
+                    Destroy(impactZone, 1f);
+                    UnitInstance[] allUnits = FindObjectsByType<UnitInstance>(FindObjectsSortMode.None);
+                    foreach (UnitInstance hitUnit in allUnits)
+                    {
+                        if (hitUnit == null || hitUnit == attackerSnapshot)
+                            continue;
+
+                        if (hitUnit.playerId == attackerSnapshot.playerId)
+                            continue;
+
+                        if (hitUnit.currentHealth <= 0)
+                            continue;
+
+                        float dist = Vector3.Distance(hitUnit.transform.position, impactPos);
+                        if (dist <= impactRadius)
+                        {
+                            Debug.Log($"[Mortar] Dégâts sur {hitUnit.name} (dist={dist:F2})");
+                            float damageMultiplier = 1f + (impactRadius - dist);
+                            hitUnit.TakeDamage(attack * damageMultiplier);
+                            UnitsAnimation anim = hitUnit.GetComponent<UnitsAnimation>();
+                            if (anim != null)
+                                anim.AttackTheAttacker(transform);
+                        }
+                    }
+
+                    // Structures
+                    StructureInstance[] allStructures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+                    foreach (StructureInstance hitStructure in allStructures)
+                    {
+                        if (hitStructure == null || hitStructure.playerId == attackerSnapshot.playerId)
+                            continue;
+
+                        float dist = Vector3.Distance(hitStructure.transform.position, impactPos);
+                        if (dist <= impactRadius)
+                            hitStructure.TakeDamage(attack, attackerSnapshot);
+                    }
+
+                }, transform);
+            }
+        }
+        else
+        {
+            if (targetUnit != null)
+            {
+                targetUnit.TakeDamage(attack);
+                UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
+                if (targetAnimation != null && attackerUnit != null)
+                    targetAnimation.AttackTheAttacker(transform);
             }
             else
             {
-                if (targetUnit != null)
-                {
-                    targetUnit.TakeDamage(attack);
-                    UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
-                    if (targetAnimation != null && attackerUnit != null)
-                        targetAnimation.AttackTheAttacker(transform);
-                }
-                else
-                {
-                    targetStructure.TakeDamage(attack, attackerUnit);
-                }
+                targetStructure.TakeDamage(attack, attackerUnit);
             }
-            yield return new WaitForSeconds(halfDuration);
-        }
-        StopAttackInternal();
-    }
-
-    private IEnumerator BoatAttackLoopCoroutine()
-    {
-        while (true)
-        {
-            if (attackTarget == null) break;
-
-            UnitInstance attackerUnit = cachedUnit;
-            if (attackerUnit == null || attackerUnit.currentHealth <= 0) break;
-
-            if (!IsTargetWithinAttackRange()) break;
-
-            UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
-            StructureInstance targetStructure = targetUnit == null ? attackTarget.GetComponent<StructureInstance>() : null;
-
-            if (targetUnit == null && targetStructure == null) break;
-            if (targetUnit != null && targetUnit.currentHealth <= 0) break;
-            if (targetStructure != null && targetStructure.currentHealth <= 0) break;
-
-            float attack = GetAttackDamage(targetUnit, targetStructure);
-            float attackSpeed = GetAttackSpeed();
-
-            yield return HandleProjectileAttack(attackerUnit, targetUnit, targetStructure, attack, attackSpeed);
         }
 
-        StopAttackInternal();
+        yield return new WaitForSeconds(halfDuration);
     }
+
+    StopAttackInternal();
+}
 
     private AnimationClip GetAttackClip()
     {
@@ -232,6 +267,30 @@ public class UnitsAnimation : MonoBehaviour
         return null;
     }
 
+    private void EnsureAttackAnimationStateAfterCoroutineStart()
+    {
+        if (ensureAttackAnimationCoroutine != null)
+            StopCoroutine(ensureAttackAnimationCoroutine);
+
+        ensureAttackAnimationCoroutine = StartCoroutine(EnsureAttackAnimationStateNextFrame());
+    }
+
+    private IEnumerator EnsureAttackAnimationStateNextFrame()
+    {
+        yield return null;
+
+        if (attackCoroutine != null && attackTarget != null)
+        {
+            SetAttackAnimationState(true);
+
+            UnitInstance unit = cachedUnit;
+            if (unit != null && unit.objectModel != null)
+                unit.objectModel.SetActive(true);
+        }
+
+        ensureAttackAnimationCoroutine = null;
+    }
+
     private void SetAttackAnimationState(bool isAttacking)
     {
         if (animator != null)
@@ -240,129 +299,79 @@ public class UnitsAnimation : MonoBehaviour
 
     private void StopAttackInternal()
     {
-        StopAttackCoroutine();
-        SetAttackVisuals(false);
-        attackTarget = null;
-    }
+        if (attackCoroutine != null)
+        {
+            StopCoroutine(attackCoroutine);
+            attackCoroutine = null;
+        }
+        SetAttackAnimationState(false);
+        isRetaliating = false;
 
-    public void StopAttackForMovement()
-    {
+        if (ensureAttackAnimationCoroutine != null)
+        {
+            StopCoroutine(ensureAttackAnimationCoroutine);
+            ensureAttackAnimationCoroutine = null;
+        }
+
+        UnitInstance unit = cachedUnit;
+        if (unit != null && unit.objectModel != null)
+            unit.objectModel.SetActive(false);
         attackTarget = null;
-        StopAttackInternal();
     }
 
     void HandleAutoAttack()
     {
         UnitInstance unit = cachedUnit;
-        if (!CanAttackWithDamage(unit))
+        if (unit != null && unit.unitData != null && (unit.unitData.type == UnitsType.Support || unit.unitData.type == UnitsType.Healer))
+        {
             return;
+        }
 
         if (attackTarget == null)
         {
-            SetAttackVisuals(false);
+            SetAttackAnimationState(false);
+            if (unit != null && unit.objectModel != null)
+                unit.objectModel.SetActive(false);
             return;
         }
 
-        if (!TryGetCurrentTarget(out UnitInstance targetUnit, out StructureInstance targetStructure))
-        {
-            StopAttackInternal();
-            return;
-        }
+        UnitInstance targetUnit = attackTarget.GetComponent<UnitInstance>();
+        StructureInstance targetStructure = null;
+        if (targetUnit == null)
+            targetStructure = attackTarget.GetComponent<StructureInstance>();
 
-        if (IsFriendlyStructureTarget(targetStructure, unit))
-        {
-            StopAttackInternal();
-            return;
-        }
-        if (!IsTargetWithinAttackRange())
-        {
-            StopAttackInternal();
-            return;
-        }
-        if (attackCoroutine != null)
-            SetAttackVisuals(true);
-    }
-
-    private void RefreshMovingArcherModel()
-    {
-        UnitInstance unit = cachedUnit;
-        if (animator == null || movementManager == null || unit == null || unit.objectModel == null || unit.unitData == null)
-            return;
-
-        if (unit.unitData.type == UnitsType.Archer && movementManager.IsMoving())
-            unit.objectModel.SetActive(true);
-    }
-
-    private bool CanAttackWithDamage(UnitInstance unit)
-    {
-        if (unit == null || unit.unitData == null)
-            return false;
-
-        return unit.unitData.type != UnitsType.Support && unit.unitData.type != UnitsType.Healer;
-    }
-
-    private void SetAttackVisuals(bool visible)
-    {
-        SetAttackAnimationState(visible);
-        SetObjectModelVisible(visible);
-    }
-
-    private void SetObjectModelVisible(bool visible)
-    {
-        UnitInstance unit = cachedUnit;
-        if (unit == null)
-            unit = GetComponent<UnitInstance>();
-
-        if (unit != null && unit.objectModel != null)
-            unit.objectModel.SetActive(visible);
-    }
-
-    private void BeginAttackLoop()
-    {
-        SetAttackVisuals(true);
-        StopAttackCoroutine();
-
-        bool isProjectileUnit = cachedUnit != null && cachedUnit.unitData != null && (
-            cachedUnit.unitData.type == UnitsType.Fregate
-            || cachedUnit.unitData.type == UnitsType.Destroyer);
-
-        attackCoroutine = isProjectileUnit
-            ? StartCoroutine(BoatAttackLoopCoroutine())
-            : StartCoroutine(AttackLoopCoroutine());
-    }
-
-    private void StopAttackCoroutine()
-{
-    if (attackCoroutine == null)
-        return;
-
-    StopCoroutine(attackCoroutine);
-    attackCoroutine = null;
-
-    if (animator != null)
-        animator.speed = oldSpeedAnimation;
-}
-
-    private bool TryGetCurrentTarget(out UnitInstance targetUnit, out StructureInstance targetStructure)
-    {
-        targetUnit = GetTargetUnit();
-        targetStructure = targetUnit == null ? GetTargetStructure() : null;
-
+        // Vérifier si la cible existe et est encore en vie
         if (targetUnit == null && targetStructure == null)
-            return false;
+        {
+            StopAttackInternal();
+            return;
+        }
 
+        // Vérifier si la cible est encore en vie
         if (targetUnit != null && targetUnit.currentHealth <= 0)
-            return false;
-
+        {
+            StopAttackInternal();
+            return;
+        }
         if (targetStructure != null && targetStructure.currentHealth <= 0)
-            return false;
+        {
+            StopAttackInternal();
+            return;
+        }
 
-        return true;
-    }
+        if (!isRetaliating && !IsTargetWithinAttackRange())
+        {
+            StopAttackInternal();
+            return;
+        }
 
-    private bool IsFriendlyStructureTarget(StructureInstance targetStructure, UnitInstance attackerUnit)
-    {
-        return targetStructure != null && attackerUnit != null && targetStructure.playerId == attackerUnit.playerId;
+        if (attackCoroutine != null)
+        {
+            SetAttackAnimationState(true);
+
+            if (unit != null && unit.objectModel != null)
+                unit.objectModel.SetActive(true);
+        }
     }
 
     private float GetCurrentAttackRange()
@@ -412,108 +421,75 @@ public class UnitsAnimation : MonoBehaviour
         return toTarget.sqrMagnitude;
     }
 
-    private UnitInstance GetTargetUnit()
+    private float GetAttackDamage()
+{
+    UnitInstance attacker = cachedUnit;
+    UnitInstance target = attackTarget != null ? attackTarget.GetComponent<UnitInstance>() : null;
+    StructureInstance targetStructure = attackTarget != null ? attackTarget.GetComponent<StructureInstance>() : null;
+
+    if (attacker != null && attacker.unitData is UnitCombatData combatData)
     {
-        if (attackTarget == null)
-            return null;
-
-        UnitInstance unit = attackTarget.GetComponent<UnitInstance>();
-        if (unit == null)
-            unit = attackTarget.GetComponentInParent<UnitInstance>();
-        if (unit == null)
-            unit = attackTarget.GetComponentInChildren<UnitInstance>();
-
-        return unit;
-    }
-
-    private StructureInstance GetTargetStructure()
-    {
-        if (attackTarget == null)
-            return null;
-
-        StructureInstance structure = attackTarget.GetComponent<StructureInstance>();
-        if (structure == null)
-            structure = attackTarget.GetComponentInParent<StructureInstance>();
-        if (structure == null)
-            structure = attackTarget.GetComponentInChildren<StructureInstance>();
-
-        return structure;
-    }
-
-    private float GetAttackDamage(UnitInstance targetUnit, StructureInstance targetStructure)
-    {
-        UnitInstance attacker = cachedUnit;
         if (attacker == null)
-        {
-            Debug.LogError("attacker NULL");
-            return 0f;
-        }
-
-        if (!(attacker.unitData is UnitCombatData combatData))
-        {
-            Debug.LogError("attacker.unitData NULL");
-            return 0f;
-        }
-
-        if (targetStructure != null)
-        {
-            if (targetStructure.playerId == attacker.playerId)
-                return 0f;
-
-            return Mathf.Max(0f, combatData.attack);
-        }
-
-        if (targetUnit == null)
-        {
-            Debug.LogError("target NULL");
-            return 0f;
-        }
-
-        if (targetUnit.unitData == null)
-        {
-            Debug.LogError("target.unitData NULL");
-            return 0f;
-        }
-
-        if (damageTable == null)
-        {
-            Debug.LogError("damageTable NULL");
-            return 0f;
-        }
-
-        float damage = combatData.attack * damageTable.GetMultiplier(attacker, targetUnit);
-        return Mathf.Max(0f, damage);
+    {
+        Debug.LogError("attacker NULL");
+        return 0;
+    }
+        return Mathf.Max(0f, combatData.attack * damageTable.GetMultiplier(attacker, target != null ? target : null, targetStructure != null ? targetStructure : null));
     }
 
-     private void ApplyAttackDamage(UnitInstance targetUnit, StructureInstance targetStructure, UnitInstance attackerUnit, float attack)
-     {
-         if (targetUnit != null)
-         {
-             targetUnit.TakeDamage(attack, attackerUnit);
-
-             UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
-             if (targetAnimation != null && attackerUnit != null)
-                 targetAnimation.AttackTheAttacker(transform);
-
-             return;
-         }
-
-         if (targetStructure != null)
-             targetStructure.TakeDamage(attack, attackerUnit);
-     }
+    return 0f;
+}
 
     private void OnMovementCompleted(Transform target)
     {
-        if (target == null)
-            return;
+        if (isGroupLeader && activeGroupMoveId >= 0)
+            completedGroupMoves.Add(activeGroupMoveId);
 
-        attackTarget = target;
-        if (CanAttackWithDamage(cachedUnit))
-            StartAttackWithDamage();
-        else
-        Debug.LogWarning($"[OnMovementCompleted] {gameObject.name} ne peut pas attaquer !");
+        if (target != null)
+        {
+            attackTarget = target;
+
+            UnitInstance unit = cachedUnit;
+            if (unit != null && unit.unitData != null)
+            {
+                if (unit.unitData.type != UnitsType.Healer &&
+                    unit.unitData.type != UnitsType.Support)
+                {
+                    StartAttackWithDamage();
+                }
+            }
+        }
     }
 
+    private void ClearGroupMoveState()
+    {
+        activeGroupMoveId = -1;
+        isGroupLeader = false;
+    }
+
+    public void MoveToPosition(Vector3 destination, float stopDistance)
+    {
+        attackTarget = null;
+        StopAttackInternal();
+        ClearGroupMoveState();
+
+        if (movementManager != null)
+        {
+            movementManager.MoveToPosition(destination, stopDistance);
+        }
+    }
+
+    public void MoveToTarget(Transform target, float stopDistance)
+    {
+        attackTarget = null;
+        StopAttackInternal();
+        ClearGroupMoveState();
+
+        if (movementManager != null)
+        {
+            movementManager.MoveToTarget(target, GetCurrentAttackRange());
+        }
+    }
 
     public void EngageTarget(Transform target, float stopDistance)
     {
@@ -524,115 +500,73 @@ public class UnitsAnimation : MonoBehaviour
         bool alreadyMovingToTarget = movementManager.IsMoving();
         bool alreadyAttackingTarget = attackTarget == target;
 
-        if (alreadyMovingToTarget || alreadyAttackingTarget)
+        if ((alreadyMovingToTarget || alreadyAttackingTarget))
             return;
 
-        movementManager.MoveToTarget(target, desiredStopDistance);
+        MoveToTarget(target, desiredStopDistance);
+    }
+
+    public void MoveToPositionAsGroup(Vector3 destination, float stopDistance, int groupMoveId, bool isLeader)
+    {
+        activeGroupMoveId = groupMoveId;
+        isGroupLeader = isLeader;
+        attackTarget = null;
+        StopAttackInternal();
+
+        if (movementManager != null)
+        {
+            movementManager.MoveToPosition(destination, stopDistance);
+        }
     }
 
     public void StartAttackAnimationFromSpell()
     {
-        SetAttackVisuals(true);
-        StartCoroutine(ResetSpellAttackToIdleAfterAnimation());
+        UnitInstance unit = cachedUnit != null ? cachedUnit : GetComponent<UnitInstance>();
+        if (animator != null)
+            animator.SetBool("isAttacking", true);
+        if (unit != null && unit.objectModel != null)
+            unit.objectModel.SetActive(true);
+        spellAttackResetCoroutine = StartCoroutine(ResetSpellAttackToIdleAfterAnimation());
     }
 
     private IEnumerator ResetSpellAttackToIdleAfterAnimation()
     {
         AnimationClip attackClip = GetAttackClip();
-        float duration = attackClip != null ? attackClip.length : 0.05f;
+        float duration =  attackClip.length;
         duration = Mathf.Max(0.05f, duration);
-
         yield return new WaitForSeconds(duration);
-
-        SetAttackVisuals(false);
+        animator.SetBool("isAttacking", false);
+        UnitInstance unit = cachedUnit;
+        unit.objectModel.SetActive(false);
+        spellAttackResetCoroutine = null;
     }
     
-    private float GetAttackSpeed()
+    public void StopAttackForMovement()
     {
-        if (cachedUnit != null && cachedUnit.unitData is UnitCombatData combatData)
-            return Mathf.Max(0.1f, combatData.attackSpeed);
-
-        return 1f;
+        attackTarget = null;
+        StopAttackInternal();
     }
-
-    private IEnumerator HandleProjectileAttack(UnitInstance attackerUnit, UnitInstance targetUnit, StructureInstance targetStructure, float attack, float attackSpeed)
+    
+    public bool TryStartAttackTargetIfInRange(Transform target)
     {
-        float halfDuration = Mathf.Max(0.05f, attackSpeed * 0.5f);
+        if (target == null)
+            return false;
 
-        yield return new WaitForSeconds(halfDuration);
+        if (attackTarget == target && attackCoroutine != null)
+            return true;
 
-        if (cannonBallPrefab == null || attackTarget == null)
-            yield break;
-
-        Transform targetSnapshot = attackTarget;
-        UnitInstance attackerSnapshot = attackerUnit;
-        Vector3 spawnPos = transform.position;
-
-        CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, (impactPos) =>
+        Transform previousTarget = attackTarget;
+        attackTarget = target;
+        if (!IsTargetWithinAttackRange())
         {
-            if (targetUnit != null && targetUnit.currentHealth > 0)
-            {
-                targetUnit.TakeDamage(attack);
-                UnitsAnimation anim = targetUnit.GetComponent<UnitsAnimation>();
-                if (anim != null)
-                    anim.AttackTheAttacker(transform);
-            }
-            else if (targetStructure != null && targetStructure.currentHealth > 0)
-            {
-                targetStructure.TakeDamage(attack, attackerSnapshot);
-            }
+            attackTarget = previousTarget;
+            return false;
+        }
 
-        }, transform, 0f, 0.5f);
+        if (movementManager != null)
+            movementManager.StopMovement();
 
-        yield return new WaitForSeconds(halfDuration);
-    }
-
-    private void SpawnMortarProjectile(UnitInstance attackerUnit, UnitInstance targetUnit, StructureInstance targetStructure, float attack)
-    {
-        if (cannonBallPrefab == null || attackTarget == null)
-            return;
-
-        Transform targetSnapshot = attackTarget;
-        UnitInstance attackerSnapshot = attackerUnit;
-        Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
-        float impactRadius = 1.5f;
-
-        CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, (impactPos) =>
-        {
-            GameObject impactZone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            impactZone.transform.position = impactPos;
-            impactZone.transform.localScale = new Vector3(impactRadius * 2f, 0.05f, impactRadius * 2f);
-            impactZone.GetComponent<Collider>().enabled = false;
-            impactZone.GetComponent<Renderer>().material = Resources.Load<Material>("Materials/ImpactZone");
-            Destroy(impactZone, 1f);
-
-            UnitInstance[] allUnits = FindObjectsByType<UnitInstance>(FindObjectsSortMode.None);
-            foreach (UnitInstance hitUnit in allUnits)
-            {
-                if (hitUnit == null || hitUnit == attackerSnapshot || hitUnit.playerId == attackerSnapshot.playerId || hitUnit.currentHealth <= 0)
-                    continue;
-
-                float dist = Vector3.Distance(hitUnit.transform.position, impactPos);
-                if (dist <= impactRadius)
-                {
-                    float damageMultiplier = 1f + (impactRadius - dist);
-                    hitUnit.TakeDamage(attack * damageMultiplier);
-                    UnitsAnimation anim = hitUnit.GetComponent<UnitsAnimation>();
-                    if (anim != null)
-                        anim.AttackTheAttacker(transform);
-                }
-            }
-
-            StructureInstance[] allStructures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
-            foreach (StructureInstance hitStructure in allStructures)
-            {
-                if (hitStructure == null || hitStructure.playerId == attackerSnapshot.playerId)
-                    continue;
-
-                float dist = Vector3.Distance(hitStructure.transform.position, impactPos);
-                if (dist <= impactRadius)
-                    hitStructure.TakeDamage(attack, attackerSnapshot);
-            }
-        }, transform, 5f);
+        StartAttackWithDamage();
+        return true;
     }
 }

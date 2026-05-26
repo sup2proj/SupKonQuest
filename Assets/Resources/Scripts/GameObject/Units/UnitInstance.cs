@@ -131,12 +131,12 @@ public class UnitInstance : MonoBehaviour
         protectorSourceStructure = sourceStructure;
     }
 
-    public void TakeDamage(float amount, UnitInstance attacker = null)
+    public void TakeDamage(float amount, UnitInstance attacker = null, int attackerPlayerId = -1)
     {
         if (unitData == null)
             return;
 
-        lastAttackerPlayerId = attacker != null ? attacker.playerId : -1;
+        lastAttackerPlayerId = attacker != null ? attacker.playerId : attackerPlayerId;
 
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, unitData.maxHealth);

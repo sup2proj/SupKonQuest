@@ -6,8 +6,8 @@ public class StructureAttack : MonoBehaviour
     [Header("Projectile")]
     public GameObject cannonBallPrefab;
     public float cannonBallSpeed = 5f;
-    public float attackRange = 10f;
-    public float attackDamage = 50f;
+    public float attackRange = 5f;
+    public float attackDamage = 10f;
     public float attackCooldown = 3f;
 
     private StructureInstance structureInstance;

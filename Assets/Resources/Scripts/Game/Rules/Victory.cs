@@ -53,9 +53,6 @@ public class Victory : MonoBehaviour
         if (HasWinner || playerId <= 0)
             return false;
 
-        if (!IsOnlyPlayerWithStructures(playerId))
-            return false;
-
         DeclareWinner(playerId, "il est le dernier joueur avec des structures");
         return true;
     }
@@ -113,9 +110,6 @@ public class Victory : MonoBehaviour
         if (victory != null)
             return victory.TryDeclareWinnerIfOnlyPlayerWithStructures(playerIdToCheck);
 
-        if (!IsOnlyPlayerWithStructures(playerIdToCheck))
-            return false;
-
         InterfaceInstance interfaceInstance = InterfaceInstance.Instance;
         if (interfaceInstance == null)
             interfaceInstance = FindFirstObjectByType<InterfaceInstance>(FindObjectsInactive.Include);
@@ -124,27 +118,5 @@ public class Victory : MonoBehaviour
             interfaceInstance.ShowVictoryPanel(playerIdToCheck);
 
         return true;
-    }
-
-    private static bool IsOnlyPlayerWithStructures(int playerId)
-    {
-        bool playerHasStructure = false;
-        StructureInstance[] structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
-        if (structures == null)
-            return false;
-
-        for (int i = 0; i < structures.Length; i++)
-        {
-            StructureInstance structure = structures[i];
-            if (structure == null || structure.playerId <= 0)
-                continue;
-
-            if (structure.playerId != playerId)
-                return false;
-
-            playerHasStructure = true;
-        }
-
-        return playerHasStructure;
     }
 }
