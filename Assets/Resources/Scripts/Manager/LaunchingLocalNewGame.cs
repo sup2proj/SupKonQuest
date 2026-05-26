@@ -4,6 +4,9 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
+/// <summary>
+/// Gère l'interface de configuration pour lancer une nouvelle partie locale (choix de la carte, nombre d'IA et difficulté).
+/// </summary>
 public class LaunchingLocalNewGameManager : MonoBehaviour
 {
     [Header("Map Settings")]
@@ -29,6 +32,9 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
         UpdateDisplays();
     }
 
+    /// <summary>
+    /// Passe à la carte suivante dans la liste. Boucle au début si la fin est atteinte.
+    /// </summary>
     public void NextMap()
     {
         currentMapIndex++;
@@ -39,6 +45,9 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
         UpdateDisplays();
     }
     
+    /// <summary>
+    /// Revient à la carte précédente dans la liste. Boucle à la fin si le début est atteint.
+    /// </summary>
     public void PreviousMap()
     {
         currentMapIndex--;
@@ -49,6 +58,9 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
         UpdateDisplays();
     }
     
+    /// <summary>
+    /// Augmente le nombre d'IA dans la partie, sans dépasser le maximum autorisé (maxAi).
+    /// </summary>
     public void IncreaseAi()
     {
         aiCount++;
@@ -59,6 +71,9 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
         UpdateDisplays();
     }
     
+    /// <summary>
+    /// Diminue le nombre d'IA dans la partie, sans descendre en dessous de zéro.
+    /// </summary>
     public void DecreaseAi()
     {
         aiCount--;
@@ -69,6 +84,9 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
         UpdateDisplays();
     }
     
+    /// <summary>
+    /// Passe au niveau de difficulté supérieur. Boucle au niveau le plus facile si la fin est atteinte.
+    /// </summary>
     public void NextDifficulty()
     {
         currentDiffIndex++;
@@ -81,6 +99,9 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
         UpdateDisplays();
     }
     
+    /// <summary>
+    /// Revient au niveau de difficulté inférieur. Boucle au niveau le plus difficile si le début est atteint.
+    /// </summary>
     public void PreviousDifficulty()
     {
         currentDiffIndex--;
@@ -93,6 +114,9 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
         UpdateDisplays();
     }
 
+    /// <summary>
+    /// Met à jour tous les éléments visuels de l'interface (textes, images) en fonction des paramètres actuels et de la langue sauvegardée par le joueur.
+    /// </summary>
     void UpdateDisplays()
     {
         if (mapNames.Length > 0 && mapImages.Length > 0)
@@ -114,7 +138,9 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
             diffDisplay.text = difficultiesFr[currentDiffIndex];
         }
     }
-
+    /// <summary>
+    /// Valide les paramètres et charge la scène de jeu.
+    /// </summary>
      public void StartGame()
      { 
          string selectedMap = mapNames[currentMapIndex];
@@ -124,6 +150,9 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
          SceneManager.LoadScene("Game");
      }
 
+    /// <summary>
+    /// Annule la configuration et retourne au menu principal.
+    /// </summary>
     public void Back()
     {
         SceneManager.LoadScene("MainMenu"); 

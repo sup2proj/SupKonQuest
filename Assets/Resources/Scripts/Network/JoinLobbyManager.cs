@@ -6,22 +6,28 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Gère la recherche, l'affichage sous forme de liste et la connexion aux salons (lobbies) existants sur les serveurs d'Unity.
+/// </summary>
 public class JoinLobbyManager : MonoBehaviour
 {
     [Header("Interface (UI)")]
     public Transform lobbyListContainer;
     public GameObject lobbyItemPrefab;
 
-    public TextMeshProUGUI statusText;
+    public LocalizedText statusText;
 
     void Start()
     {
         RefreshLobbyList();
     }
 
+    /// <summary>
+    /// Lance une requête aux serveurs d'Unity pour récupérer jusqu'à 25 salons publics disposant d'au moins une place libre, puis déclenche la mise à jour de l'interface.
+    /// </summary>
     public async void RefreshLobbyList()
     {
-        statusText.text = "Recherche de parties...";
+        if (statusText != null) statusText.SetDynamicTranslations("Searching for games...", "Recherche de parties...","Ricerca di partite...");
         
         try
         {
@@ -35,16 +41,25 @@ public class JoinLobbyManager : MonoBehaviour
 
             QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync(options);
 
-            statusText.text = response.Results.Count + " partie(s) trouvée(s)";
+            if (statusText != null) 
+                statusText.SetDynamicTranslations(
+                    response.Results.Count + " game(s) found", 
+                    response.Results.Count + " partie(s) trouvée(s)",
+                    response.Results.Count + " risultato(i) trovato(i)"
+                );
             UpdateLobbyUI(response.Results);
         }
         catch (LobbyServiceException e)
         {
-            statusText.text = "Erreur de recherche.";
+            if (statusText != null) statusText.SetDynamicTranslations("Search error.", "Erreur de recherche.","Errore di ricerca.");
             Debug.LogError(e);
         }
     }
 
+    /// <summary>
+    /// Nettoie la liste actuelle à l'écran, puis instancie un nouveau bloc (prefab) pour chaque salon trouvé. Applique automatiquement la traduction du préfixe ("Salon de", "Lobby of") selon la langue du joueur.
+    /// </summary>
+    /// <param name="lobbies">La liste des salons renvoyée par la requête au serveur.</param>
     private void UpdateLobbyUI(List<Lobby> lobbies)
     {
         foreach (Transform child in lobbyListContainer)
@@ -58,7 +73,20 @@ public class JoinLobbyManager : MonoBehaviour
             
             TextMeshProUGUI[] texts = item.GetComponentsInChildren<TextMeshProUGUI>();
             
-            texts[0].text = lobby.Name + " (" + lobby.Players.Count + "/" + lobby.MaxPlayers + ")";
+            int currentLang = PlayerPrefs.GetInt("Language", 0);
+            string prefix = "Lobby of "; // 0 = Anglais par défaut
+
+            if (currentLang == 1) 
+            {
+                prefix = "Salon de ";    // 1 = Français
+            }
+            else if (currentLang == 2) 
+            {
+                prefix = "Lobby di ";    // 2 = Italien
+            }
+
+            texts[0].text = prefix + lobby.Name + " (" + lobby.Players.Count + "/" + lobby.MaxPlayers + ")";
+            
             
             if (lobby.Data != null && lobby.Data.ContainsKey("Map"))
             {
@@ -70,9 +98,13 @@ public class JoinLobbyManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Tente de rejoindre un salon spécifique, prépare les données initiales du joueur (son pseudo et son statut "Non Prêt") et charge la scène de la salle d'attente en cas de succès.
+    /// </summary>
+    /// <param name="lobbyId">L'identifiant unique (ID) du salon que le joueur souhaite rejoindre.</param>
     public async void JoinLobby(string lobbyId)
     {
-        statusText.text = "Connexion au lobby...";
+        if (statusText != null) statusText.SetDynamicTranslations("Connecting to lobby...", "Connexion au lobby...","Connessione alla lobby...");
         try
         {
             string myName = PlayerPrefs.GetString("PlayerName", "Joueur Inconnu");
@@ -99,6 +131,9 @@ public class JoinLobbyManager : MonoBehaviour
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
 
+    /// <summary>
+    /// Interrompt la recherche de salons et retourne à l'écran principal du multijoueur.
+    /// </summary>
     public void BackToMenu()
     {
         SceneManager.LoadScene("MultiplayerScene");

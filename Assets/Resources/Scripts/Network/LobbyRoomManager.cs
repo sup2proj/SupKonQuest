@@ -9,6 +9,9 @@ using TMPro;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 
+/// <summary>
+/// Gère la salle d'attente (Lobby Room) une fois qu'un joueur a créé ou rejoint une partie. Gère le chat, les paramètres de la partie, l'état "Prêt" des joueurs et la transition vers le jeu en réseau (Relay).
+/// </summary>
 public class LobbyRoomManager : MonoBehaviour
 {
     public static bool IsHost = false;
@@ -18,14 +21,14 @@ public class LobbyRoomManager : MonoBehaviour
     private float lobbyUpdateTimer;
 
     [Header("Interface (UI) Common")]
-    public TextMeshProUGUI lobbyStatusText;
+    public LocalizedText lobbyStatusText;
 
     [Header("Players List (UI)")]
     public Transform playerListContainer;
     public GameObject playerListItemPrefab;
 
-    public TextMeshProUGUI mapNameText;
-    public TextMeshProUGUI maxPlayersText;
+    public LocalizedText mapNameText;
+    public LocalizedText maxPlayersText;
     public Button readyBtn;
 
     private bool isLocalPlayerReady = false;
@@ -49,14 +52,16 @@ public class LobbyRoomManager : MonoBehaviour
         if (IsHost)
         {
             hostControlsPanel.SetActive(true);
-            lobbyStatusText.text = "Création du Lobby en cours...";
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Creating Lobby...", "Creation du Lobby en cours...","Creazione della lobby in corso...");
+                
             await CreateLobby();
         }
         else
         {
             hostControlsPanel.SetActive(false);
             currentLobby = JoinedLobby;
-            lobbyStatusText.text = "Connecté au salon";
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Connected to lobby", "Connecte au salon","In collegamento con il salone");
+                
             RefreshUI();
         }
         if (chatInputField != null)
@@ -72,15 +77,43 @@ public class LobbyRoomManager : MonoBehaviour
     void Update()
     {
         HandleLobbyPolling();
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            if (chatInputField != null && !chatInputField.isFocused)
+            {
+                UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
+                chatInputField.Select();
+                chatInputField.ActivateInputField();
+            }
+        }
     }
 
-
+    /// <summary>
+    /// Initialise un nouveau salon sur les serveurs d'Unity avec les données de départ (nom, carte, message de bienvenue) et assigne ce joueur comme hôte.
+    /// </summary>
     private async System.Threading.Tasks.Task CreateLobby()
     {
         try
         {
             string myName = PlayerPrefs.GetString("PlayerName", "Joueur Inconnu");
-            string lobbyName = "Salon de " + myName;
+            
+            int currentLang = PlayerPrefs.GetInt("Language", 0);
+            
+            string lobbyName = myName;
+            string welcomeMsg = "";
+
+            if (currentLang == 1) // Français
+            {
+                welcomeMsg = "Bienvenue dans le salon !\n";
+            }
+            else if (currentLang == 2) // Italiano
+            {
+                welcomeMsg = "Benvenuti in salotto !\n";
+            }
+            else // Anglais (si currentLang == 0 ou autre)
+            {
+                welcomeMsg = "Welcome to the lobby !\n";
+            }
             
             CreateLobbyOptions options = new CreateLobbyOptions
             {
@@ -96,20 +129,27 @@ public class LobbyRoomManager : MonoBehaviour
                 Data = new Dictionary<string, DataObject>
                 {
                     { "Map", new DataObject(DataObject.VisibilityOptions.Public, currentMap) },
-                    { "ChatLog", new DataObject(DataObject.VisibilityOptions.Member, "Bienvenue dans le salon !\n") }
+                    { "ChatLog", new DataObject(DataObject.VisibilityOptions.Member, welcomeMsg) }
                 }
             };
 
             currentLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, currentMaxPlayers, options);
+            
             GameObject keeperObj = new GameObject("LobbyKeeper");
             LobbyKeeper keeper = keeperObj.AddComponent<LobbyKeeper>();
             keeper.StartKeepingLobbyAlive(currentLobby.Id);
+            
             RefreshUI();
-            lobbyStatusText.text = "Lobby Ouvert ! En attente de joueurs...";
+            
+            if (lobbyStatusText != null) lobbyStatusText.SetDynamicTranslations("Lobby Open ! Waiting for players...", "Lobby Ouvert ! En attente de joueurs...","Lobby aperta ! In attesa dei giocatori...");
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
 
+    /// <summary>
+    /// Permet à l'hôte de modifier la carte de la partie et met à jour cette information sur le serveur pour tous les joueurs.
+    /// </summary>
+    /// <param name="newMap">Le nom de la nouvelle carte sélectionnée.</param>
     public async void ChangeMap(string newMap)
     {
         if (currentLobby == null || !IsHost) return;
@@ -128,20 +168,43 @@ public class LobbyRoomManager : MonoBehaviour
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
-
-    public async void ChangeMaxPlayers(int newMax)
+    
+    /// <summary>
+    /// Augmente la limite maximum de joueurs dans le salon (jusqu'à un maximum de 8). Action réservée à l'hôte.
+    /// </summary>
+    public async void UpMaxPlayers()
     {
         if (currentLobby == null || !IsHost) return;
-
+        if (currentMaxPlayers >= 8) return; 
         try
         {
-            currentMaxPlayers = newMax;
+            currentMaxPlayers++; 
+            UpdateLobbyOptions options = new UpdateLobbyOptions { MaxPlayers = currentMaxPlayers };
+            currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
+        }
+        catch (LobbyServiceException e) { Debug.LogError(e); }
+    }
+    
+    /// <summary>
+    /// Diminue la limite maximum de joueurs dans le salon (jusqu'à un minimum de 2). Action réservée à l'hôte.
+    /// </summary>
+    public async void DownMaxPlayers()
+    {
+        if (currentLobby == null || !IsHost) return;
+        if (currentMaxPlayers <= 2) return; 
+        try
+        {
+            currentMaxPlayers--; 
             UpdateLobbyOptions options = new UpdateLobbyOptions { MaxPlayers = currentMaxPlayers };
             currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
 
+    /// <summary>
+    /// Permet à l'hôte d'expulser un joueur spécifique du salon.
+    /// </summary>
+    /// <param name="targetPlayerId">L'identifiant (ID) du joueur à expulser.</param>
     public async void KickPlayer(string targetPlayerId)
     {
         if (!IsHost || currentLobby == null) return;
@@ -154,6 +217,9 @@ public class LobbyRoomManager : MonoBehaviour
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
 
+    /// <summary>
+    /// Envoie un message dans le chat en mettant à jour les données du joueur avec le contenu du message et un horodatage (pour forcer la détection de la mise à jour par les autres joueurs).
+    /// </summary>
     public async void SendChatMessage()
     {
         if (currentLobby == null || string.IsNullOrWhiteSpace(chatInputField.text)) return;
@@ -178,6 +244,9 @@ public class LobbyRoomManager : MonoBehaviour
         catch (LobbyServiceException e) { Debug.LogError("Erreur Chat : " + e.Message); }
     }
 
+    /// <summary>
+    /// Quitte la salle d'attente. Si le joueur est l'hôte, le salon entier est détruit. Si c'est un client, il est simplement retiré de la liste.
+    /// </summary>
     public async void LeaveLobby()
     {
         if (currentLobby != null)
@@ -196,13 +265,15 @@ public class LobbyRoomManager : MonoBehaviour
             catch (LobbyServiceException e) { Debug.LogError(e); }
         }
         if (LobbyKeeper.Instance != null)
-            {
-                LobbyKeeper.Instance.StopKeepingLobby();
-            }
+        {
+            LobbyKeeper.Instance.StopKeepingLobby();
+        }
         SceneManager.LoadScene("MultiplayerScene");
     }
 
-
+    /// <summary>
+    /// Alterne l'état du joueur local entre "Prêt" et "Non Prêt", et met à jour son statut sur le serveur pour débloquer le bouton de lancement de l'hôte.
+    /// </summary>
     public async void ToggleReady()
     {
         if (currentLobby == null) return;
@@ -222,11 +293,24 @@ public class LobbyRoomManager : MonoBehaviour
             string playerId = AuthenticationService.Instance.PlayerId;
             await LobbyService.Instance.UpdatePlayerAsync(currentLobby.Id, playerId, options);
 
-            readyBtn.GetComponentInChildren<TextMeshProUGUI>().text = isLocalPlayerReady ? "Annuler Prêt" : "Être Prêt";
+            if (readyBtn != null)
+            {
+                LocalizedText btnText = readyBtn.GetComponentInChildren<LocalizedText>();
+                if (btnText != null)
+                {
+                    if (isLocalPlayerReady)
+                        btnText.SetDynamicTranslations("Cancel Ready", "Annuler Pret","Annulla Pronto");
+                    else
+                        btnText.SetDynamicTranslations("Ready", "Pret","Pronto");
+                }
+            }
         }
         catch (LobbyServiceException e) { Debug.LogError(e); }
     }
 
+    /// <summary>
+    /// Action réservée à l'hôte. Crée un serveur Relay pour héberger la vraie partie en réseau, génère un code de connexion et l'inscrit dans les données du salon pour y inviter automatiquement les autres joueurs.
+    /// </summary>
     public async void StartNetworkGame()
     {
         if (!IsHost || currentLobby == null) return;
@@ -258,6 +342,9 @@ public class LobbyRoomManager : MonoBehaviour
         catch (LobbyServiceException e) { Debug.LogError("Erreur Lobby : " + e.Message); }
     }
 
+    /// <summary>
+    /// Vérifie si l'hôte a lancé la partie et publié le code Relay. Si c'est le cas, connecte automatiquement le client au serveur Relay.
+    /// </summary>
     private async void CheckGameStartSignal()
     {
         if (currentLobby != null && currentLobby.Data != null)
@@ -285,6 +372,9 @@ public class LobbyRoomManager : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Interroge le serveur régulièrement pour mettre à jour la liste des joueurs, synchroniser l'historique du chat, et vérifier si le joueur a été expulsé ou si la partie a commencé.
+    /// </summary>
     private async void HandleLobbyPolling()
     {
         if (currentLobby != null)
@@ -307,7 +397,7 @@ public class LobbyRoomManager : MonoBehaviour
 
                     if (!amIStillInLobby)
                     {
-                        HandleDisconnection("Vous avez été expulsé du salon par l'hôte.");
+                        HandleDisconnection("Kicked by host.", "Vous avez ete expulse du salon par l'hôte.","Sei stato espulso dalla chat dall'amministratore.");
                         return; 
                     }
 
@@ -350,18 +440,24 @@ public class LobbyRoomManager : MonoBehaviour
                 catch (LobbyServiceException e)
                 {
                     Debug.LogWarning("Impossible de rafraîchir le salon. Erreur : " + e.Reason);
-                    HandleDisconnection("La connexion au salon a été perdue.");
+                    HandleDisconnection("Connection lost.", "La connexion au salon a été perdue.","La connessione con la sala è stata interrotta.");
                 }
             }
         }
     }
 
+    /// <summary>
+    /// Met à jour toute l'interface visuelle (liste des joueurs, état du bouton "Lancer", chat, carte) en fonction des dernières données récupérées du serveur.
+    /// </summary>
     private void RefreshUI()
     {
         if (currentLobby == null) return;
 
-        mapNameText.text = "Carte : " + currentLobby.Data["Map"].Value;
-        maxPlayersText.text = "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers;
+        if (mapNameText != null)
+            mapNameText.SetDynamicTranslations("Map: " + currentLobby.Data["Map"].Value, "Carte : " + currentLobby.Data["Map"].Value, "Mappa : "+currentLobby.Data["Map"].Value);
+            
+        if (maxPlayersText != null)
+            maxPlayersText.SetDynamicTranslations("Slots: " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers, "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers,"Posti : "+currentLobby.Players.Count + " / " + currentLobby.MaxPlayers);
 
         foreach (Transform child in playerListContainer)
         {
@@ -403,13 +499,21 @@ public class LobbyRoomManager : MonoBehaviour
         }
     }
 
-    private void HandleDisconnection(string reason)
+    /// <summary>
+    /// Gère le retour forcé au menu multijoueur (en cas d'expulsion ou de perte de connexion) et sauvegarde la raison exacte pour l'afficher proprement au joueur à son retour au menu.
+    /// </summary>
+    /// <param name="reasonEN">Raison de la déconnexion en anglais.</param>
+    /// <param name="reasonFR">Raison de la déconnexion en français.</param>
+    /// <param name="reasonIT">Raison de la déconnexion en italien.</param>
+    private void HandleDisconnection(string reasonEN, string reasonFR, string reasonIT)
     {
-        Debug.LogWarning("Déconnexion forcée : " + reason);
+        Debug.LogWarning("Déconnexion forcée : " + reasonFR);
         
         currentLobby = null; 
         
-        PlayerPrefs.SetString("DisconnectReason", reason);
+        PlayerPrefs.SetString("DisconnectReasonEN", reasonEN);
+        PlayerPrefs.SetString("DisconnectReasonFR", reasonFR);
+        PlayerPrefs.SetString("DisconnectReasonIT", reasonIT);
         SceneManager.LoadScene("MultiplayerScene");
     }
 }

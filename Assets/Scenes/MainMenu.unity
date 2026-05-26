@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 161725981}
   - component: {fileID: 161725980}
   - component: {fileID: 161725979}
+  - component: {fileID: 161725982}
   m_Layer: 5
   m_Name: BtnMulti
   m_TagString: Untagged
@@ -252,6 +253,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 161725977}
   m_CullTransparentMesh: 1
+--- !u!114 &161725982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161725977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &298063994
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,8 +350,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 60
+  m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -354,7 +367,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -404,6 +417,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Quit
   frenchText: Quitter
+  italianoText: Esci
 --- !u!1 &363535081
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,8 +452,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -350, y: 250}
-  m_SizeDelta: {x: 600, y: 150}
+  m_AnchoredPosition: {x: 0, y: 400}
+  m_SizeDelta: {x: 1000, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &363535083
 MonoBehaviour:
@@ -488,14 +502,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
-  m_fontSizeBase: 72
+  m_fontSize: 130
+  m_fontSizeBase: 130
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -626,8 +640,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 60
+  m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -693,6 +707,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: Multiplayer
   frenchText: Multijoueur
+  italianoText: Multigiocatore
 --- !u!1 &442358767
 GameObject:
   m_ObjectHideFlags: 0
@@ -899,6 +914,7 @@ GameObject:
   - component: {fileID: 517376170}
   - component: {fileID: 517376172}
   - component: {fileID: 517376171}
+  - component: {fileID: 517376173}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -972,8 +988,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 60
+  m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -989,7 +1005,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1025,6 +1041,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 517376169}
   m_CullTransparentMesh: 1
+--- !u!114 &517376173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517376169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Options
+  frenchText: Options
+  italianoText: Opzioni
 --- !u!1 &597359684
 GameObject:
   m_ObjectHideFlags: 0
@@ -1110,8 +1141,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28
-  m_fontSizeBase: 28
+  m_fontSize: 60
+  m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1177,6 +1208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
   englishText: New game
   frenchText: Nouvelle partie
+  italianoText: Nuova partita
 --- !u!1 &619718700
 GameObject:
   m_ObjectHideFlags: 0
@@ -1214,7 +1246,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -350, y: -50}
+  m_AnchoredPosition: {x: 0, y: -50}
   m_SizeDelta: {x: 400, y: 450}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &619718702
@@ -1234,8 +1266,8 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 3
-  m_Spacing: -10
+  m_ChildAlignment: 4
+  m_Spacing: 50
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
@@ -1255,6 +1287,7 @@ GameObject:
   - component: {fileID: 644277192}
   - component: {fileID: 644277191}
   - component: {fileID: 644277190}
+  - component: {fileID: 644277193}
   m_Layer: 5
   m_Name: BtnOptions
   m_TagString: Untagged
@@ -1376,6 +1409,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 644277188}
   m_CullTransparentMesh: 1
+--- !u!114 &644277193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 644277188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &846414640
 GameObject:
   m_ObjectHideFlags: 0
@@ -1388,6 +1433,7 @@ GameObject:
   - component: {fileID: 846414644}
   - component: {fileID: 846414643}
   - component: {fileID: 846414642}
+  - component: {fileID: 846414645}
   m_Layer: 5
   m_Name: BtnNewGame
   m_TagString: Untagged
@@ -1509,6 +1555,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 846414640}
   m_CullTransparentMesh: 1
+--- !u!114 &846414645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846414640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &958724400
 GameObject:
   m_ObjectHideFlags: 0
@@ -1521,6 +1579,7 @@ GameObject:
   - component: {fileID: 958724404}
   - component: {fileID: 958724403}
   - component: {fileID: 958724402}
+  - component: {fileID: 958724405}
   m_Layer: 5
   m_Name: BtnQuit
   m_TagString: Untagged
@@ -1642,6 +1701,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 958724400}
   m_CullTransparentMesh: 1
+--- !u!114 &958724405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 958724400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0529bf2390ec4aa2a23fcb2b5a34d0a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TMPHoverUnderline
 --- !u!1 &1008551692
 GameObject:
   m_ObjectHideFlags: 0
