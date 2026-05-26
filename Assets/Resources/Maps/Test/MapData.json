@@ -27,7 +27,8 @@
       }
     ],
     "harbours": [
-      { "x": 15, "y": 16, "owner": -1, "territory" : "Petroville"}
+      { "x": 15, "y": 16, "owner": 2, "territory" : "Petroville"},
+      { "x": 15, "y": 24, "owner": 1, "territory" : "Petroville"}
     ],
     "special": [
       { "x": 29, "y": 4, "owner": -1 }

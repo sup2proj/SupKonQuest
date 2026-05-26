@@ -181,6 +181,8 @@ GameObject:
   - component: {fileID: 8455426616244343525}
   - component: {fileID: 1482387338201312061}
   - component: {fileID: 8463346451084302758}
+  - component: {fileID: -9217333928778241609}
+  - component: {fileID: -3976394894146892834}
   m_Layer: 0
   m_Name: Destroyer
   m_TagString: Untagged
@@ -224,6 +226,7 @@ MonoBehaviour:
   healthBar: {fileID: 5129612330594353732}
   currentHealth: 0
   playerId: 0
+  isNeutral: 0
 --- !u!54 &7780829615109988399
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -304,6 +307,43 @@ MonoBehaviour:
   moveSpeed: 3.5
   stoppingDistance: 0.2
   rotationSpeed: 12
+--- !u!114 &-9217333928778241609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6524080215285962826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64cb831562a6bdf41a4a4ca58a11e281, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
+  animator: {fileID: 0}
+  cannonBallPrefab: {fileID: 0}
+  cannonBallSpeed: 3
+--- !u!95 &-3976394894146892834
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6524080215285962826}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 1
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7622655996319963400
 GameObject:
   m_ObjectHideFlags: 0

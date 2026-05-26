@@ -79,6 +79,9 @@ public partial class StructureInstance
         }
 
         TryTriggerProtectorRetaliation(attacker);
+        StructureAttack structureAttack = GetComponent<StructureAttack>();
+        if (structureAttack != null)
+            structureAttack.OnAttacked(attacker);
     }
 
     public void HandleProtectorDeath(UnitInstance protectorUnit, int killerPlayerId)

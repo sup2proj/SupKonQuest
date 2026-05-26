@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6807213923685891317}
   - component: {fileID: -654240376972270683}
+  - component: {fileID: 8609337139710418626}
   m_Layer: 0
   m_Name: NeutralStructure
   m_TagString: Untagged
@@ -53,9 +54,28 @@ MonoBehaviour:
   playerId: 0
   health: 1000
   currentHealth: 0
+  territoryId: 0
+  territoryName: 
   healthBar: {fileID: 4238307199586979279}
   territoryStructureName: {fileID: 0}
   unitsFarRadius: 5
+--- !u!114 &8609337139710418626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 314074348264333094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49228ad981fcff948935557ba555cb9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StructureAttack
+  cannonBallPrefab: {fileID: 0}
+  cannonBallSpeed: 5
+  attackRange: 5
+  attackDamage: 50
+  attackCooldown: 3
 --- !u!1 &6671406994162845979
 GameObject:
   m_ObjectHideFlags: 0
