@@ -22,6 +22,30 @@ public class StructureAttack : MonoBehaviour
             Debug.LogError("[StructureAttack] CannonBall prefab introuvable !");
     }
 
+    void Update()
+    {
+        if (Time.time - lastAttackTime < attackCooldown)
+            return;
+
+        // Scan toutes les unités ennemies dans le rayon
+        UnitInstance[] allUnits = FindObjectsByType<UnitInstance>(FindObjectsSortMode.None);
+        foreach (UnitInstance unit in allUnits)
+        {
+            if (unit == null || unit.currentHealth <= 0)
+                continue;
+
+            if (unit.playerId == structureInstance.playerId)
+                continue;
+
+            float dist = Vector3.Distance(transform.position, unit.transform.position);
+            if (dist <= attackRange)
+            {
+                lastAttackTime = Time.time;
+                ShootAt(unit);
+                break; // une seule cible à la fois
+            }
+        }
+    }
     public void OnAttacked(UnitInstance attacker)
     {
         if (attacker == null || attacker.transform == null)

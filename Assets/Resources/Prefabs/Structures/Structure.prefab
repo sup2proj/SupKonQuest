@@ -213,7 +213,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StructureAttack
   cannonBallPrefab: {fileID: 0}
   cannonBallSpeed: 5
-  attackRange: 10
+  attackRange: 5
   attackDamage: 50
   attackCooldown: 3
 --- !u!1 &9182087538525045394
