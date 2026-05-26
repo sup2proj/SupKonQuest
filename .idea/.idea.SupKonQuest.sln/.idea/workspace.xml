@@ -5,30 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f255f268-479c-4f68-8fb9-1c81ce841df1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/Capture.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/Capture.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/Protector.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/Protector.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SupKonQuest.sln/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/BoatTransport.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/BoatTransport.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/BoatTransport.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/BoatTransport.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/Buffs.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/Buffs.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/Buffs.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/Buffs.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/DamageTable.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/DamageTable.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/DamageTable.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/DamageTable.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/NeutralUnits.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/NeutralUnits.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/NeutralUnits.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/NeutralUnits.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/Spells.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/Spells.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/Spells.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/Spells.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/StructureInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/StructureInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/StructureInstance.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Structure/StructureInstance.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitInstance.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/UnitInstance.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitInstance.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/UnitInstance.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitsAnimation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/UnitsAnimation.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Units/UnitsAnimation.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/UnitsAnimation.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Game/IA/Easy/EasyMovement.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Game/IA/Easy/EasyMovement.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/Game/Rules/Victory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/Game/Rules/Victory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/NeutralUnits.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Scripts/GameObject/Units/NeutralUnits.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +19,7 @@
   <component name="CopilotChats">
     <option name="panelChat">
       <chat>
-        <option name="activeSessionId" value="34e238d9-1136-4504-a819-ed90533c00ad" />
+        <option name="activeSessionId" value="8b6045f6-e1bb-4c9d-920b-79f8d2efd628" />
         <option name="sessions">
           <session>
             <option name="chatType" value="PANEL" />
@@ -64,6 +45,31 @@
             <option name="modelType" value="builtin_family" />
             <option name="modelValue" value="auto" />
             <option name="status" value="Stopped" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="b0fb6a68-f675-4807-9e1c-ca7c026e5fb5" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="c8314ee4-0dcb-4aae-9912-0cb4593bdd9f" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="8b6045f6-e1bb-4c9d-920b-79f8d2efd628" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
             <option name="targetType" value="LOCAL" />
           </session>
         </option>
@@ -197,7 +203,7 @@
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;startGame&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -225,6 +231,8 @@
       <workItem from="1779221133538" duration="6237000" />
       <workItem from="1779266884364" duration="11312000" />
       <workItem from="1779296638742" duration="6460000" />
+      <workItem from="1779731853056" duration="1360000" />
+      <workItem from="1779804201032" duration="5867000" />
     </task>
     <task id="LOCAL-00001" summary="test">
       <option name="closed" value="true" />

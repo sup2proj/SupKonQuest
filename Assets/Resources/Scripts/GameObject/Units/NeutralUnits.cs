@@ -40,10 +40,6 @@ public class NeutralUnits : MonoBehaviour
                 MovementEasyNormal movementEasyNormal = candidate.GetComponent<MovementEasyNormal>();
                 if (movementEasyNormal != null)
                     Destroy(movementEasyNormal);
-
-                EasyMovement easyMovement = candidate.GetComponent<EasyMovement>();
-                if (easyMovement != null)
-                    Destroy(easyMovement);
             }
         }
     }
