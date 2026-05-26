@@ -102,6 +102,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
     <Compile Include="Assets\Resources\Scripts\GameObject\Units\NeutralUnits.cs" />
+    <Compile Include="Assets\Resources\Scripts\GameObject\Structure\StructureAttack.cs" />
     <Compile Include="Assets\Resources\Scripts\Controller\SelectableObjectController.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\GameManager\PlayerManager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />

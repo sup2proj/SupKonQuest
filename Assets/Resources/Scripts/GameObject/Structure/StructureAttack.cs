@@ -1,0 +1,63 @@
+using UnityEngine;
+using System.Collections;
+
+public class StructureAttack : MonoBehaviour
+{
+    [Header("Projectile")]
+    public GameObject cannonBallPrefab;
+    public float cannonBallSpeed = 5f;
+    public float attackRange = 10f;
+    public float attackDamage = 50f;
+    public float attackCooldown = 3f;
+
+    private StructureInstance structureInstance;
+    private float lastAttackTime = -999f;
+
+    void Awake()
+    {
+        structureInstance = GetComponent<StructureInstance>();
+
+        cannonBallPrefab = Resources.Load<GameObject>("Prefabs/Units/CannonBall/Cannonball");
+        if (cannonBallPrefab == null)
+            Debug.LogError("[StructureAttack] CannonBall prefab introuvable !");
+    }
+
+    public void OnAttacked(UnitInstance attacker)
+    {
+        if (attacker == null || attacker.transform == null)
+            return;
+
+        if (Time.time - lastAttackTime < attackCooldown)
+            return;
+
+        float dist = Vector3.Distance(transform.position, attacker.transform.position);
+        if (dist > attackRange)
+            return;
+
+        lastAttackTime = Time.time;
+        ShootAt(attacker);
+    }
+
+    private void ShootAt(UnitInstance target)
+    {
+        if (cannonBallPrefab == null || target == null)
+            return;
+
+        Vector3 spawnPos = transform.position + Vector3.up * 1f;
+        UnitInstance attackerSnapshot = target;
+        StructureInstance structureSnapshot = structureInstance;
+
+        CannonBall.Spawn(cannonBallPrefab, spawnPos, target.transform, cannonBallSpeed, (impactPos) =>
+        {
+            if (attackerSnapshot == null || attackerSnapshot.currentHealth <= 0)
+                return;
+
+            attackerSnapshot.TakeDamage(attackDamage);
+
+            UnitsAnimation anim = attackerSnapshot.GetComponent<UnitsAnimation>();
+            if (anim != null)
+                anim.AttackTheAttacker(structureSnapshot.transform);
+
+        }, transform, arcHeight: 1.5f, scale: 0.2f);
+    }
+}
