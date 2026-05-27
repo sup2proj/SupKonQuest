@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 public class AutoLauncher : MonoBehaviour
 {
@@ -54,8 +55,19 @@ public class AutoLauncher : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (!launchRequested || scene.name != "Game")
-            return;
+        if (scene.name != "Game") return;
+
+        // Si on est un Client réseau, on s'auto-autorise à générer la carte
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
+        {
+            if (LobbyRoomManager.JoinedLobby != null && LobbyRoomManager.JoinedLobby.Data.ContainsKey("Map"))
+            {
+                pendingMapFolder = LobbyRoomManager.JoinedLobby.Data["Map"].Value;
+                launchRequested = true;
+            }
+        }
+
+        if (!launchRequested) return;
 
         launchRequested = false;
         CreateGame(pendingMapFolder, pendingAiCount, pendingAiDifficulty);
@@ -66,6 +78,19 @@ public class AutoLauncher : MonoBehaviour
     /// </summary>
     public void CreateGame(string mapFolderName = "TEST", int aiCount = 1, int aiDifficulty = 2)
     {
+        // On récupère la graine (par défaut au hasard pour le local)
+        int mapSeed = UnityEngine.Random.Range(10000, 99999); 
+        
+        // Si on est en multijoueur, on prend la graine du Lobby !
+        if (LobbyRoomManager.JoinedLobby != null && LobbyRoomManager.JoinedLobby.Data.ContainsKey("MapSeed"))
+        {
+            mapSeed = int.Parse(LobbyRoomManager.JoinedLobby.Data["MapSeed"].Value);
+        }
+        
+        // On synchronise la matrice de l'aléatoire
+        UnityEngine.Random.InitState(mapSeed);
+        Debug.Log($"[AutoLauncher] Génération avec la graine : {mapSeed}");
+
         Debug.Log($"AutoLauncher.CreateGame called with mapFolderName='{mapFolderName}', aiCount={aiCount}, aiDifficulty={aiDifficulty}");
         string localPlayerName = "toto";
         string[] playerList = { "toto" };
@@ -102,7 +127,11 @@ public class AutoLauncher : MonoBehaviour
 
         camMovement.SetUpCamera(mapGenerator.mapWidth, mapGenerator.mapHeight, startCameraPositionX, startCameraPositionY);
 
-        InstantiateAIs(aiCount, aiDifficulty);
+        // Seul l'Hôte (ou le mode local) a le droit de générer les IA
+        if (NetworkManager.Singleton == null || NetworkManager.Singleton.IsServer)
+        {
+            InstantiateAIs(aiCount, aiDifficulty);
+        }
     }
 
     private StructureAttribution PrepareStructureAttribution(string mapFolderName, int aiCount)
