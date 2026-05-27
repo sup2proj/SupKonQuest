@@ -4,6 +4,9 @@ using System.Collections;
 
 public partial class InterfaceInstance
 {
+    /// <summary>
+    /// Attache les callbacks de clic aux emplacements de buff disponibles dans l'UI.
+    /// </summary>
     private void WireBuffSlotClicks()
     {
         if (buffSlots == null || buffSlots.Length == 0)
@@ -17,6 +20,9 @@ public partial class InterfaceInstance
         }
     }
 
+     /// <summary>
+     /// Gère le clic sur un emplacement de buff : recherche le spells approprié et déclenche son listener.
+     /// </summary>
      private void OnBuffSlotClicked(int index)
      {
          if (buffSlots == null || index < 0 || index >= buffSlots.Length || buffSlots[index] == null)
@@ -46,8 +52,11 @@ public partial class InterfaceInstance
          }
      }
 
-     private Spells FindSpellsOfType(UnitsType type)
-     {
+      /// <summary>
+      /// Recherche parmi la sélection d'unités un composant Spells correspondant au type demandé.
+      /// </summary>
+      private Spells FindSpellsOfType(UnitsType type)
+      {
          if (SelectionManager.Instance == null || SelectionManager.Instance.CurrentlySelectedObjects == null)
              return null;
 
@@ -72,13 +81,19 @@ public partial class InterfaceInstance
          return null;
      }
 
-    public void hideBuffIcons()
-    {
+     /// <summary>
+     /// Masque toutes les icônes de buff dans l'UI.
+     /// </summary>
+     public void hideBuffIcons()
+     {
         SetImageArrayActive(buffSlots, false);
     }
 
-    public void RefreshBuffIconsForSelection()
-    {
+     /// <summary>
+     /// Actualise l'affichage des icônes de buff en fonction de l'unité(s) sélectionnée(s).
+     /// </summary>
+     public void RefreshBuffIconsForSelection()
+     {
         hideBuffIcons();
 
         if (buffSlots == null || buffSlots.Length == 0)
@@ -91,8 +106,11 @@ public partial class InterfaceInstance
             ShowHealerIcon();
     }
 
-    public void ShowSupportIcons()
-    {
+     /// <summary>
+     /// Affiche les icônes de support si l'unité sélectionnée possède des capacités de support.
+     /// </summary>
+     public void ShowSupportIcons()
+     {
         if (!IsSelectedUnitSupport())
             return;
 
@@ -107,8 +125,11 @@ public partial class InterfaceInstance
         }
     }
 
-    public void ShowHealerIcon()
-    {
+     /// <summary>
+     /// Affiche l'icône de healer si l'unité sélectionnée possède des capacités de soin.
+     /// </summary>
+     public void ShowHealerIcon()
+     {
         if (!IsSelectedUnitHealer())
             return;
 
@@ -120,8 +141,11 @@ public partial class InterfaceInstance
             SetImageActive(buffSlots[healerIndex], true);
     }
 
-    public void HideBuffIconForCooldown(int slotIndex, float cooldown)
-    {
+     /// <summary>
+     /// Cache une icône de buff pendant la durée de cooldown puis la réaffiche quand le cooldown est écoulé.
+     /// </summary>
+     public void HideBuffIconForCooldown(int slotIndex, float cooldown)
+     {
         if (buffSlots == null || slotIndex < 0 || slotIndex >= buffSlots.Length)
             return;
 
@@ -144,8 +168,11 @@ public partial class InterfaceInstance
         buffSlotReappearCoroutines[slotIndex] = StartCoroutine(ShowBuffIconAfterDelay(slotIndex, cooldown));
     }
 
-    private IEnumerator ShowBuffIconAfterDelay(int slotIndex, float cooldown)
-    {
+     /// <summary>
+     /// Coroutine qui attend le cooldown puis réaffiche l'icône de buff si les conditions sont toujours valides.
+     /// </summary>
+     private IEnumerator ShowBuffIconAfterDelay(int slotIndex, float cooldown)
+     {
         yield return new WaitForSeconds(cooldown);
 
         if (buffSlots == null)
@@ -172,18 +199,27 @@ public partial class InterfaceInstance
         buffSlotReappearCoroutines.Remove(slotIndex);
     }
 
-    private bool IsSelectedUnitSupport()
-    {
+     /// <summary>
+     /// Indique si la sélection courante contient au moins une unité de type Support.
+     /// </summary>
+     private bool IsSelectedUnitSupport()
+     {
         return IsSelectedUnitOfType(UnitsType.Support);
     }
 
-    private bool IsSelectedUnitHealer()
-    {
+     /// <summary>
+     /// Indique si la sélection courante contient au moins une unité de type Healer.
+     /// </summary>
+     private bool IsSelectedUnitHealer()
+     {
         return IsSelectedUnitOfType(UnitsType.Healer);
     }
 
-    private bool IsSelectedUnitOfType(UnitsType type)
-    {
+     /// <summary>
+     /// Vérifie si la sélection contient une unité d'un type donné.
+     /// </summary>
+     private bool IsSelectedUnitOfType(UnitsType type)
+     {
         if (SelectionManager.Instance == null || SelectionManager.Instance.CurrentlySelectedObjects == null)
             return false;
 
@@ -204,21 +240,30 @@ public partial class InterfaceInstance
         return false;
     }
 
-    private bool IsBuffSlotOnCooldown(int slotIndex)
-    {
+     /// <summary>
+     /// Vérifie si le slot de buff est actuellement en cooldown (coroutine en cours).
+     /// </summary>
+     private bool IsBuffSlotOnCooldown(int slotIndex)
+     {
         return buffSlotReappearCoroutines.TryGetValue(slotIndex, out var running) && running != null;
     }
 
-    private bool IsSupportBuffSlot(int slotIndex)
-    {
+     /// <summary>
+     /// Indique si l'index correspond à un slot de support (les premiers slots).
+     /// </summary>
+     private bool IsSupportBuffSlot(int slotIndex)
+     {
         if (buffSlots == null)
             return false;
 
         return slotIndex >= 0 && slotIndex < Mathf.Min(3, buffSlots.Length);
     }
 
-    private bool IsHealerBuffSlot(int slotIndex)
-    {
+     /// <summary>
+     /// Indique si l'index correspond au slot dédié au healer (dernier slot).
+     /// </summary>
+     private bool IsHealerBuffSlot(int slotIndex)
+     {
         return buffSlots != null && buffSlots.Length > 0 && slotIndex == buffSlots.Length - 1;
     }
 }

@@ -12,6 +12,9 @@ public class TabMenuStatistics : MonoBehaviour
         public TextMeshProUGUI territoryCountText;
         public TextMeshProUGUI unitsCountText;
 
+        /// <summary>
+        /// Efface toutes les valeurs affichées pour cette ligne de joueur.
+        /// </summary>
         public void Clear()
         {
             SetText(nameText, null);
@@ -22,6 +25,9 @@ public class TabMenuStatistics : MonoBehaviour
             SetText(unitsCountText, null);
         }
 
+        /// <summary>
+        /// Applique les statistiques d'une session à la ligne de joueur.
+        /// </summary>
         public void Apply(PlayerSession session, int playerId)
         {
             if (session == null)
@@ -38,12 +44,18 @@ public class TabMenuStatistics : MonoBehaviour
             SetText(unitsCountText, session.UnitCount.ToString());
         }
 
+        /// <summary>
+        /// Définit le texte d'un champ si celui-ci existe.
+        /// </summary>
         private static void SetText(TextMeshProUGUI text, string value)
         {
             if (text != null)
                 text.text = value;
         }
 
+        /// <summary>
+        /// Définit la couleur d'un champ texte si celui-ci existe.
+        /// </summary>
         private static void SetColor(TextMeshProUGUI text, Color color)
         {
             if (text != null)
@@ -57,22 +69,34 @@ public class TabMenuStatistics : MonoBehaviour
     [Header("Runtime (auto si vide)")]
     [SerializeField] private PlayerManager playerManager;
 
+    /// <summary>
+    /// Récupère le gestionnaire de joueurs si la référence n'est pas assignée.
+    /// </summary>
     private void Awake()
     {
         if (playerManager == null)
             playerManager = FindFirstObjectByType<PlayerManager>();
     }
 
+    /// <summary>
+    /// Rafraîchit l'affichage lorsque l'onglet devient visible.
+    /// </summary>
     private void OnEnable()
     {
         Refresh();
     }
 
+    /// <summary>
+    /// Met à jour régulièrement les statistiques affichées.
+    /// </summary>
     private void Update()
     {
         Refresh();
     }
 
+    /// <summary>
+    /// Recharge toutes les lignes de statistiques des joueurs.
+    /// </summary>
     public void Refresh()
     {
         if (playerManager == null)

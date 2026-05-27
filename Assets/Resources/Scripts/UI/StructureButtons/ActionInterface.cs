@@ -33,12 +33,18 @@ public class ActionInterface : MonoBehaviour
     private static float x;
     private static float z;
 
+    /// <summary>
+    /// Initialise l'instance singleton et masque tous les boutons au démarrage.
+    /// </summary>
     void Awake()
     {
         Instance = this;
         HideAllButtons();
     }
 
+    /// <summary>
+    /// Démarre la configuration : initialise tous les boutons et met à jour les prix des unités et bateaux.
+    /// </summary>
     void Start()
     {
         SetupAllButtons();
@@ -46,16 +52,25 @@ public class ActionInterface : MonoBehaviour
         SetupBoatPrices();
     }
 
+    /// <summary>
+    /// Configure les textes de prix des unités en appliquant le multiplicateur courant.
+    /// </summary>
     public void SetupUnitPrices()
     {
         SetupPriceTexts(unitPriceTexts, 0, GetCurrentUnitPriceMultiplier());
     }
 
+    /// <summary>
+    /// Configure les textes de prix des bateaux (offset pour les données bateau).
+    /// </summary>
     public void SetupBoatPrices()
     {
         SetupPriceTexts(boatPriceTexts, HarbourUnitDataOffset, 1f);
     }
 
+    /// <summary>
+    /// Initialise tous les tableaux de boutons (structures, port, structures neutres).
+    /// </summary>
     private void SetupAllButtons()
     {
         SetupButtonArray(structureButtons, StructureType.Structure);
@@ -63,6 +78,9 @@ public class ActionInterface : MonoBehaviour
         SetupButtonArray(neutralStructureButtons, StructureType.NeutralStructure);
     }
 
+    /// <summary>
+    /// Configure chaque bouton d'un tableau en lui passant le type de structure et l'action correspondante.
+    /// </summary>
     private void SetupButtonArray(ActionButton[] buttons, StructureType structureType)
     {
         if (buttons == null)
@@ -79,6 +97,9 @@ public class ActionInterface : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Délègue l'action du bouton selon le type de structure sélectionné.
+    /// </summary>
     private void ButtonAction(int buttonNumber, StructureType structureType)
     {
         switch (structureType)
@@ -97,12 +118,18 @@ public class ActionInterface : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Traite l'envoi d'une icône d'unité depuis une structure (normale ou neutre).
+    /// </summary>
     private void SendUnitsIcon(int buttonNumber, bool isPowered)
     {
         ActionButton[] sourceButtons = isPowered ? neutralStructureButtons : structureButtons;
         TryCreateUnitFromButton(buttonNumber, sourceButtons, 0, isPowered, "Structure");
     }
 
+    /// <summary>
+    /// Retourne l'objet GameObject correspondant à l'icône d'unité cliquée pour le bouton donné.
+    /// </summary>
     public GameObject GetClickedUnitsIcon(int buttonNumber, bool isPowered)
     {
         ActionButton[] sourceButtons = isPowered ? neutralStructureButtons : structureButtons;
@@ -114,11 +141,18 @@ public class ActionInterface : MonoBehaviour
         return sourceButtons[index].gameObject;
     }
 
+    /// <summary>
+    /// Gère le clic sur un bouton de port en tentant de créer l'unité correspondante.
+    /// </summary>
     public void HarbourButtonAction(int buttonNumber)
     {
         TryCreateUnitFromButton(buttonNumber, harbourButtons, HarbourUnitDataOffset, false, "Harbour");
     }
 
+    /// <summary>
+    /// Tente de créer une unité à partir d'un bouton : vérifie l'index, récupère les données
+    /// et demande à l'interface de création d'initialiser la création.
+    /// </summary>
     private bool TryCreateUnitFromButton(int buttonNumber, ActionButton[] sourceButtons, int unitDataOffset, bool isPowered, string logContext)
     {
         int buttonIndex = buttonNumber - 1;
@@ -149,6 +183,9 @@ public class ActionInterface : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Masque tous les boutons, textes et images d'interface liés aux actions.
+    /// </summary>
     public void HideAllButtons()
     {
         Debug.Log("[ActionInterface] HideAllButtons() appele");
@@ -157,6 +194,9 @@ public class ActionInterface : MonoBehaviour
         SetImagesActive(false, structureImage);
     }
 
+    /// <summary>
+    /// Active ou désactive les groupes de boutons passés en paramètres.
+    /// </summary>
     private void SetButtonsActive(bool active, params ActionButton[][] buttonGroups)
     {
         if (buttonGroups == null)
@@ -176,6 +216,9 @@ public class ActionInterface : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Active ou désactive les textes (prix, etc.) et les replace en dernier enfant si activés.
+    /// </summary>
     private void SetTextsActive(bool active, params TextMeshProUGUI[][] textGroups)
     {
         if (textGroups == null)
@@ -199,6 +242,9 @@ public class ActionInterface : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Active ou désactive un tableau d'images d'interface.
+    /// </summary>
     private void SetImagesActive(bool active, GameObject[] images)
     {
         if (images == null)
@@ -211,6 +257,9 @@ public class ActionInterface : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Affiche l'image correspondant au type de structure sélectionné et masque les autres.
+    /// </summary>
     private void ShowImage(StructureType selectedType)
     {
         SetImagesActive(false, structureImage);
@@ -225,6 +274,9 @@ public class ActionInterface : MonoBehaviour
         Debug.LogWarning($"[ActionInterface] Aucune image configuree pour {selectedType} (index {index}).");
     }
 
+    /// <summary>
+    /// Méthode d'accès statique pour afficher les boutons et prix associés à un type de structure.
+    /// </summary>
     public static void ShowStructureButtons(StructureType structureType)
     {
         if (Instance == null)
@@ -241,6 +293,9 @@ public class ActionInterface : MonoBehaviour
         Instance.ShowButtonsAndPricesFor(structureType);
     }
 
+    /// <summary>
+    /// Affiche les boutons et textes de prix correspondant à un type de structure donné.
+    /// </summary>
     private void ShowButtonsAndPricesFor(StructureType structureType)
     {
         switch (structureType)
@@ -265,6 +320,9 @@ public class ActionInterface : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Enregistre la structure sélectionnée et sa position (x, z) pour les opérations ultérieures.
+    /// </summary>
     public static void SetSelectedStructure(StructureInstance structure, Vector3 position)
     {
         x = position.x;
@@ -273,6 +331,9 @@ public class ActionInterface : MonoBehaviour
         Debug.Log($"[ActionInterface] Structure selectionnee: {structureName}, x={position.x}, z={position.z}");
     }
 
+    /// <summary>
+    /// Affiche le prix du protector pour une unité donnée à l'index de prix spécifié.
+    /// </summary>
     public void ShowUnitProtectorPrice(int unitIndex, int priceIndex)
     {
         if (!IsValidIndex(unitProtectorPriceTexts, priceIndex))
@@ -290,6 +351,9 @@ public class ActionInterface : MonoBehaviour
         priceText.transform.SetAsLastSibling();
     }
 
+    /// <summary>
+    /// Remplit les textes de prix pour un tableau donné en utilisant un offset et un multiplicateur.
+    /// </summary>
     private void SetupPriceTexts(TextMeshProUGUI[] priceTexts, int unitDataOffset, float multiplier)
     {
         if (priceTexts == null || unitDatas == null)
@@ -312,6 +376,9 @@ public class ActionInterface : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Tente de récupérer les données d'une unité à l'index donné et renvoie false si invalide.
+    /// </summary>
     private bool TryGetUnitData(int unitIndex, string logContext, out UnitData data)
     {
         data = null;
@@ -325,16 +392,25 @@ public class ActionInterface : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Retourne le multiplicateur de prix courant en fonction du type de structure sélectionné.
+    /// </summary>
     private float GetCurrentUnitPriceMultiplier()
     {
         return currentStructureType == StructureType.NeutralStructure ? PoweredStructureMultiplier : 1f;
     }
 
+    /// <summary>
+    /// Formate un prix en entier arrondi et retourne sa représentation en chaîne.
+    /// </summary>
     private string FormatPrice(float price)
     {
         return Mathf.RoundToInt(price).ToString();
     }
 
+    /// <summary>
+    /// Vérifie si un index est valide pour un tableau générique (non null et dans les limites).
+    /// </summary>
     private bool IsValidIndex<T>(T[] array, int index)
     {
         return array != null && index >= 0 && index < array.Length;

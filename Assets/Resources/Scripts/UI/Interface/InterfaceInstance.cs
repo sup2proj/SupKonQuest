@@ -122,11 +122,17 @@ public partial class InterfaceInstance : MonoBehaviour
         public int sourceStructureId;
     }
     
+    /// <summary>
+    /// Initialise l'instance singleton de l'InterfaceInstance.
+    /// </summary>
     void Awake()
     {
         Instance = this;
     }
 
+     /// <summary>
+     /// Configuration initiale de l'interface : masque/initialise les éléments UI et attache les handlers.
+     /// </summary>
      void Start()
      {
          if (unitsQueue != null && unitsProtector != null)
@@ -156,6 +162,9 @@ public partial class InterfaceInstance : MonoBehaviour
              SetGameObjectActive(tabMenuStatistics, false);
      }
 
+     /// <summary>
+     /// Gestion des entrées utilisateur liées à l'interface (ex: touche TAB pour afficher les stats).
+     /// </summary>
      void Update()
      {
          // Gestion de la touche TAB pour afficher/masquer les statistiques
@@ -172,6 +181,9 @@ public partial class InterfaceInstance : MonoBehaviour
          }
      }
 
+    /// <summary>
+    /// Cache l'ensemble de l'interface HUD (structures, buffs, boutons, liste joueurs, statistiques).
+    /// </summary>
     public void HideHud()
     {
         HideStructureInterface();
@@ -184,6 +196,9 @@ public partial class InterfaceInstance : MonoBehaviour
             ActionInterface.Instance.HideAllButtons();
     }
 
+    /// <summary>
+    /// Affiche le panneau de victoire pour le joueur gagnant si le panel central est prêt.
+    /// </summary>
     public void ShowVictoryPanel(int winnerPlayerId)
     {
         if (!TryPreparePanelInMiddle())
@@ -192,6 +207,9 @@ public partial class InterfaceInstance : MonoBehaviour
         panelInMiddle.ShowVictory(winnerPlayerId);
     }
 
+    /// <summary>
+    /// Affiche le panneau de défaite pour le joueur défait si le panel central est prêt.
+    /// </summary>
     public void ShowDefeatPanel(int defeatedPlayerId)
     {
         if (!TryPreparePanelInMiddle())
@@ -200,6 +218,9 @@ public partial class InterfaceInstance : MonoBehaviour
         panelInMiddle.ShowDefeat(defeatedPlayerId);
     }
 
+    /// <summary>
+    /// Masque le panneau central (victoire/défaite) s'il est résolu.
+    /// </summary>
     public void HideVictoryPanel()
     {
         ResolvePanelInMiddle();
@@ -208,6 +229,9 @@ public partial class InterfaceInstance : MonoBehaviour
             panelInMiddle.Hide();
     }
 
+    /// <summary>
+    /// Prépare le panel central en cachant le HUD et en résolvant la référence au panel; retourne true si prêt.
+    /// </summary>
     private bool TryPreparePanelInMiddle()
     {
         HideHud();
@@ -222,12 +246,18 @@ public partial class InterfaceInstance : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Rafraîchit l'interface des statistiques du joueur si elle est assignée.
+    /// </summary>
     private void RefreshPlayerStatisticsUI()
     {
         if (statisticsInterface != null)
             statisticsInterface.Refresh();
     }
 
+    /// <summary>
+    /// Assure que la référence au PlayerManager est résolue en recherchant l'objet dans la scène si nécessaire.
+    /// </summary>
     private PlayerManager ResolvePlayerManager()
     {
         if (playerManager == null)
@@ -236,18 +266,27 @@ public partial class InterfaceInstance : MonoBehaviour
         return playerManager;
     }
 
+    /// <summary>
+    /// Active ou désactive un GameObject si la référence n'est pas nulle.
+    /// </summary>
     private void SetGameObjectActive(GameObject target, bool active)
     {
         if (target != null)
             target.SetActive(active);
     }
 
+    /// <summary>
+    /// Active ou désactive l'objet d'une Image UI si la référence est valide.
+    /// </summary>
     private void SetImageActive(Image image, bool active)
     {
         if (image != null)
             SetGameObjectActive(image.gameObject, active);
     }
 
+    /// <summary>
+    /// Active ou désactive un tableau d'Images UI en itérant sur chaque élément.
+    /// </summary>
     private void SetImageArrayActive(Image[] images, bool active)
     {
         if (images == null)
@@ -259,6 +298,9 @@ public partial class InterfaceInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Active ou désactive une liste d'Images UI en itérant sur chaque élément.
+    /// </summary>
     private void SetImageListActive(List<Image> images, bool active)
     {
         if (images == null)
@@ -270,6 +312,9 @@ public partial class InterfaceInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Associe une action UnityAction au clic d'une Image utilisée comme bouton.
+    /// </summary>
     private void WireImageButton(Image image, UnityEngine.Events.UnityAction action)
     {
         if (image == null)
@@ -284,6 +329,9 @@ public partial class InterfaceInstance : MonoBehaviour
     }
 
 	//TEMPORAIRE ---------------------
+    /// <summary>
+    /// Attache les callbacks de clic aux éléments de la liste de joueurs temporaire.
+    /// </summary>
     private void WirePlayersListClicks()
     {
         if (playersList == null || playersList.Count == 0)
@@ -297,6 +345,9 @@ public partial class InterfaceInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sélectionne un joueur à partir de l'index UI dans la liste et met à jour l'état du gestionnaire de joueurs.
+    /// </summary>
     private void SelectPlayerFromPlayersList(int uiIndex)
     {
         int playerId;
@@ -331,6 +382,9 @@ public partial class InterfaceInstance : MonoBehaviour
         RefreshPlayerStatisticsUI();
     }
 
+    /// <summary>
+    /// Obtient l'ID du joueur actuellement sélectionné en priorisant le PlayerManager, sinon fallback.
+    /// </summary>
     private int GetSelectedPlayerId()
     {
         ResolvePlayerManager();
@@ -356,11 +410,17 @@ public partial class InterfaceInstance : MonoBehaviour
         Debug.Log("[InterfaceInstance] Aucun PlayerManager, fallback sur Player 1.", this);
         return 1;
     }
+    /// <summary>
+    /// Cache la liste UI des joueurs.
+    /// </summary>
     private void HidePlayersList()
     {
         SetImageListActive(playersList, false);
     }
 
+    /// <summary>
+    /// Cache l'interface des statistiques si elle est assignée.
+    /// </summary>
     private void HideStatisticsInterface()
     {
         if (statisticsInterface == null)
@@ -369,6 +429,9 @@ public partial class InterfaceInstance : MonoBehaviour
         SetGameObjectActive(statisticsInterface.gameObject, false);
     }
 
+    /// <summary>
+    /// Résout la référence au PanelInMiddle en cherchant dans la scène s'il n'est pas déjà assigné.
+    /// </summary>
     private void ResolvePanelInMiddle()
     {
         if (panelInMiddle != null && panelInMiddle.HasAssignedPanelReferences)

@@ -2,11 +2,17 @@
 
 public partial class InterfaceInstance
 {
+    /// <summary>
+    /// Attache le callback de clic au bouton de sortie des bateaux.
+    /// </summary>
     private void WireBoatExitButtonClick()
     {
         WireImageButton(boatExitButton, OnBoatExitClicked);
     }
 
+    /// <summary>
+    /// Gère l'action de débarquement des unités depuis les bateaux sélectionnés appartenant au joueur actif.
+    /// </summary>
     private void OnBoatExitClicked()
     {
         int activePlayerId = PlayerManager.Instance != null ? PlayerManager.Instance.GetActivePlayerId() : GetSelectedPlayerId();
@@ -41,11 +47,17 @@ public partial class InterfaceInstance
         Debug.Log($"[InterfaceInstance] BoatExit: {unloadedBoats} bateau(x) ont debarque leurs unites.");
     }
 
+    /// <summary>
+    /// Affiche l'icône permettant d'ordonner la sortie des unités des bateaux.
+    /// </summary>
     public void ShowBoatExitIcons()
     {
         SetImageActive(boatExitButton, true);
     }
 
+    /// <summary>
+    /// Masque l'icône de sortie des bateaux.
+    /// </summary>
     public void HideBoatExitIcons()
     {
         SetImageActive(boatExitButton, false);
