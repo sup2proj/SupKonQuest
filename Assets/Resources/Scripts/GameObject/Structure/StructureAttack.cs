@@ -13,6 +13,9 @@ public class StructureAttack : MonoBehaviour
     private StructureInstance structureInstance;
     private float lastAttackTime = -999f;
 
+    /// <summary>
+    /// Récupère la structure associée et charge le projectile utilisé pour les attaques.
+    /// </summary>
     void Awake()
     {
         structureInstance = GetComponent<StructureInstance>();
@@ -22,6 +25,9 @@ public class StructureAttack : MonoBehaviour
             Debug.LogError("[StructureAttack] CannonBall prefab introuvable !");
     }
 
+    /// <summary>
+    /// Cherche des unités ennemies à portée pour déclencher une attaque automatique.
+    /// </summary>
     void Update()
     {
         if (Time.time - lastAttackTime < attackCooldown)
@@ -46,6 +52,9 @@ public class StructureAttack : MonoBehaviour
             }
         }
     }
+    /// <summary>
+    /// Réagit lorsqu'une unité attaque la structure en tentant une riposte.
+    /// </summary>
     public void OnAttacked(UnitInstance attacker)
     {
         if (attacker == null || attacker.transform == null)
@@ -62,6 +71,9 @@ public class StructureAttack : MonoBehaviour
         ShootAt(attacker);
     }
 
+    /// <summary>
+    /// Tire un projectile sur une unité cible et applique les dégâts à l'arrivée.
+    /// </summary>
     private void ShootAt(UnitInstance target)
     {
         if (cannonBallPrefab == null || target == null)

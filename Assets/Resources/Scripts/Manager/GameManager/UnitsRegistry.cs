@@ -13,6 +13,9 @@ public static class UnitsRegistry
         }
     }
 
+    /// <summary>
+    /// Enregistre une unité dans le registre global.
+    /// </summary>
     public static void Register(UnitInstance unit, int unitsPlayerId)
     {
         if (unit != null)
@@ -22,12 +25,18 @@ public static class UnitsRegistry
         }
     }
 
+    /// <summary>
+    /// Retire une unité du registre global.
+    /// </summary>
     public static void Unregister(UnitInstance unit)
     {
         if (unit == null) return;
         units.Remove(unit);
     }
 
+    /// <summary>
+    /// Retourne une copie nettoyée du registre des unités.
+    /// </summary>
     public static List<UnitInstance> GetSnapshot()
     {
         units.RemoveWhere(u => u == null);

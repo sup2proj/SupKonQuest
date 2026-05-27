@@ -2,6 +2,9 @@ using UnityEngine;
 
 public partial class StructureInstance
 {
+    /// <summary>
+    /// Capture la structure pour un nouveau propriétaire et met à jour les effets associés.
+    /// </summary>
     private void CaptureStructure(int newOwnerId, int previousOwnerId, bool checkDefeat = true)
     {
           if (newOwnerId <= 0 || newOwnerId == playerId)
@@ -54,6 +57,9 @@ public partial class StructureInstance
          }
     }
 
+    /// <summary>
+    /// Met à jour les compteurs de structures entre l'ancien et le nouveau propriétaire.
+    /// </summary>
     private void UpdateStructureCounts(int previousOwnerId, int newOwnerId)
     {
         if (previousOwnerId == newOwnerId)

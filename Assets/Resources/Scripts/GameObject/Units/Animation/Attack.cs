@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public partial class UnitsAnimation : MonoBehaviour
 {
+    /// <summary>
+    /// Lance une attaque de riposte contre l'attaquant fourni ou la cible courante.
+    /// </summary>
     public void AttackTheAttacker(Transform attacker = null)
     {
         UnitInstance selfUnit = cachedUnit;
@@ -39,6 +42,9 @@ public partial class UnitsAnimation : MonoBehaviour
         attackCoroutine = StartCoroutine(AttackLoopCoroutine());
     }
 
+    /// <summary>
+    /// Démarre une attaque classique avec dégâts, en ignorant les unités de soutien et de soin.
+    /// </summary>
     public void StartAttackWithDamage()
     {
         UnitInstance unit = cachedUnit;
@@ -62,6 +68,9 @@ public partial class UnitsAnimation : MonoBehaviour
         attackCoroutine = StartCoroutine(AttackLoopCoroutine());
     }
 
+    /// <summary>
+    /// Gère la boucle principale d'attaque tant que la cible reste valide et à portée.
+    /// </summary>
     private IEnumerator AttackLoopCoroutine()
     {
         while (true)
@@ -129,6 +138,9 @@ public partial class UnitsAnimation : MonoBehaviour
         StopAttackInternal();
     }
     
+    /// <summary>
+    /// Déclenche le tir de mortier et applique ses dégâts de zone à l'impact.
+    /// </summary>
     private void MortarDamage(UnitInstance targetUnit, StructureInstance targetStructure, UnitInstance attackerUnit, float attack)
     {
         Transform targetSnapshot = attackTarget;
@@ -187,6 +199,9 @@ public partial class UnitsAnimation : MonoBehaviour
         }, transform);   
     }
 
+    /// <summary>
+    /// Charge le clip d'attaque à partir de l'Animator courant.
+    /// </summary>
     private AnimationClip GetAttackClip()
     {
         if (animator == null || animator.runtimeAnimatorController == null)
@@ -201,6 +216,9 @@ public partial class UnitsAnimation : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Relance la synchronisation de l'état d'attaque au prochain frame.
+    /// </summary>
     private void EnsureAttackAnimationStateAfterCoroutineStart()
     {
         if (ensureAttackAnimationCoroutine != null)
@@ -209,6 +227,9 @@ public partial class UnitsAnimation : MonoBehaviour
         ensureAttackAnimationCoroutine = StartCoroutine(EnsureAttackAnimationStateNextFrame());
     }
 
+    /// <summary>
+    /// Réapplique l'état d'attaque au frame suivant si l'attaque est toujours active.
+    /// </summary>
     private IEnumerator EnsureAttackAnimationStateNextFrame()
     {
         yield return null;
@@ -225,12 +246,18 @@ public partial class UnitsAnimation : MonoBehaviour
         ensureAttackAnimationCoroutine = null;
     }
 
+    /// <summary>
+    /// Met à jour le booléen d'attaque dans l'Animator.
+    /// </summary>
     private void SetAttackAnimationState(bool isAttacking)
     {
         if (animator != null)
             animator.SetBool("isAttacking", isAttacking);
     }
 
+    /// <summary>
+    /// Arrête proprement toute attaque en cours et réinitialise les états associés.
+    /// </summary>
     private void StopAttackInternal()
     {
         if (attackCoroutine != null)
@@ -253,6 +280,9 @@ public partial class UnitsAnimation : MonoBehaviour
         attackTarget = null;
     }
 
+    /// <summary>
+    /// Gère l'attaque automatique lorsque la cible actuelle reste valide.
+    /// </summary>
     void HandleAutoAttack()
     {
         UnitInstance unit = cachedUnit;
@@ -308,6 +338,9 @@ public partial class UnitsAnimation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Retourne la portée d'attaque courante de l'unité.
+    /// </summary>
     private float GetCurrentAttackRange()
     {
         UnitInstance unit = cachedUnit;
@@ -316,6 +349,9 @@ public partial class UnitsAnimation : MonoBehaviour
         return 0.1f;
     }
 
+    /// <summary>
+    /// Vérifie si la cible courante est à portée d'attaque.
+    /// </summary>
     private bool IsTargetWithinAttackRange()
     {
         if (attackTarget == null)
@@ -326,6 +362,9 @@ public partial class UnitsAnimation : MonoBehaviour
         return GetFlatDistanceSqToAttackTarget() <= allowedRange * allowedRange;
     }
 
+    /// <summary>
+    /// Calcule la distance au carré sur le plan horizontal jusqu'à la cible d'attaque.
+    /// </summary>
     private float GetFlatDistanceSqToAttackTarget()
     {
         Vector3 selfPosition = transform.position;
@@ -355,6 +394,9 @@ public partial class UnitsAnimation : MonoBehaviour
         return toTarget.sqrMagnitude;
     }
 
+    /// <summary>
+    /// Calcule les dégâts finaux de l'attaque selon les données de combat et les multiplicateurs.
+    /// </summary>
     private float GetAttackDamage()
     {
         UnitInstance attacker = cachedUnit;
@@ -374,12 +416,18 @@ public partial class UnitsAnimation : MonoBehaviour
         return 0f;
     }
 
+    /// <summary>
+    /// Réinitialise l'état d'attaque lorsqu'un mouvement reprend.
+    /// </summary>
     public void StopAttackForMovement()
     {
         attackTarget = null;
         StopAttackInternal();
     }
 
+    /// <summary>
+    /// Tente de lancer une attaque sur une cible si elle est à portée.
+    /// </summary>
     public bool TryStartAttackTargetIfInRange(Transform target)
     {
         if (target == null)

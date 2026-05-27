@@ -26,6 +26,9 @@ public partial class UnitsAnimation : MonoBehaviour
     public GameObject cannonBallPrefab;
     public float cannonBallSpeed = 3f;
 
+    /// <summary>
+    /// Initialise les références nécessaires à l'animation, au combat et au mouvement de l'unité.
+    /// </summary>
     void Awake()
     {
         if (animator == null)
@@ -50,6 +53,9 @@ public partial class UnitsAnimation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Met à jour les comportements d'attaque automatique et les ajustements visuels liés au mouvement.
+    /// </summary>
     void Update()
     {
         HandleAutoAttack();

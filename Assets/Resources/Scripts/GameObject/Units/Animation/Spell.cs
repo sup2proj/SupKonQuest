@@ -3,6 +3,9 @@ using System.Collections;
 
 public partial class UnitsAnimation : MonoBehaviour
 {
+    /// <summary>
+    /// Déclenche l'animation d'attaque utilisée par un sort.
+    /// </summary>
     public void StartAttackAnimationFromSpell()
     {
         UnitInstance unit = cachedUnit != null ? cachedUnit : GetComponent<UnitInstance>();
@@ -13,6 +16,9 @@ public partial class UnitsAnimation : MonoBehaviour
         spellAttackResetCoroutine = StartCoroutine(ResetSpellAttackToIdleAfterAnimation());
     }
 
+    /// <summary>
+    /// Rétablit l'état idle après la fin de l'animation d'attaque déclenchée par un sort.
+    /// </summary>
     private IEnumerator ResetSpellAttackToIdleAfterAnimation()
     {
         AnimationClip attackClip = GetAttackClip();

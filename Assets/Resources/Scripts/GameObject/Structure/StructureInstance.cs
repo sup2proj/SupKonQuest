@@ -40,6 +40,9 @@ public partial class StructureInstance : MonoBehaviour
     [Header("Detection")]
     [SerializeField] private float unitsFarRadius = 5f;
     
+    /// <summary>
+    /// Initialise les composants visuels et physiques de la structure.
+    /// </summary>
     void Awake()
     {
         Instance = this;
@@ -57,11 +60,17 @@ public partial class StructureInstance : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Définit l'identifiant du joueur propriétaire de la structure.
+    /// </summary>
     public void InitializePlayerId(int owner)
     {
         playerId = owner;
     }
     
+    /// <summary>
+    /// Initialise l'état runtime, l'UI et lance la production de la structure.
+    /// </summary>
     void Start()
     {
         structurePosition = transform.position;
@@ -71,6 +80,9 @@ public partial class StructureInstance : MonoBehaviour
         StartCoroutine(ProcessProductionQueue());
     }
 
+    /// <summary>
+    /// Nettoie l'état de sélection lorsque la structure est détruite.
+    /// </summary>
     void OnDestroy()
     {
         if (currentlySelected == this)
@@ -79,6 +91,9 @@ public partial class StructureInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Gère les entrées de test, l'orientation de la barre de vie et les clics globaux.
+    /// </summary>
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -102,6 +117,9 @@ public partial class StructureInstance : MonoBehaviour
     /// <summary>
     /// Gestion centralisee des clics sur les structures
     /// Cette methode n'est executee qu'une fois par frame (par l'Instance principale)
+    /// </summary>
+    /// <summary>
+    /// Détecte le clic global sur les structures et sélectionne la plus proche.
     /// </summary>
     private void HandleGlobalStructureClick()
     {
@@ -168,6 +186,9 @@ public partial class StructureInstance : MonoBehaviour
     /// <summary>
     /// Appele quand cette structure est cliquee
     /// </summary>
+    /// <summary>
+    /// Traite la sélection d'une structure après un clic.
+    /// </summary>
     private void OnStructureClicked()
     {
         Debug.Log($"[{name}] Structure cliquee (PlayerId: {playerId})");
@@ -191,6 +212,9 @@ public partial class StructureInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Configure la barre de vie de la structure.
+    /// </summary>
     private void InitHealthBar()
     {
         if (healthBar == null)
@@ -204,11 +228,17 @@ public partial class StructureInstance : MonoBehaviour
         healthBar.SetHealth(health);
     }
 
+    /// <summary>
+    /// Ajoute une unité standard à la file de production.
+    /// </summary>
     public void AddToQueue(UnitsType type)
     {
         AddToQueue(type, false);
     }
 
+    /// <summary>
+    /// Ajoute une unité à la file de production en précisant si elle est protectrice.
+    /// </summary>
     public void AddToQueue(UnitsType type, bool isProtector)
     {
         if (StructureManager.Instance == null)
@@ -243,6 +273,9 @@ public partial class StructureInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Traite en continu la file de production des unités de la structure.
+    /// </summary>
     private IEnumerator ProcessProductionQueue()
     {
         while (true)
@@ -283,6 +316,9 @@ public partial class StructureInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Marque la structure comme sélectionnée et affiche son interface associée.
+    /// </summary>
     public void Selected()
     {
         Debug.Log($"Structure {name} selectionnee (Type: {structureType}).");
@@ -329,6 +365,9 @@ public partial class StructureInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Retire la sélection de la structure et masque son interface.
+    /// </summary>
     public void UnSelected()
     {
         Debug.Log($"Structure {name} deselectionnee.");
@@ -350,6 +389,9 @@ public partial class StructureInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Recherche une structure à partir de son identifiant d'instance Unity.
+    /// </summary>
     public static StructureInstance FindByInstanceId(int instanceId)
     {
         if (instanceId == -1)
@@ -366,6 +408,9 @@ public partial class StructureInstance : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Retourne les unités alliées situées dans un rayon donné autour de la structure.
+    /// </summary>
     public List<UnitInstance> GetUnitsWithinRadius(float radius)
     {
         var result = new List<UnitInstance>();
@@ -390,12 +435,18 @@ public partial class StructureInstance : MonoBehaviour
         return result;
     }
 
+    /// <summary>
+    /// Retourne les unités alliées présentes dans le rayon configuré de détection.
+    /// </summary>
     public List<UnitInstance> GetUnitsWithinConfiguredRadius()
     {
         return GetUnitsWithinRadius(unitsFarRadius);
     }
 
     // Centralise l'application du nom de territoire et adapte la couleur selon le playerId
+    /// <summary>
+    /// Applique ou met à jour le nom du territoire affiché par la structure.
+    /// </summary>
     public void ApplyTerritoryName(string territory)
     {
         TerritoryStructureName t = GetTerritoryStructureName();
@@ -412,6 +463,9 @@ public partial class StructureInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Récupère le composant d'affichage du nom de territoire.
+    /// </summary>
     private TerritoryStructureName GetTerritoryStructureName()
     {
         if (territoryStructureName == null)
@@ -420,6 +474,9 @@ public partial class StructureInstance : MonoBehaviour
         return territoryStructureName;
     }
     
+    /// <summary>
+    /// Charge des données de carte depuis un chemin de ressources.
+    /// </summary>
     public static MapJsonData LoadDataFromPath(string path) {
         TextAsset targetFile = UnityEngine.Resources.Load<TextAsset>(path);
         if (targetFile != null) {

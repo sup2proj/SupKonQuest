@@ -2,6 +2,9 @@ using UnityEngine;
 
 public partial class StructureInstance
 {
+    /// <summary>
+    /// Ajoute une unité protectrice à la liste des protecteurs de la structure.
+    /// </summary>
     public void AddProtectorUnit(UnitInstance protectorUnit)
     {
         if (protectorUnit == null)
@@ -13,6 +16,9 @@ public partial class StructureInstance
             unitsProtectorTypes.Add(protectorObject);
     }
 
+    /// <summary>
+    /// Retire une unité protectrice de la structure.
+    /// </summary>
     public void RemoveProtectorUnit(UnitInstance protectorUnit)
     {
         if (protectorUnit == null)
@@ -21,11 +27,17 @@ public partial class StructureInstance
         unitsProtectorTypes.Remove(protectorUnit.gameObject);
     }
 
+    /// <summary>
+    /// Supprime les références nulles dans la liste des protecteurs.
+    /// </summary>
     private void CleanupProtectorUnits()
     {
         unitsProtectorTypes.RemoveAll(unitObject => unitObject == null);
     }
 
+    /// <summary>
+    /// Applique des dégâts à la structure et déclenche les réactions défensives si nécessaire.
+    /// </summary>
     public void TakeDamage(float amount, UnitInstance attacker)
     {
         if (attacker != null && attacker.playerId == playerId)
@@ -84,6 +96,9 @@ public partial class StructureInstance
             structureAttack.OnAttacked(attacker);
     }
 
+    /// <summary>
+    /// Réagit à la mort d'une unité protectrice liée à la structure.
+    /// </summary>
     public void HandleProtectorDeath(UnitInstance protectorUnit, int killerPlayerId)
     {
         if (protectorUnit != null)
@@ -97,6 +112,9 @@ public partial class StructureInstance
         CaptureStructure(killerPlayerId, previousOwnerId, checkDefeat: true);
     }
 
+    /// <summary>
+    /// Demande aux unités protectrices de riposter contre l'attaquant.
+    /// </summary>
     private void TryTriggerProtectorRetaliation(UnitInstance attacker)
     {
         if (attacker == null || attacker.transform == null)

@@ -2,6 +2,9 @@
 
 public partial class UnitsAnimation : MonoBehaviour
 {
+    /// <summary>
+    /// Termine un déplacement et déclenche éventuellement une attaque sur la cible atteinte.
+    /// </summary>
     private void OnMovementCompleted(Transform target)
     {
         if (isGroupLeader && activeGroupMoveId >= 0)
@@ -23,12 +26,18 @@ public partial class UnitsAnimation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Réinitialise l'état interne lié au déplacement de groupe.
+    /// </summary>
     private void ClearGroupMoveState()
     {
         activeGroupMoveId = -1;
         isGroupLeader = false;
     }
 
+    /// <summary>
+    /// Lance un déplacement vers une position précise.
+    /// </summary>
     public void MoveToPosition(Vector3 destination, float stopDistance)
     {
         attackTarget = null;
@@ -41,6 +50,9 @@ public partial class UnitsAnimation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Lance un déplacement vers une cible en utilisant la portée d'attaque actuelle.
+    /// </summary>
     public void MoveToTarget(Transform target, float stopDistance)
     {
         attackTarget = null;
@@ -53,6 +65,9 @@ public partial class UnitsAnimation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Engage automatiquement la cible si l'unité ne la poursuit pas déjà.
+    /// </summary>
     public void EngageTarget(Transform target, float stopDistance)
     {
         if (target == null || movementManager == null)
@@ -68,6 +83,9 @@ public partial class UnitsAnimation : MonoBehaviour
         MoveToTarget(target, desiredStopDistance);
     }
 
+    /// <summary>
+    /// Lance un déplacement en groupe avec l'identifiant et le rôle de leader fournis.
+    /// </summary>
     public void MoveToPositionAsGroup(Vector3 destination, float stopDistance, int groupMoveId, bool isLeader)
     {
         activeGroupMoveId = groupMoveId;

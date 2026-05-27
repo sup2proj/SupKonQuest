@@ -20,11 +20,17 @@ public class SelectionManager : MonoBehaviour
 
     Vector3 mouseStartPos;
 
+    /// <summary>
+    /// Enregistre cette instance comme gestionnaire de sélection global.
+    /// </summary>
     void Awake()
     {
         Instance = this;
     }
 
+    /// <summary>
+    /// Gère les entrées souris, la sélection et les ordres de déplacement/attaque.
+    /// </summary>
     void Update()
     {
         if (Mouse.current == null)
@@ -103,6 +109,9 @@ public class SelectionManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Réinitialise l'état du drag de sélection.
+    /// </summary>
     private void ResetSelectionDrag()
     {
         isMouseDown = false;
@@ -111,6 +120,9 @@ public class SelectionManager : MonoBehaviour
             SelectionBox.gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// Désélectionne toutes les unités actuellement sélectionnées.
+    /// </summary>
     public void ClearCurrentSelection()
     {
         if (CurrentlySelectedObjects != null)
@@ -128,6 +140,9 @@ public class SelectionManager : MonoBehaviour
         ResetSelectionDrag();
     }
 
+    /// <summary>
+    /// Indique si le joueur actif a déjà été vaincu.
+    /// </summary>
     private bool IsActivePlayerDefeated()
     {
         if (PlayerManager.Instance == null)
@@ -136,6 +151,9 @@ public class SelectionManager : MonoBehaviour
         return Defeat.IsPlayerDefeated(PlayerManager.Instance.GetActivePlayerId());
     }
 
+    /// <summary>
+    /// Vérifie si le pointeur est au-dessus d'un élément d'interface.
+    /// </summary>
     private bool IsPointerOverUi()
     {
         if (EventSystem.current == null)
@@ -147,6 +165,9 @@ public class SelectionManager : MonoBehaviour
         return EventSystem.current.IsPointerOverGameObject(-1);
     }
 
+    /// <summary>
+    /// Envoie un ordre de déplacement de groupe vers la position cliquée.
+    /// </summary>
     private void TryIssueGroupMoveOrder()
 {
     if (IsActivePlayerDefeated())
@@ -176,6 +197,9 @@ public class SelectionManager : MonoBehaviour
     }
 }
 
+    /// <summary>
+    /// Génère des positions de formation autour d'un point central.
+    /// </summary>
 private List<Vector3> GetFormationPositions(Vector3 center, int total)
 {
     List<Vector3> slots = new List<Vector3>();
@@ -214,6 +238,9 @@ private List<Vector3> GetFormationPositions(Vector3 center, int total)
     return slots;
 }
 
+    /// <summary>
+    /// Ajuste une position candidate sur le NavMesh si possible.
+    /// </summary>
 private Vector3 SampleNavMesh(Vector3 candidate)
 {
     if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 2f, NavMesh.AllAreas))
@@ -221,6 +248,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
     return candidate;
 }
 
+    /// <summary>
+    /// Retourne l'unité la plus proche d'un point donné.
+    /// </summary>
     private UnitInstance GetClosestUnitToPoint(List<UnitInstance> units, Vector3 point)
     {
         UnitInstance closest = null;
@@ -243,6 +273,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return closest;
     }
 
+    /// <summary>
+    /// Tente d'envoyer un ordre de rive pour rapprocher un bateau et ses unités terrestres.
+    /// </summary>
     private bool TryIssueBoatShoreOrder()
     {
         if (IsActivePlayerDefeated())
@@ -309,6 +342,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return true;
     }
 
+    /// <summary>
+    /// Recherche le bateau allié sous le curseur de la souris.
+    /// </summary>
     private UnitInstance GetFriendlyBoatUnderMouse(int activePlayerId)
     {
         RaycastHit[] hits = GetMouseRaycastHits();
@@ -334,6 +370,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return GetFriendlyBoatNearMouseOnScreen(activePlayerId);
     }
 
+    /// <summary>
+    /// Recherche le bateau allié le plus proche du pointeur à l'écran.
+    /// </summary>
     private UnitInstance GetFriendlyBoatNearMouseOnScreen(int activePlayerId)
     {
         if (AllSelectableObjects == null || Camera.main == null || Mouse.current == null)
@@ -371,6 +410,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return bestBoat;
     }
 
+    /// <summary>
+    /// Récupère une unité à partir d'un collider touché par le raycast.
+    /// </summary>
     private UnitInstance GetUnitFromCollider(Collider hitCollider)
     {
         if (hitCollider == null)
@@ -385,6 +427,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return unit;
     }
 
+    /// <summary>
+    /// Recherche le meilleur point de rendez-vous entre la rive et le bateau.
+    /// </summary>
     private bool TryFindBestShoreRendezvous(List<UnitInstance> landUnits, UnitInstance targetBoat, out Vector3 landDestination, out Vector3 waterDestination)
     {
         landDestination = Vector3.zero;
@@ -420,6 +465,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return found;
     }
 
+    /// <summary>
+    /// Évalue un couple eau/terre pour déterminer un meilleur point de débarquement.
+    /// </summary>
     private void TryEvaluateShorePair(
         MapGenerator map,
         TileData waterTile,
@@ -452,6 +500,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         found = true;
     }
 
+    /// <summary>
+    /// Calcule le centre moyen d'une liste d'unités.
+    /// </summary>
     private Vector3 GetUnitsCenter(List<UnitInstance> units)
     {
         if (units == null || units.Count == 0)
@@ -473,6 +524,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return count > 0 ? sum / count : Vector3.zero;
     }
 
+    /// <summary>
+    /// Rafraîchit périodiquement la liste des objets sélectionnables.
+    /// </summary>
     private void AnalyzeSelectableObjectsContinuously()
     {
         selectableRefreshTimer += Time.deltaTime;
@@ -483,6 +537,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         ForceRefreshSelectableObjects();
     }
 
+    /// <summary>
+    /// Reconstruit immédiatement la liste des objets sélectionnables.
+    /// </summary>
     private void ForceRefreshSelectableObjects()
     {
         var found = Object.FindObjectsByType<SelectableObject>(FindObjectsSortMode.None);
@@ -491,6 +548,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         AllSelectableObjects.AddRange(found);
     }
 
+    /// <summary>
+    /// Enregistre un objet comme sélectionnable s'il ne l'est pas déjà.
+    /// </summary>
     public void RegisterSelectable(SelectableObject selectable)
     {
         if (selectable == null)
@@ -501,6 +561,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
     }
 
 
+    /// <summary>
+    /// Sélectionne les unités visibles dans le rectangle de sélection.
+    /// </summary>
     private void SelectUnits()
     {
         if (IsActivePlayerDefeated())
@@ -569,6 +632,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
     // - Si la sélection contient uniquement des Supports/Healers => on consomme le clic mais on ne déplace personne.
     // - Si la sélection contient au moins une unité de combat => on déplace TOUTES les unités valides (combat + support + healer)
     //   vers la cible ennemie. Les unités de combat s'arrêtent à leur attackRange, les autres suivent sans portée propre.
+    /// <summary>
+    /// Tente d'envoyer un ordre d'attaque sur l'unité ou la structure sous la souris.
+    /// </summary>
     private bool TryIssueAttackMoveOrder()
     {
         if (IsActivePlayerDefeated())
@@ -583,6 +649,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return TryIssueStructureAttackOrder();
     }
 
+    /// <summary>
+    /// Tente d'envoyer un ordre d'attaque contre une unité ennemie.
+    /// </summary>
     private bool TryIssueUnitAttackOrder()
     {
         if (IsActivePlayerDefeated())
@@ -611,6 +680,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return true;
     }
 
+    /// <summary>
+    /// Tente d'envoyer un ordre d'attaque contre une structure ennemie.
+    /// </summary>
     private bool TryIssueStructureAttackOrder()
     {
         if (IsActivePlayerDefeated())
@@ -637,6 +709,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return true;
     }
 
+    /// <summary>
+    /// Recherche l'unité ennemie la plus pertinente sous le curseur.
+    /// </summary>
     private UnitInstance GetEnemyUnitUnderMouse(int activePlayerId)
     {
         RaycastHit[] hits = GetMouseRaycastHits();
@@ -671,6 +746,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return GetEnemyUnitNearMouseOnScreen(activePlayerId);
     }
 
+    /// <summary>
+    /// Recherche l'unité ennemie la plus proche du pointeur à l'écran.
+    /// </summary>
     private UnitInstance GetEnemyUnitNearMouseOnScreen(int activePlayerId)
     {
         if (AllSelectableObjects == null || Camera.main == null || Mouse.current == null)
@@ -708,6 +786,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return bestUnit;
     }
 
+    /// <summary>
+    /// Recherche la structure ennemie la plus pertinente sous le curseur.
+    /// </summary>
     private StructureInstance GetEnemyStructureUnderMouse(int activePlayerId)
     {
         RaycastHit[] hits = GetMouseRaycastHits();
@@ -739,12 +820,18 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return bestStructure;
     }
 
+    /// <summary>
+    /// Lance un raycast depuis la souris et retourne tous les impacts.
+    /// </summary>
     private RaycastHit[] GetMouseRaycastHits()
     {
         Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
         return Physics.RaycastAll(ray);
     }
 
+    /// <summary>
+    /// Vérifie si la sélection contient au moins une unité de combat.
+    /// </summary>
     private bool SelectionHasCombatUnit(List<UnitInstance> units)
     {
         if (units == null || units.Count == 0)
@@ -761,6 +848,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return false;
     }
 
+    /// <summary>
+    /// Calcule la distance d'arrêt à utiliser pour une unité lors d'un ordre d'attaque.
+    /// </summary>
     private float GetAttackStopDistance(UnitInstance unit)
     {
         if (unit != null && unit.unitData is UnitCombatData combatData)
@@ -771,6 +861,9 @@ private Vector3 SampleNavMesh(Vector3 candidate)
         return 0.1f;
     }
 
+    /// <summary>
+    /// Récupère les unités du joueur actif présentes dans la sélection actuelle.
+    /// </summary>
     private List<UnitInstance> CollectSelectedPlayerUnits(int activePlayerId)
     {
         List<UnitInstance> units = new List<UnitInstance>();
