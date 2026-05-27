@@ -452,7 +452,7 @@ private Vector3 SampleNavMesh(Vector3 candidate)
             for (int y = 0; y < height; y++)
             {
                 TileData waterTile = map.allTiles[x, y];
-                if (!MapTileUtility.IsNavigableWaterTile(waterTile))
+                if (!TileData.IsNavigableWater(waterTile))
                     continue;
 
                 TryEvaluateShorePair(map, waterTile, x + 1, y, landAnchor, boatPosition, ref landDestination, ref waterDestination, ref bestScore, ref found);
@@ -484,12 +484,12 @@ private Vector3 SampleNavMesh(Vector3 candidate)
             return;
 
         TileData landTile = map.allTiles[landX, landY];
-        if (!MapTileUtility.IsWalkableLandTile(landTile))
+        if (!TileData.IsWalkableLand(landTile))
             return;
 
-        Vector3 candidateLand = MapTileUtility.TileToWorldPosition(map, landTile);
-        Vector3 candidateWater = MapTileUtility.TileToWorldPosition(map, waterTile);
-        float score = MapTileUtility.FlatDistanceSq(landAnchor, candidateLand) + MapTileUtility.FlatDistanceSq(boatPosition, candidateWater);
+        Vector3 candidateLand = TileData.ToWorldPosition(map, landTile);
+        Vector3 candidateWater = TileData.ToWorldPosition(map, waterTile);
+        float score = TileData.FlatDistanceSq(landAnchor, candidateLand) + TileData.FlatDistanceSq(boatPosition, candidateWater);
 
         if (score >= bestScore)
             return;

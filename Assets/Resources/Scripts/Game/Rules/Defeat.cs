@@ -8,17 +8,26 @@ public class Defeat : MonoBehaviour
     [SerializeField, Min(0.1f)] private float globalDefeatCheckInterval = 0.5f;
     private float nextGlobalDefeatCheckAt;
 
+    /// <summary>
+    /// Réinitialise l'ensemble des joueurs défaits lors du rechargement du sous-système.
+    /// </summary>
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetDefeatedPlayers()
     {
         defeatedPlayers.Clear();
     }
 
+    /// <summary>
+    /// Indique si le joueur donné est marqué comme défait.
+    /// </summary>
     public static bool IsPlayerDefeated(int playerId)
     {
         return playerId > 0 && defeatedPlayers.Contains(playerId);
     }
 
+    /// <summary>
+    /// Vérifie si un joueur est défait après une capture (par ex. perte de structures) et l'applique si nécessaire.
+    /// </summary>
     public static bool CheckDefeatAfterCapture(int playerIdToCheck, bool showPanel = true)
     {
         if (playerIdToCheck <= 0)
@@ -34,6 +43,9 @@ public class Defeat : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Affiche le panneau de défaite pour le joueur spécifié si c'est le joueur actif.
+    /// </summary>
     public static void ShowDefeatForPlayer(int playerId)
     {
         if (playerId <= 0)
@@ -47,6 +59,9 @@ public class Defeat : MonoBehaviour
             InterfaceInstance.Instance.ShowDefeatPanel(playerId);
     }
 
+    /// <summary>
+    /// Détermine si le joueur possède encore des structures dans la scène ou via le PlayerManager.
+    /// </summary>
     private static bool PlayerStillHasStructure(int playerId)
     {
         PlayerManager playerManager = PlayerManager.Instance;
@@ -71,6 +86,9 @@ public class Defeat : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Contrôle périodiquement (intervalle configurable) l'état de défaite pour tous les joueurs.
+    /// </summary>
     private void Update()
     {
         if (Time.time < nextGlobalDefeatCheckAt)
@@ -80,6 +98,9 @@ public class Defeat : MonoBehaviour
         CheckDefeatForAllPlayers();
     }
 
+    /// <summary>
+    /// Parcourt toutes les sessions de joueurs et vérifie si elles doivent être marquées comme défaites.
+    /// </summary>
     private static void CheckDefeatForAllPlayers()
     {
         PlayerSession[] sessions = Object.FindObjectsByType<PlayerSession>(FindObjectsSortMode.None);
@@ -101,6 +122,9 @@ public class Defeat : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Applique la défaite à un joueur : convertit ses unités en neutres, nettoie la sélection et notifie.
+    /// </summary>
     private static void ApplyDefeat(int playerId)
     {
         defeatedPlayers.Add(playerId);
@@ -119,6 +143,9 @@ public class Defeat : MonoBehaviour
         TryDeclareWinnerFromRemainingPlayers();
     }
 
+    /// <summary>
+    /// Si un seul joueur reste avec des structures, déclenche la vérification de victoire correspondante.
+    /// </summary>
     private static void TryDeclareWinnerFromRemainingPlayers()
     {
         PlayerSession[] sessions = Object.FindObjectsByType<PlayerSession>(FindObjectsSortMode.None);

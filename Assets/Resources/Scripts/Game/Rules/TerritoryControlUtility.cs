@@ -3,6 +3,9 @@ using UnityEngine;
 
 public static class TerritoryControlUtility
 {
+    /// <summary>
+    /// Retourne le nombre de territoires entièrement contrôlés par le joueur spécifié.
+    /// </summary>
     public static int CountControlledTerritories(int playerId)
     {
         if (playerId <= 0)
@@ -15,6 +18,10 @@ public static class TerritoryControlUtility
         return controlledTerritories;
     }
 
+    /// <summary>
+    /// Cherche un joueur qui contrôle au moins <paramref name="territoriesToWin"/> territoires.
+    /// Renvoie true et l'ID du joueur gagnant si trouvé.
+    /// </summary>
     public static bool TryGetWinnerByTerritories(int territoriesToWin, out int playerId)
     {
         playerId = -1;
@@ -37,6 +44,10 @@ public static class TerritoryControlUtility
         return false;
     }
 
+    /// <summary>
+    /// Calcule et retourne un dictionnaire mapping ownerId => nombre de territoires entièrement contrôlés.
+    /// Renvoie false si aucune donnée valable n'a pu être déterminée.
+    /// </summary>
     private static bool TryGetControlledTerritoriesByOwner(out Dictionary<int, int> territoriesByOwner)
     {
         territoriesByOwner = new Dictionary<int, int>();

@@ -223,9 +223,9 @@ public class StructureManager : MonoBehaviour
         if (map == null || map.allTiles == null || map.tileSize <= 0f)
             return false;
 
-        if (map.TryGetTileAtWorldPosition(preferredPosition, out TileData preferredTile) && MapTileUtility.IsNavigableWaterTile(preferredTile))
+        if (map.TryGetTileAtWorldPosition(preferredPosition, out TileData preferredTile) && TileData.IsNavigableWater(preferredTile))
         {
-            spawnPosition = MapTileUtility.TileToWorldPosition(map, preferredTile);
+            spawnPosition = TileData.ToWorldPosition(map, preferredTile);
             return true;
         }
 
@@ -238,20 +238,20 @@ public class StructureManager : MonoBehaviour
         int width = map.allTiles.GetLength(0);
         int height = map.allTiles.GetLength(1);
 
-        for (int tileX = 0; tileX < width; tileX++)
-        {
-            for (int tileY = 0; tileY < height; tileY++)
+            for (int tileX = 0; tileX < width; tileX++)
             {
-                TileData tile = map.allTiles[tileX, tileY];
-                if (!MapTileUtility.IsNavigableWaterTile(tile))
-                    continue;
+                for (int tileY = 0; tileY < height; tileY++)
+                {
+                    TileData tile = map.allTiles[tileX, tileY];
+                    if (!TileData.IsNavigableWater(tile))
+                        continue;
 
-                Vector3 candidate = MapTileUtility.TileToWorldPosition(map, tile);
-                float harbourDistanceSq = MapTileUtility.FlatDistanceSq(candidate, harbourPosition);
-                if (harbourDistanceSq > maxDistanceSq)
-                    continue;
+                    Vector3 candidate = TileData.ToWorldPosition(map, tile);
+                    float harbourDistanceSq = TileData.FlatDistanceSq(candidate, harbourPosition);
+                    if (harbourDistanceSq > maxDistanceSq)
+                        continue;
 
-                float preferredDistanceSq = MapTileUtility.FlatDistanceSq(candidate, preferredPosition);
+                    float preferredDistanceSq = TileData.FlatDistanceSq(candidate, preferredPosition);
                 if (preferredDistanceSq > bestPreferredDistanceSq)
                     continue;
 
