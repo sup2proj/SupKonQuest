@@ -14,6 +14,9 @@ public class NormalAttack : MonoBehaviour
     private UnitsAnimation unitsAnimation;
     private UnitInstance unitInstance;
 
+    /// <summary>
+    /// Initialise les références aux composants nécessaires (movement, animation, unit).
+    /// </summary>
     private void Awake()
     {
         movementManager = GetComponent<MovementManager>();
@@ -21,6 +24,10 @@ public class NormalAttack : MonoBehaviour
         unitInstance = GetComponent<UnitInstance>();
     }
 
+    /// <summary>
+    /// Effectue un scan périodique autour de l'unité pour détecter des structures
+    /// ennemies et lancer des ordres d'attaque si nécessaire.
+    /// </summary>
     private void Update()
     {
         if (movementManager == null)
@@ -36,6 +43,11 @@ public class NormalAttack : MonoBehaviour
         CheckForStructureInRadius();
     }
 
+    /// <summary>
+    /// Retourne la portée d'attaque de l'unité si elle est de type combat;
+    /// sinon retourne une petite valeur par défaut.
+    /// </summary>
+    /// <returns>Portée d'attaque en unités de distance.</returns>
     private float GetUnitAttackRange()
     {
         if (unitInstance != null && unitInstance.unitData is UnitCombatData combatData)
@@ -43,6 +55,11 @@ public class NormalAttack : MonoBehaviour
         return 0.1f;
     }
 
+    /// <summary>
+    /// Indique si l'unité peut cibler des structures (les unités de support/healer
+    /// ne ciblent pas les structures).
+    /// </summary>
+    /// <returns>True si l'unité peut cibler des structures.</returns>
     private bool CanTargetStructures()
     {
         if (unitInstance == null || unitInstance.unitData == null)
@@ -51,6 +68,10 @@ public class NormalAttack : MonoBehaviour
         return unitInstance.unitData.type != UnitsType.Support && unitInstance.unitData.type != UnitsType.Healer;
     }
 
+    /// <summary>
+    /// Parcourt les structures à proximité et choisit la plus proche
+    /// qui appartient à un joueur ennemi. Lance ensuite l'ordre d'attaque.
+    /// </summary>
     private void CheckForStructureInRadius()
     {
         if (!CanTargetStructures())
@@ -97,6 +118,11 @@ public class NormalAttack : MonoBehaviour
         SendAttackOrder(currentTarget);
     }
 
+    /// <summary>
+    /// Envoie l'ordre d'attaque vers la <paramref name="target"/> en prenant en
+    /// compte la portée d'attaque, l'animation et la navigabilité de la position.
+    /// </summary>
+    /// <param name="target">Structure à attaquer.</param>
     private void SendAttackOrder(StructureInstance target)
     {
         if (target == null)
@@ -116,7 +142,7 @@ public class NormalAttack : MonoBehaviour
             }
 
             if (movement != null)
-                movement.MoveToTarget(target.transform, attackStopDistance);
+                movement.MoveToTarget(target.transform, attackStopDistance);<
             return;
         }
 
@@ -133,6 +159,11 @@ public class NormalAttack : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Définit l'identifiant du joueur propriétaire de cette unité (utilisé pour
+    /// déterminer quels targets sont ennemis).
+    /// </summary>
+    /// <param name="playerId">Identifiant du joueur propriétaire.</param>
     public void SetOwnerPlayerId(int playerId)
     {
         ownerPlayerId = playerId;

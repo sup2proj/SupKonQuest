@@ -24,11 +24,20 @@ public class NormalDefense : MonoBehaviour
     private float defendUntilTime;
     private bool isDefending;
 
+    /// <summary>
+    /// Récupère la référence à la <see cref="StructureInstance"/> associée.
+    /// </summary>
     private void Awake()
     {
         structureInstance = GetComponent<StructureInstance>();
     }
 
+    /// <summary>
+    /// Appelée lorsque la structure est attaquée : prépare la défense, peut
+    /// enqueuer des protecteurs et rappeler des unités locales pour contrer
+    /// l'attaquant fourni.
+    /// </summary>
+    /// <param name="attacker">Instance de l'unité attaquante.</param>
     public void MyStructureAttacked(UnitInstance attacker)
     {
         if (structureInstance == null || attacker == null)
@@ -56,6 +65,10 @@ public class NormalDefense : MonoBehaviour
         CallUnitsInRadiusForProtect();
     }
 
+    /// <summary>
+    /// Appelée pour indiquer que la période de défense est terminée. Réinitialise
+    /// l'état si le délai de défense est écoulé.
+    /// </summary>
     public void MyStructureDefended()
     {
         if (!isDefending)
@@ -68,6 +81,11 @@ public class NormalDefense : MonoBehaviour
         lastAttacker = null;
     }
 
+    /// <summary>
+    /// Vérifie s'il existe des unités alliées de type combat à proximité de
+    /// la structure (selon le rayon configuré par la structure).
+    /// </summary>
+    /// <returns>True si une unité de combat alliée est trouvée.</returns>
     private bool HasCombatAllyNearby()
     {
         if (structureInstance == null)
@@ -90,6 +108,10 @@ public class NormalDefense : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Rappelle les unités alliées dans un rayon autour de la structure afin
+    /// qu'elles engagent la dernière unité attaquante.
+    /// </summary>
     private void CallUnitsInRadiusForProtect()
     {
         if (structureInstance == null || lastAttacker == null)
@@ -126,6 +148,10 @@ public class NormalDefense : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Enfile des unités protectrices dans la file de production de la structure
+    /// attaquée en se basant sur les unités proches et des règles de fallback.
+    /// </summary>
     private void CreateProtectorsInAttackedStructure()
     {
         if (structureInstance == null || StructureManager.Instance == null)
@@ -205,6 +231,10 @@ public class NormalDefense : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Force le spawn immédiat d'une unité protectrice pour débogage ou
+    /// situation d'urgence (choisit un type de combat disponible).
+    /// </summary>
     public void ForceSpawnProtectorNow()
     {
         if (structureInstance == null || StructureManager.Instance == null)

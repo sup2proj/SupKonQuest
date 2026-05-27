@@ -15,6 +15,10 @@ public class AIEasy : MonoBehaviour
     private float decisionTimer;
     private int playerId = -1;
 
+    /// <summary>
+    /// Initialisation des références singletons et création automatique du
+    /// composant <see cref="EasyProduction"/> si nécessaire.
+    /// </summary>
     private void Awake()
     {
         if (playerManager == null)
@@ -36,6 +40,10 @@ public class AIEasy : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Démarrage : récupère l'identifiant du joueur actif et initialise la
+    /// production de l'IA si le composant existe.
+    /// </summary>
     private void Start()
     {
         if (playerManager != null)
@@ -45,6 +53,10 @@ public class AIEasy : MonoBehaviour
             easyProduction.Initialize(playerManager, structureManager, mapGenerator, playerId);
     }
 
+    /// <summary>
+    /// Tick principal : maintient les références, initialise la production
+    /// et exécute la logique de production périodique de l'IA ultra-facile.
+    /// </summary>
     private void Update()
     {
         if (playerManager == null)

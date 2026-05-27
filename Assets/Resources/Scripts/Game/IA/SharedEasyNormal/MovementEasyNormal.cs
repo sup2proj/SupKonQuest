@@ -23,6 +23,9 @@ public class MovementEasyNormal : MonoBehaviour
     private Transform lastAttackTarget = null;
     private NormalAttack normalAttackComponent;
 
+    /// <summary>
+    /// Initialisation des composants locaux (références aux managers et composants liés à l'unité).
+    /// </summary>
     private void Awake()
     {
         unitInstance = GetComponent<UnitInstance>();
@@ -33,6 +36,10 @@ public class MovementEasyNormal : MonoBehaviour
             mapGenerator = MapGenerator.Instance != null ? MapGenerator.Instance : FindFirstObjectByType<MapGenerator>();
     }
 
+    /// <summary>
+    /// Appelé lorsque le composant est activé : planifie un mouvement, configure
+    /// l'attaque normale en fonction de la difficulté et lance un déplacement aléatoire si nécessaire.
+    /// </summary>
     private void OnEnable()
     {
         ScheduleNextMove(0f);
@@ -59,6 +66,10 @@ public class MovementEasyNormal : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Logique par frame : gestion du statut de combat, pauses et des transitions
+    /// entre déplacement et arrêt.
+    /// </summary>
     private void Update()
     {
         if (unitInstance == null || movementManager == null || unitInstance.unitData == null)
@@ -97,6 +108,10 @@ public class MovementEasyNormal : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Met à jour l'état de combat de l'unité en se basant sur l'animation et
+    /// gère la remise en mouvement quand le combat est terminé.
+    /// </summary>
     private void UpdateCombatStatus()
     {
         bool isCurrentlyInCombat = false;
@@ -136,6 +151,11 @@ public class MovementEasyNormal : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Récupère la cible d'attaque courante depuis le composant d'animation des unités,
+    /// ou null si aucune cible n'est indiquée.
+    /// </summary>
+    /// <returns>Transform de la cible d'attaque ou null.</returns>
     private Transform GetAttackTargetFromAnimation()
     {
         if (unitsAnimation == null)
@@ -144,18 +164,30 @@ public class MovementEasyNormal : MonoBehaviour
         return unitsAnimation.AttackTarget;
     }
 
+    /// <summary>
+    /// Planifie une pause aléatoire entre les mouvements en utilisant les bornes
+    /// configurées pour la durée de pause.
+    /// </summary>
     private void SchedulePause()
     {
         float pause = Random.Range(pauseDurationMin, pauseDurationMax);
         nextStateChangeTime = Time.time + pause;
     }
 
+    /// <summary>
+    /// Débute un délai avant le prochain mouvement. L'unité sort de l'état "paused".
+    /// </summary>
+    /// <param name="immediateDelay">Délai en secondes avant le prochain mouvement (peut être 0).</param>
     private void ScheduleNextMove(float immediateDelay)
     {
         isPaused = false;
         nextStateChangeTime = Time.time + Mathf.Max(0f, immediateDelay);
     }
 
+    /// <summary>
+    /// Tente de lancer un déplacement aléatoire vers une destination valide de la map.
+    /// Si aucun point valide n'est trouvé, utilise un fallback local ou replanifie.
+    /// </summary>
     private void StartRandomMove()
     {
         if (TryGetRandomDestination(out Vector3 destination))
@@ -177,6 +209,12 @@ public class MovementEasyNormal : MonoBehaviour
         ScheduleNextMove(1f);
     }
 
+    /// <summary>
+    /// Cherche une destination proche (fallback) autour de l'unité utilisable
+    /// pour se déplacer si aucune destination éloignée n'est trouvée.
+    /// </summary>
+    /// <param name="destination">Sortie contenant la position de fallback si trouvée.</param>
+    /// <returns>True si une position valide a été trouvée.</returns>
     private bool TryGetLocalFallbackDestination(out Vector3 destination)
     {
         destination = transform.position;
@@ -195,6 +233,12 @@ public class MovementEasyNormal : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Tente de sélectionner aléatoirement une tuile de la carte comme destination
+    /// en évitant les tuiles trop proches et non praticables.
+    /// </summary>
+    /// <param name="destination">Sortie contenant la position sélectionnée.</param>
+    /// <returns>True si une destination valide a été trouvée.</returns>
     private bool TryGetRandomDestination(out Vector3 destination)
     {
         destination = transform.position;
