@@ -117,20 +117,6 @@ public class ProgressBar : MonoBehaviour
     }
 
     /// <summary>
-    /// Indique si la progression est terminée.
-    /// </summary>
-    public bool IsFinished()
-    {
-        if (durationSeconds <= 0f)
-            return true;
-
-        if (!isRunning)
-            return elapsedSeconds >= durationSeconds;
-
-        return (Time.time - creationStartTime) >= durationSeconds;
-    }
-
-    /// <summary>
     /// Synchronise l'affichage de la barre avec le temps écoulé réel.
     /// </summary>
     private void RefreshVisualFromClock()

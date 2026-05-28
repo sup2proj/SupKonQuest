@@ -188,7 +188,6 @@ public class ActionInterface : MonoBehaviour
     /// </summary>
     public void HideAllButtons()
     {
-        Debug.Log("[ActionInterface] HideAllButtons() appele");
         SetButtonsActive(false, structureButtons, harbourButtons, neutralStructureButtons, unitActionButtons);
         SetTextsActive(false, unitPriceTexts, boatPriceTexts, unitProtectorPriceTexts);
         SetImagesActive(false, structureImage);
@@ -301,19 +300,16 @@ public class ActionInterface : MonoBehaviour
         switch (structureType)
         {
             case StructureType.Structure:
-                Debug.Log("[ActionInterface] Affichage des boutons pour Structure");
                 SetButtonsActive(true, structureButtons);
                 SetTextsActive(true, unitPriceTexts);
                 break;
 
             case StructureType.Harbour:
-                Debug.Log("[ActionInterface] Affichage des boutons pour Harbour");
                 SetButtonsActive(true, harbourButtons);
                 SetTextsActive(true, boatPriceTexts);
                 break;
 
             case StructureType.NeutralStructure:
-                Debug.Log("[ActionInterface] Affichage des boutons pour NeutralStructure");
                 SetButtonsActive(true, neutralStructureButtons);
                 SetTextsActive(true, unitPriceTexts);
                 break;
@@ -328,7 +324,6 @@ public class ActionInterface : MonoBehaviour
         x = position.x;
         z = position.z;
         string structureName = structure != null ? structure.name : "null";
-        Debug.Log($"[ActionInterface] Structure selectionnee: {structureName}, x={position.x}, z={position.z}");
     }
 
     /// <summary>
