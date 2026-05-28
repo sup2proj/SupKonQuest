@@ -373,10 +373,12 @@ public class LobbyRoomManager : MonoBehaviour
                     {
                         JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
                         Debug.Log("Client connecté au Relay");
-                        
+                    
                         RelayServerData relayServerData = new RelayServerData(joinAllocation, "udp");
                         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-                        
+                    
+                        string mapFolder = currentLobby.Data.ContainsKey("Map") ? currentLobby.Data["Map"].Value : "TEST";
+                        AutoLauncher.Request(mapFolder, 0, 2);
                         NetworkManager.Singleton.StartClient();
                     }
                     catch (RelayServiceException e) { Debug.LogError("Erreur Relay Client : " + e.Message); }
