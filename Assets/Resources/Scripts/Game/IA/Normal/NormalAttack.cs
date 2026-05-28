@@ -142,7 +142,7 @@ public class NormalAttack : MonoBehaviour
             }
 
             if (movement != null)
-                movement.MoveToTarget(target.transform, attackStopDistance);<
+                movement.MoveToTarget(target.transform, attackStopDistance);
             return;
         }
 
