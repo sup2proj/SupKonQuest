@@ -2693,10 +2693,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LaunchingLocalNewGameManager
   mapImageDisplay: {fileID: 112259792}
   mapNameDisplay: {fileID: 1893753072}
-  mapNames:
-  - TEST
-  - LOL
-  - Europe
+  mapNames: []
   aiCountDisplay: {fileID: 1641345798}
   maxAi: 7
   diffDisplay: {fileID: 176130712}
