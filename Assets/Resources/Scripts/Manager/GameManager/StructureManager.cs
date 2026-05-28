@@ -114,6 +114,16 @@ public class StructureManager : MonoBehaviour
 
         GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
 
+        // Si le réseau est actif et que l'on est le Serveur (Hôte), on déploie l'unité sur le réseau
+        if (Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsServer)
+        {
+            Unity.Netcode.NetworkObject netObj = unitGO.GetComponent<Unity.Netcode.NetworkObject>();
+            if (netObj != null && !netObj.IsSpawned)
+            {
+                netObj.Spawn(); // apparaître l'unité chez le Client
+            }
+        }
+
         if (isPoweredUnit)
             ApplyColorTint(unitGO, new Color(1f, 0.35f, 0.35f, 1f));
 
