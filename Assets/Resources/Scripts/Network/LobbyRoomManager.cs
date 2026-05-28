@@ -346,7 +346,9 @@ public class LobbyRoomManager : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             NetworkManager.Singleton.StartHost();
             
-            AutoLauncher.Request(currentLobby.Data["Map"].Value, 0, 2);            
+            // L'hôte récupère le nom de la carte et transmet la graine générée
+            string mapFolder = currentLobby.Data.ContainsKey("Map") ? currentLobby.Data["Map"].Value : "TEST";
+            AutoLauncher.Request(mapFolder, 0, 2, randomSeed);           
             NetworkManager.Singleton.SceneManager.LoadScene("Game", LoadSceneMode.Single);
         }
         catch (RelayServiceException e) { Debug.LogError("Erreur Relay : " + e.Message); }
@@ -377,8 +379,10 @@ public class LobbyRoomManager : MonoBehaviour
                         RelayServerData relayServerData = new RelayServerData(joinAllocation, "udp");
                         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                     
+                        // Le Client lit la carte et la graine depuis les données du serveur
                         string mapFolder = currentLobby.Data.ContainsKey("Map") ? currentLobby.Data["Map"].Value : "TEST";
-                        AutoLauncher.Request(mapFolder, 0, 2);
+                        int mapSeed = currentLobby.Data.ContainsKey("MapSeed") ? int.Parse(currentLobby.Data["MapSeed"].Value) : -1;
+                        AutoLauncher.Request(mapFolder, 0, 2, mapSeed);
                         NetworkManager.Singleton.StartClient();
                     }
                     catch (RelayServiceException e) { Debug.LogError("Erreur Relay Client : " + e.Message); }
