@@ -91,9 +91,6 @@ public class Victory : MonoBehaviour
     {
         HasWinner = true;
         WinnerPlayerId = playerId;
-
-        Debug.Log($"[Victory] Le joueur {playerId} a gagne : {reason}.");
-
         InterfaceInstance interfaceInstance = InterfaceInstance.Instance;
         if (interfaceInstance == null)
             interfaceInstance = FindFirstObjectByType<InterfaceInstance>(FindObjectsInactive.Include);

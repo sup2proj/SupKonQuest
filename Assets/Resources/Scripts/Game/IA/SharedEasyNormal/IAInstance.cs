@@ -24,9 +24,6 @@ public class IAInstance : MonoBehaviour
         set => difficultyIA = value;
     }
 
-    // Expose playerId so other systems can detect IA-owned structures/units
-    public int PlayerId => playerId;
-
     /// <summary>
     /// Indique si un joueur donné est géré par une IA (présence d'une instance).
     /// </summary>
@@ -116,7 +113,7 @@ public class IAInstance : MonoBehaviour
         if (difficultyIA == 1 || difficultyIA == 2)
         {
             if (productionEasyNormal != null)
-                productionEasyNormal.Initialize(playerManager, structureManager, mapGenerator, playerId, difficultyIA);
+                productionEasyNormal.Initialize(playerManager, structureManager, mapGenerator, playerId);
         }
     }
 
@@ -147,8 +144,7 @@ public class IAInstance : MonoBehaviour
 
             if (productionEasyNormal != null)
             {
-                productionEasyNormal.Initialize(playerManager, structureManager, mapGenerator, playerId,
-                    difficultyIA);
+                productionEasyNormal.Initialize(playerManager, structureManager, mapGenerator, playerId);
                 productionEasyNormal.SetMapReady(true);
                 productionEasyNormal.Tick();
             }

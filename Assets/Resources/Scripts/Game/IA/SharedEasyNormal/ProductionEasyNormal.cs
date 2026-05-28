@@ -23,12 +23,7 @@ public class ProductionEasyNormal : MonoBehaviour
     /// Initialise le composant de production avec les références aux managers
     /// et l'identifiant du joueur géré.
     /// </summary>
-    /// <param name="pm">Instance de <see cref="PlayerManager"/>.</param>
-    /// <param name="sm">Instance de <see cref="StructureManager"/>.</param>
-    /// <param name="mg">Instance de <see cref="MapGenerator"/>.</param>
-    /// <param name="id">Identifiant du joueur associé.</param>
-    /// <param name="difficultyIA">Difficulté (non utilisée ici mais fournie pour cohérence).</param>
-    public void Initialize(PlayerManager pm, StructureManager sm, MapGenerator mg, int id, int difficultyIA)
+    public void Initialize(PlayerManager pm, StructureManager sm, MapGenerator mg, int id)
     {
         if (playerManager == null) 
             playerManager = pm;
@@ -71,10 +66,7 @@ public class ProductionEasyNormal : MonoBehaviour
         if (!mapReady && (ownedStructures == null || ownedStructures.Count == 0))
         {
             if (!loggedWaitingForMap)
-            {
-                Debug.Log("[EasyProduction] Waiting for map/structures to be ready before producing units.");
                 loggedWaitingForMap = true;
-            }
             return;
         }
 
@@ -119,23 +111,15 @@ public class ProductionEasyNormal : MonoBehaviour
         bool chosenIsSpecial = chosenStructure.structureType == StructureType.NeutralStructure;
         bool hasSpecialStructure = HasSpecialStructure();
     
-        Debug.Log($"[EasyProduction] Player{playerId} choisit structure {chosenStructure.name} (special={chosenIsSpecial}). Gold={gold}");
-    
         UnitData chosenData = PickUnitForProduction(gold, hasSpecialStructure, chosenIsSpecial, out bool powered);
         if (chosenData == null)
-        {
-            Debug.Log($"[EasyProduction] Player{playerId} n'a pas d'unité éligible à produire (gold={gold}, requirePowered={chosenIsSpecial})");
             return;
-        }
     
         if (chosenIsSpecial)
             powered = true;
     
         if (!session.SpendGold(chosenData.price))
-        {
-            Debug.Log($"[EasyProduction] Player{playerId} n'a pas assez d'or pour {chosenData.type} (coût={chosenData.price}, gold={gold})");
             return;
-        }
     
         Vector3 spawnPos = chosenStructure.StructurePosition;
         bool spawned = structureManager.SpawnUnitByTypeAtPosition(
@@ -151,11 +135,9 @@ public class ProductionEasyNormal : MonoBehaviour
         if (!spawned)
         {
             session.AddGold(chosenData.price);
-            Debug.Log($"[EasyProduction] Échec du spawn pour player{playerId} unit={chosenData.type} powered={powered} depuis {chosenStructure.name}");
             return;
         }
     
-        Debug.Log($"[EasyProduction] Player{playerId} a spawn {chosenData.type} powered={powered} à {spawnPos} depuis {chosenStructure.name}");
         nextProductionReadyTime = Time.time + Mathf.Max(0.1f, chosenData.creationTime);
     }
 
@@ -185,11 +167,6 @@ public class ProductionEasyNormal : MonoBehaviour
     /// Sélectionne un <see cref="UnitData"/> candidat pour la production en
     /// fonction de l'or disponible et des structures spéciales.
     /// </summary>
-    /// <param name="gold">Or disponible.</param>
-    /// <param name="hasSpecialStructure">Indique si le joueur possède une structure spéciale.</param>
-    /// <param name="requirePowered">Si true, ne retourne que des unités "powered".</param>
-    /// <param name="powered">Sortie indiquant si l'unité choisie sera powered.</param>
-    /// <returns>UnitData sélectionné ou null si aucun éligible.</returns>
     private UnitData PickUnitForProduction(int gold, bool hasSpecialStructure, bool requirePowered, out bool powered)
     {
         powered = false;

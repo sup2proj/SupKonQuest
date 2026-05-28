@@ -68,15 +68,6 @@ public class UnitInstance : MonoBehaviour
             Vector3 forward = Camera.main.transform.forward;
             healthBar.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
         }
-
-        
-        if (Input.GetKeyDown("b"))
-        {
-            if (unitData == null)
-                return;
-            const float damageAmount = 10f;
-            TakeDamage(damageAmount);
-        }
     }
 
     /// <summary>
@@ -87,7 +78,6 @@ public class UnitInstance : MonoBehaviour
         unitData = data;
         if (unitData == null)
         {
-            Debug.LogError("UnitData is null on " + gameObject.name);
             return;
         }
 
@@ -108,8 +98,6 @@ public class UnitInstance : MonoBehaviour
     public void SetNeutralState(bool neutral)
     {
         isNeutral = neutral;
-
-        // Reste compatible avec les systèmes qui lisent encore l'info depuis UnitData.
         if (unitData != null)
             unitData.isNeutral = neutral;
     }
@@ -135,8 +123,6 @@ public class UnitInstance : MonoBehaviour
         }
     }
 
-    // NOTE: player color mapping centralisée dans PlayerManager.GetPlayerColor
-
     /// <summary>
     /// Positionne et valide la barre de vie de l'unité.
     /// </summary>
@@ -144,7 +130,6 @@ public class UnitInstance : MonoBehaviour
     {
         if (healthBar == null)
         {
-            Debug.LogWarning($"[UnitInstance] {name} : healthBar non assignée dans l'inspector.", this);
             return;
         }
         healthBar.transform.localPosition = (1.1f * Vector3.up);
@@ -202,19 +187,6 @@ public class UnitInstance : MonoBehaviour
                 StatisticsInterface.Instance.Refresh();
         }
     }
-
-    /// <summary>
-    /// Applique une action de buff simple aux unités de type support.
-    /// </summary>
-    public void ApplyBuff()
-    {
-        if (unitData == null)
-            return;
-        if (!(unitData is UnitSupportData))
-            return;
-        Debug.Log("Buff applied to " + unitData.type);
-    }
-
 
     /// <summary>
     /// Ajoute ou retire de la santé tout en respectant les limites de l'unité.

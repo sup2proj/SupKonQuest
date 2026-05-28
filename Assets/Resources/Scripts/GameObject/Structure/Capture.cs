@@ -37,8 +37,6 @@ public partial class StructureInstance
          if (currentlySelected == this && PlayerManager.Instance != null && PlayerManager.Instance.GetActivePlayerId() != playerId)
              UnSelected();
 
-         Debug.Log($"[StructureInstance] {name} capturÃ©e par le joueur {newOwnerId} (ancien propriÃ©taire: {previousOwnerId}).", this);
-
          StructureManager structureManager = StructureManager.Instance;
          if (structureManager == null)
              structureManager = FindFirstObjectByType<StructureManager>();
@@ -70,10 +68,7 @@ public partial class StructureInstance
             playerManager = FindFirstObjectByType<PlayerManager>();
 
         if (playerManager == null)
-        {
-            Debug.LogWarning("[StructureInstance] PlayerManager introuvable, impossible de mettre Ã  jour les compteurs de structures.", this);
             return;
-        }
 
         PlayerSession previousOwnerSession = previousOwnerId > 0 ? playerManager.GetSession(previousOwnerId) : null;
         if (previousOwnerSession != null)

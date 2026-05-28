@@ -117,24 +117,15 @@ public class EasyProduction : MonoBehaviour
     
         bool chosenIsSpecial = chosenStructure.structureType == StructureType.NeutralStructure;
         bool hasSpecialStructure = HasSpecialStructure();
-    
-        Debug.Log($"[EasyProduction] Player{playerId} choisit structure {chosenStructure.name} (special={chosenIsSpecial}). Gold={gold}");
-    
         UnitData chosenData = PickUnitForProduction(gold, hasSpecialStructure, chosenIsSpecial, out bool powered);
         if (chosenData == null)
-        {
-            Debug.Log($"[EasyProduction] Player{playerId} n'a pas d'unité éligible à produire (gold={gold}, requirePowered={chosenIsSpecial})");
             return;
-        }
     
         if (chosenIsSpecial)
             powered = true;
     
         if (!session.SpendGold(chosenData.price))
-        {
-            Debug.Log($"[EasyProduction] Player{playerId} n'a pas assez d'or pour {chosenData.type} (coût={chosenData.price}, gold={gold})");
             return;
-        }
     
         Vector3 spawnPos = chosenStructure.StructurePosition;
         bool spawned = structureManager.SpawnUnitByTypeAtPosition(
@@ -150,11 +141,9 @@ public class EasyProduction : MonoBehaviour
         if (!spawned)
         {
             session.AddGold(chosenData.price);
-            Debug.Log($"[EasyProduction] Échec du spawn pour player{playerId} unit={chosenData.type} powered={powered} depuis {chosenStructure.name}");
             return;
         }
     
-        Debug.Log($"[EasyProduction] Player{playerId} a spawn {chosenData.type} powered={powered} à {spawnPos} depuis {chosenStructure.name}");
         nextProductionReadyTime = Time.time + Mathf.Max(0.1f, chosenData.creationTime);
     }
 

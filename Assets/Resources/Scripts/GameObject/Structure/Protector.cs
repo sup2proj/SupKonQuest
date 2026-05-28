@@ -57,11 +57,8 @@ public partial class StructureInstance
             return;
         }
 
-        // DÃ©clenchement IA uniquement si le comportement IA niveau 2 est actif
         if (IAInstance.IsDifficultyForPlayer(playerId, 2) && attacker != null && attacker.playerId != playerId)
         {
-            // On regarde dans le rayon de la structure: s'il y a au moins une unitÃ© de combat alliÃ©e,
-            // on autorise la crÃ©ation de protecteurs.
             bool hasCombatAllyNearby = false;
             var nearbyUnits = GetUnitsWithinConfiguredRadius();
             for (int i = 0; i < nearbyUnits.Count; i++)
@@ -108,7 +105,6 @@ public partial class StructureInstance
             return;
 
         int previousOwnerId = playerId;
-        // Important: la capture par mort du protecteur doit aussi vÃ©rifier dÃ©faite/victoire.
         CaptureStructure(killerPlayerId, previousOwnerId, checkDefeat: true);
     }
 

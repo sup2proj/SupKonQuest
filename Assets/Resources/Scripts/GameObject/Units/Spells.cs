@@ -14,7 +14,6 @@ public class Spells : MonoBehaviour
     private float fillAlpha = 0.06f;
     private float circleOutlineAlpha = 0.45f;
     private float circleHeightOffset = 0.05f;
-    private float circleDurationSeconds;
     private LineRenderer rangeCircle;
     private MeshRenderer rangeFillRenderer;
     private MeshFilter rangeFillFilter;
@@ -88,8 +87,6 @@ public class Spells : MonoBehaviour
     {
         if (casterUnit == null || casterUnit.unitData == null)
             return;
-        Debug.Log("[BuffSpell] ButtonListener called with choice=" + choice, this);
-
         UnitsAnimation anim = casterUnit.GetComponent<UnitsAnimation>();
         float iconHideCooldown = 0f;
         bool shouldHideIcon = false;
@@ -104,44 +101,47 @@ public class Spells : MonoBehaviour
                 healerSpellLockedUntil = Time.time + iconHideCooldown;
                 spellLockedUntil = healerSpellLockedUntil;
             }
-            shouldHideIcon = true;
-        }
 
-        if (choice == 0 && casterUnit.unitData is UnitSupportData)
-        {
-            TriggerSpell(Color.green, 2);
-            anim.StartAttackAnimationFromSpell();
-            iconHideCooldown = GetSupportCooldwon();
-            if (iconHideCooldown > 0f)
-            {
-                supportSpellLockedUntil = Time.time + iconHideCooldown;
-                spellLockedUntil = supportSpellLockedUntil;
-            }
             shouldHideIcon = true;
         }
-        if (choice == 1 && casterUnit.unitData is UnitSupportData)
+        else if (casterUnit.unitData is UnitSupportData)
         {
-            TriggerSpell(Color.yellow, 3);
-            anim.StartAttackAnimationFromSpell();
-            iconHideCooldown = GetSupportCooldwon();
-            if (iconHideCooldown > 0f)
+            Color spellColor;
+            int spellId;
+
+            switch (choice)
             {
-                supportSpellLockedUntil = Time.time + iconHideCooldown;
-                spellLockedUntil = supportSpellLockedUntil;
+                case 0:
+                    spellColor = Color.green;
+                    spellId = 2;
+                    break;
+                case 1:
+                    spellColor = Color.yellow;
+                    spellId = 3;
+                    break;
+                case 2:
+                    spellColor = Color.blue;
+                    spellId = 4;
+                    break;
+                default:
+                    spellColor = default;
+                    spellId = 0;
+                    break;
             }
-            shouldHideIcon = true;
-        }
-        if (choice == 2 && casterUnit.unitData is UnitSupportData)
-        {
-            TriggerSpell(Color.blue, 4);
-            anim.StartAttackAnimationFromSpell();
-            iconHideCooldown = GetSupportCooldwon();
-            if (iconHideCooldown > 0f)
+
+            if (spellId != 0)
             {
-                supportSpellLockedUntil = Time.time + iconHideCooldown;
-                spellLockedUntil = supportSpellLockedUntil;
+                TriggerSpell(spellColor, spellId);
+                anim.StartAttackAnimationFromSpell();
+                iconHideCooldown = GetSupportCooldwon();
+                if (iconHideCooldown > 0f)
+                {
+                    supportSpellLockedUntil = Time.time + iconHideCooldown;
+                    spellLockedUntil = supportSpellLockedUntil;
+                }
+
+                shouldHideIcon = true;
             }
-            shouldHideIcon = true;
         }
 
         if (shouldHideIcon && InterfaceInstance.Instance != null)
@@ -385,7 +385,6 @@ public class Spells : MonoBehaviour
             if (casterUnit != null && unit == casterUnit)
                 continue;
             friendlyUnitsFound++;
-            Debug.Log($"[BuffSpell] Unité alliée trouvée: {unit.name} (playerId={unit.playerId})", unit);
             if (casterUnit.unitData is UnitHealerData targetHealerData && spell == 1)
             {
                 Buffs.ApplyRegen(this, regenByTarget, unit, targetHealerData, regenTickInterval, casterPlayerId);
@@ -397,7 +396,6 @@ public class Spells : MonoBehaviour
                     buffMultiplicator, spell, casterPlayerId);
             }
         }
-        Debug.Log($"[BuffSpell] Scan radius={scanRadius} => unités détectées={totalUnitsFound}, alliées (playerId={casterPlayerId})={friendlyUnitsFound}", this);
     }
 
     /// <summary>
