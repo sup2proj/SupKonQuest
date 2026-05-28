@@ -346,9 +346,9 @@ public class LobbyRoomManager : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             NetworkManager.Singleton.StartHost();
             
-            // L'hôte récupère le nom de la carte et transmet la graine générée
+            // L'hôte récupère le nom de la carte et transmet le nombre de joueurs ET la graine générée
             string mapFolder = currentLobby.Data.ContainsKey("Map") ? currentLobby.Data["Map"].Value : "TEST";
-            AutoLauncher.Request(mapFolder, 0, 2, randomSeed);           
+            AutoLauncher.Request(mapFolder, currentLobby.Players.Count, 0, 2, randomSeed);          
             NetworkManager.Singleton.SceneManager.LoadScene("Game", LoadSceneMode.Single);
         }
         catch (RelayServiceException e) { Debug.LogError("Erreur Relay : " + e.Message); }
@@ -375,14 +375,14 @@ public class LobbyRoomManager : MonoBehaviour
                     {
                         JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
                         Debug.Log("Client connecté au Relay");
-                    
+                        
                         RelayServerData relayServerData = new RelayServerData(joinAllocation, "udp");
                         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
-                    
-                        // Le Client lit la carte et la graine depuis les données du serveur
+                        
+                        // Le Client lit la carte, la graine ET transmet le nombre de joueurs
                         string mapFolder = currentLobby.Data.ContainsKey("Map") ? currentLobby.Data["Map"].Value : "TEST";
                         int mapSeed = currentLobby.Data.ContainsKey("MapSeed") ? int.Parse(currentLobby.Data["MapSeed"].Value) : -1;
-                        AutoLauncher.Request(mapFolder, 0, 2, mapSeed);
+                        AutoLauncher.Request(mapFolder, currentLobby.Players.Count, 0, 2, mapSeed);
                         NetworkManager.Singleton.StartClient();
                     }
                     catch (RelayServiceException e) { Debug.LogError("Erreur Relay Client : " + e.Message); }

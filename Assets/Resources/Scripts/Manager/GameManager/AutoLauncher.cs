@@ -8,6 +8,7 @@ public class AutoLauncher : MonoBehaviour
 
     private static bool launchRequested;
     private static string pendingMapFolder = "TEST";
+    private static int pendingHumanCount = 1;
     private static int pendingAiCount = 1;
     private static int pendingAiDifficulty = 2;
     private static int pendingMapSeed = -1;
@@ -55,9 +56,10 @@ public class AutoLauncher : MonoBehaviour
     /// <summary>
     /// Demande le lancement d'une partie avec les paramètres fournis.
     /// </summary>
-    public static void Request(string folder, int aiCount = 1, int aiDifficulty = 2, int mapSeed = -1)
+    public static void Request(string folder, int humanCount, int aiCount = 1, int aiDifficulty = 2, int mapSeed = -1)
     {
         pendingMapFolder = string.IsNullOrWhiteSpace(folder) ? "TEST" : folder;
+        pendingHumanCount = Mathf.Max(1, humanCount);
         pendingAiCount = Mathf.Max(0, aiCount);
         pendingAiDifficulty = Mathf.Clamp(aiDifficulty, 1, 2);
         pendingMapSeed = mapSeed;
@@ -97,8 +99,16 @@ public class AutoLauncher : MonoBehaviour
         UnityEngine.Random.InitState(mapSeed);
         Debug.Log($"[AutoLauncher] Génération avec la graine : {mapSeed} | Map : {mapFolderName}");
 
-        string localPlayerName = "toto";
-        string[] playerList = { "toto" };
+        // L'ID réseau (0 pour l'Hôte, 1, 2, 3... pour les Clients)
+        ulong myClientId = Unity.Netcode.NetworkManager.Singleton != null ? Unity.Netcode.NetworkManager.Singleton.LocalClientId : 0;
+        string localPlayerName = "Player_" + myClientId; 
+
+        // On crée une liste de la taille exacte du nombre de joueurs présents
+        string[] playerList = new string[pendingHumanCount];
+        for (int i = 0; i < pendingHumanCount; i++)
+        {
+            playerList[i] = "Player_" + i;
+        }
 
         StructureAttribution campAssignment = PrepareStructureAttribution(mapFolderName, aiCount);
         LogStartPointOwnersAfterAttribution();
