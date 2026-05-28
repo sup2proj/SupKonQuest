@@ -8,6 +8,9 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
 
 /// <summary>
 /// Gère la salle d'attente (Lobby Room) une fois qu'un joueur a créé ou rejoint une partie. Gère le chat, les paramètres de la partie, l'état "Prêt" des joueurs et la transition vers le jeu en réseau (Relay).
@@ -325,18 +328,26 @@ public class LobbyRoomManager : MonoBehaviour
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
             Debug.Log("Serveur Relay créé ! Code : " + joinCode);
 
+            // Graine aléatoire pour la map
+            int randomSeed = UnityEngine.Random.Range(10000, 99999);
+
             UpdateLobbyOptions options = new UpdateLobbyOptions
             {
                 Data = new Dictionary<string, DataObject>
                 {
                     { "GameStarted", new DataObject(DataObject.VisibilityOptions.Member, "True") },
-                    { "RelayCode", new DataObject(DataObject.VisibilityOptions.Member, joinCode) }
+                    { "RelayCode", new DataObject(DataObject.VisibilityOptions.Member, joinCode) },
+                    { "MapSeed", new DataObject(DataObject.VisibilityOptions.Member, randomSeed.ToString()) } // On sauvegarde la graine
                 }
             };
             currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
             
-            // TODO: launch le reseau local et lance la scène
-            Debug.Log("L'hôte est prêt à charger la GameScene");
+            RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
+            NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+            NetworkManager.Singleton.StartHost();
+            
+            AutoLauncher.Request(currentLobby.Data["Map"].Value, 0, 2);            
+            NetworkManager.Singleton.SceneManager.LoadScene("Game", LoadSceneMode.Single);
         }
         catch (RelayServiceException e) { Debug.LogError("Erreur Relay : " + e.Message); }
         catch (LobbyServiceException e) { Debug.LogError("Erreur Lobby : " + e.Message); }
@@ -363,7 +374,10 @@ public class LobbyRoomManager : MonoBehaviour
                         JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
                         Debug.Log("Client connecté au Relay");
                         
-                        // TODO: launch le reseau et lance la scène
+                        RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+                        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
+                        
+                        NetworkManager.Singleton.StartClient();
                     }
                     catch (RelayServiceException e) { Debug.LogError("Erreur Relay Client : " + e.Message); }
                 }
