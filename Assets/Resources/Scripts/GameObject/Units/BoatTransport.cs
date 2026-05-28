@@ -28,21 +28,33 @@ public class BoatTransport : MonoBehaviour
         public int playerId;
     }
 
+    /// <summary>
+    /// Récupère la référence vers l'unité du bateau au chargement du composant.
+    /// </summary>
     private void Awake()
     {
         boatUnit = GetComponent<UnitInstance>();
     }
 
+    /// <summary>
+    /// Déclenche la vérification automatique des unités proches à chaque frame.
+    /// </summary>
     private void Update()
     {
         TryAutoBoardNearbyUnits();
     }
 
+    /// <summary>
+    /// Libère toutes les réservations d'embarquement lorsque le bateau est détruit.
+    /// </summary>
     private void OnDestroy()
     {
         ReleaseAllReservationsForThisBoat();
     }
 
+    /// <summary>
+    /// Récupère ou ajoute le composant BoatTransport sur une unité de bateau.
+    /// </summary>
     public static BoatTransport GetOrAdd(UnitInstance unit)
     {
         if (!IsBoatUnit(unit))
@@ -55,18 +67,27 @@ public class BoatTransport : MonoBehaviour
         return transport;
     }
 
+    /// <summary>
+    /// Retourne la capacité de transport restante pour un bateau donné.
+    /// </summary>
     public static int GetAvailableCapacity(UnitInstance boat)
     {
         BoatTransport transport = GetOrAdd(boat);
         return transport != null ? transport.GetAvailableTransportCapacity() : 0;
     }
 
+    /// <summary>
+    /// Prépare l'embarquement d'une unité sur un bateau.
+    /// </summary>
     public static bool PrepareBoarding(UnitInstance unit, UnitInstance boat)
     {
         BoatTransport transport = GetOrAdd(boat);
         return transport != null && transport.PrepareBoarding(unit);
     }
 
+    /// <summary>
+    /// Supprime une réservation d'embarquement en attente pour une unité.
+    /// </summary>
     public static void ClearPendingBoarding(UnitInstance unit)
     {
         if (unit == null)
@@ -81,6 +102,9 @@ public class BoatTransport : MonoBehaviour
         PendingBoardings.Remove(unit);
     }
 
+    /// <summary>
+    /// Bloque temporairement l'embarquement d'une unité.
+    /// </summary>
     public static void BlockBoarding(UnitInstance unit, float duration)
     {
         if (unit == null)
@@ -90,12 +114,18 @@ public class BoatTransport : MonoBehaviour
         BoardingBlockedUntil[unit] = Time.time + Mathf.Max(0f, duration);
     }
 
+    /// <summary>
+    /// Fait débarquer toutes les unités transportées par un bateau.
+    /// </summary>
     public static bool ExitAllUnits(UnitInstance boat)
     {
         BoatTransport transport = GetOrAdd(boat);
         return transport != null && transport.ExitAllUnitsInBoat();
     }
 
+    /// <summary>
+    /// Indique si l'unité fournie correspond à un bateau transporteur.
+    /// </summary>
     public static bool IsBoatUnit(UnitInstance unit)
     {
         switch (unit.unitData.type)
@@ -109,11 +139,17 @@ public class BoatTransport : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Calcule la capacité de transport disponible en tenant compte des réservations.
+    /// </summary>
     public int GetAvailableTransportCapacity()
     {
         return Mathf.Max(0, GetMaxTransportCapacity() - transportedUnits.Count - reservedTransportSlots);
     }
 
+    /// <summary>
+    /// Réserve une place à bord pour une unité avant son embarquement.
+    /// </summary>
     public bool PrepareBoarding(UnitInstance unit)
     {
         if (!CanReserveBoarding(unit))
@@ -128,6 +164,9 @@ public class BoatTransport : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Vérifie si une unité peut légalement réserver une place à bord.
+    /// </summary>
     private bool CanReserveBoarding(UnitInstance unit)
     {
         if (!IsBoatUnit(boatUnit))
@@ -145,6 +184,9 @@ public class BoatTransport : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Réserve une place de transport interne si une capacité est disponible.
+    /// </summary>
     private bool TryReserveTransportSlot()
     {
         if (GetAvailableTransportCapacity() <= 0)
@@ -154,12 +196,18 @@ public class BoatTransport : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Libère une réservation interne de transport.
+    /// </summary>
     private void ReleaseTransportReservation()
     {
         if (reservedTransportSlots > 0)
             reservedTransportSlots--;
     }
 
+    /// <summary>
+    /// Retourne la capacité maximale de transport du bateau.
+    /// </summary>
     private int GetMaxTransportCapacity()
     {
         if (!IsBoatUnit(boatUnit) || !(boatUnit.unitData is UnitBoat boatData))
@@ -168,6 +216,9 @@ public class BoatTransport : MonoBehaviour
         return Mathf.Max(0, Mathf.FloorToInt(boatData.maxTransportCapacity));
     }
 
+    /// <summary>
+    /// Cherche automatiquement les unités proches à embarquer.
+    /// </summary>
     private void TryAutoBoardNearbyUnits()
     {
         if (!IsBoatUnit(boatUnit))
@@ -201,6 +252,9 @@ public class BoatTransport : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Vérifie si une unité candidate peut être embarquée automatiquement.
+    /// </summary>
     private bool CanAutoBoardUnit(UnitInstance candidate)
     {
         if (!CanReserveBoarding(candidate))
@@ -215,6 +269,9 @@ public class BoatTransport : MonoBehaviour
         return GetAvailableTransportCapacity() > 0;
     }
 
+    /// <summary>
+    /// Vérifie si l'embarquement d'une unité est actuellement bloqué.
+    /// </summary>
     private bool IsBoardingBlocked(UnitInstance unit)
     {
         if (unit == null)
@@ -230,6 +287,9 @@ public class BoatTransport : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Stocke une unité embarquée dans la liste des passagers du bateau.
+    /// </summary>
     private bool StoreTransportedUnit(UnitInstance unit)
     {
         if (!CanReserveBoarding(unit))
@@ -260,6 +320,9 @@ public class BoatTransport : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Débarque toutes les unités actuellement transportées.
+    /// </summary>
     private bool ExitAllUnitsInBoat()
     {
         if (!IsBoatUnit(boatUnit) || transportedUnits.Count == 0)
@@ -307,6 +370,9 @@ public class BoatTransport : MonoBehaviour
         return spawnedCount > 0;
     }
 
+    /// <summary>
+    /// Recherche des positions de débarquement sur les terres les plus proches.
+    /// </summary>
     private List<Vector3> FindClosestLandExitPositions(int count)
     {
         List<Vector3> positions = new List<Vector3>();
@@ -344,6 +410,9 @@ public class BoatTransport : MonoBehaviour
         return positions;
     }
 
+    /// <summary>
+    /// Nettoie les réservations d'embarquement invalides ou obsolètes.
+    /// </summary>
     private void CleanupTransportState()
     {
         List<UnitInstance> toRemove = null;
@@ -367,6 +436,9 @@ public class BoatTransport : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Supprime toutes les réservations associées à ce bateau.
+    /// </summary>
     private void ReleaseAllReservationsForThisBoat()
     {
         List<UnitInstance> toRemove = null;
@@ -389,6 +461,9 @@ public class BoatTransport : MonoBehaviour
         reservedTransportSlots = 0;
     }
 
+    /// <summary>
+    /// Calcule la distance au carré la plus faible entre ce bateau et une autre unité.
+    /// </summary>
     private float GetFlatClosestDistanceSqToUnit(UnitInstance other)
     {
         if (other == null)
@@ -425,11 +500,17 @@ public class BoatTransport : MonoBehaviour
         return FlatDistanceSq(transform.position, other.transform.position);
     }
 
+    /// <summary>
+    /// Indique si un collider peut être utilisé pour calculer un embarquement.
+    /// </summary>
     private bool IsUsableBoardingCollider(Collider candidate)
     {
         return candidate != null && candidate.enabled && !candidate.isTrigger;
     }
 
+    /// <summary>
+    /// Calcule un léger décalage pour éviter le chevauchement des unités débarquées.
+    /// </summary>
     private Vector3 GetExitOffset(int index, float tileSize)
     {
         if (index == 0)
@@ -449,11 +530,17 @@ public class BoatTransport : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Convertit une tuile de la carte en position monde.
+    /// </summary>
     private Vector3 TileToWorldPosition(MapGenerator map, TileData tile)
     {
         return new Vector3(tile.coordX * map.tileSize, 0f, tile.coordY * map.tileSize);
     }
 
+    /// <summary>
+    /// Calcule la distance au carré entre deux positions en ignorant l'axe vertical.
+    /// </summary>
     private float FlatDistanceSq(Vector3 a, Vector3 b)
     {
         float dx = a.x - b.x;
@@ -461,6 +548,9 @@ public class BoatTransport : MonoBehaviour
         return dx * dx + dz * dz;
     }
 
+    /// <summary>
+    /// Instancie une unité à partir de ses données runtime à une position donnée.
+    /// </summary>
     public static UnitInstance SpawnRuntimeUnitAtPosition(UnitData runtimeData, float currentHealth, Vector3 position)
     {
         if (runtimeData == null)
@@ -488,12 +578,18 @@ public class BoatTransport : MonoBehaviour
         return instance;
     }
 
+    /// <summary>
+    /// Réapplique la santé courante après le démarrage de l'unité instanciée.
+    /// </summary>
     private static IEnumerator ApplyCurrentHealthAfterStart(UnitInstance instance, float currentHealth)
     {
         yield return null;
         ApplyCurrentHealth(instance, currentHealth);
     }
 
+    /// <summary>
+    /// Ajuste la santé courante de l'unité instanciée et synchronise la barre de vie.
+    /// </summary>
     private static void ApplyCurrentHealth(UnitInstance instance, float currentHealth)
     {
         if (instance == null || instance.unitData == null)

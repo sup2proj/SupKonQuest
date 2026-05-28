@@ -14,6 +14,9 @@ public class StatisticsInterface : MonoBehaviour
     [Header("Runtime (auto si vide)")]
     [SerializeField] private PlayerManager playerManager;
 
+    /// <summary>
+    /// Récupère la référence vers le gestionnaire de joueurs au chargement.
+    /// </summary>
     private void Awake()
     {
         Instance = this;
@@ -21,6 +24,9 @@ public class StatisticsInterface : MonoBehaviour
             playerManager = FindFirstObjectByType<PlayerManager>();
     }
 
+    /// <summary>
+    /// Met à jour les statistiques affichées pour le joueur actif.
+    /// </summary>
     public void Refresh()
     {
         if (playerManager == null)

@@ -11,6 +11,10 @@ public class ActionButton : MonoBehaviour
     private float colorResetTimer = 0f;
     private bool isColorTemporarilyChanged = false;
 
+    /// <summary>
+    /// Configure le bouton d'action : définit le type de structure, la couleur pressée selon le type,
+    /// enregistre l'action à exécuter lors du clic et attache le listener Unity.
+    /// </summary>
     public void Setup(StructureType structureType,System.Action onClick)
     {
         if (button == null)
@@ -31,6 +35,9 @@ public class ActionButton : MonoBehaviour
         button.onClick.AddListener(Execute);
     }
 
+    /// <summary>
+    /// Met à jour le timer de réinitialisation de couleur lorsqu'une couleur temporaire a été appliquée.
+    /// </summary>
     void Update()
     {
         if (isColorTemporarilyChanged)
@@ -44,6 +51,9 @@ public class ActionButton : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Exécute l'action liée au bouton : applique temporairement la couleur "pressée" puis appelle l'action.
+    /// </summary>
     void Execute()
     {
         if (button != null && button.targetGraphic != null)
@@ -56,6 +66,9 @@ public class ActionButton : MonoBehaviour
         onClickAction?.Invoke();
     }
 
+    /// <summary>
+    /// Réinitialise la couleur du graphique cible du bouton à sa couleur d'origine.
+    /// </summary>
     public void ResetColor()
     {
         if (button != null && button.targetGraphic != null)

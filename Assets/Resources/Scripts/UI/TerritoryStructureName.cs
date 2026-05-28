@@ -6,6 +6,9 @@ public class TerritoryStructureName : MonoBehaviour
     [SerializeField] private TMP_Text territoryText;
     [SerializeField] private string territoryName;
 
+    /// <summary>
+    /// Récupère la référence du texte et rafraîchit l'affichage initial.
+    /// </summary>
     private void Awake()
     {
         if (territoryText == null)
@@ -14,12 +17,18 @@ public class TerritoryStructureName : MonoBehaviour
         RefreshText();
     }
 
+    /// <summary>
+    /// Définit le nom du territoire affiché.
+    /// </summary>
     public void SetTerritoryName(string newTerritoryName)
     {
         territoryName = newTerritoryName;
         RefreshText();
     }
 
+    /// <summary>
+    /// Met à jour la couleur du texte du territoire.
+    /// </summary>
     public void SetColor(Color color)
     {
         if (territoryText == null)
@@ -29,6 +38,9 @@ public class TerritoryStructureName : MonoBehaviour
             territoryText.color = color;
     }
 
+    /// <summary>
+    /// Réapplique le texte et la visibilité selon le nom de territoire.
+    /// </summary>
     private void RefreshText()
     {
         if (territoryText == null)

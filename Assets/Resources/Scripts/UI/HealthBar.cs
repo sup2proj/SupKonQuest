@@ -15,11 +15,17 @@ public class HealthBar : MonoBehaviour
     private float maxHealth = 1f;
     private float currentHealth = 1f;
 
+    /// <summary>
+    /// Réinitialise l'affichage de la barre de vie au chargement.
+    /// </summary>
     private void Awake()
     {
         Refresh();
     }
 
+    /// <summary>
+    /// Définit la santé maximale et recadre la santé courante.
+    /// </summary>
     public void SetMaxHealth(float value)
     {
         maxHealth = Mathf.Max(1f, value);
@@ -27,12 +33,18 @@ public class HealthBar : MonoBehaviour
         Refresh();
     }
 
+    /// <summary>
+    /// Met à jour la santé courante affichée par la barre.
+    /// </summary>
     public void SetHealth(float value)
     {
         currentHealth = Mathf.Clamp(value, 0f, maxHealth);
         Refresh();
     }
 
+    /// <summary>
+    /// Recalcule la largeur visuelle de la barre selon le ratio de santé.
+    /// </summary>
     private void Refresh()
     {
         if (healthBar == null)

@@ -2,7 +2,15 @@
 
 public static class StructureDetector
 {
-    // Retourne la structure ennemie la plus proche dans le rayon (null si rien trouvé).
+    /// <summary>
+    /// Recherche la structure ennemie la plus proche de <paramref name="origin"/>
+    /// à l'intérieur du rayon <paramref name="radius"/> et excluant les
+    /// structures appartenant à <paramref name="ownerPlayerId"/>.
+    /// Retourne la <see cref="StructureInstance"/> trouvée ou null si aucune.
+    /// </summary>
+    /// <param name="origin">Position depuis laquelle la recherche est effectuée.</param>
+    /// <param name="radius">Rayon de recherche.</param>
+    /// <param name="ownerPlayerId">Identifiant du joueur à ignorer (propre joueur).</param>
     public static StructureInstance FindNearestEnemyStructureInRadius(Vector3 origin, float radius, int ownerPlayerId)
     {
         StructureInstance[] structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
@@ -39,6 +47,16 @@ public static class StructureDetector
         return best;
     }
 
+    /// <summary>
+    /// Tentative de recherche d'une structure ennemie proche. Si trouvée,
+    /// la cible est écrite dans <paramref name="target"/> et la méthode
+    /// retourne true.
+    /// </summary>
+    /// <param name="origin">Position depuis laquelle la recherche est effectuée.</param>
+    /// <param name="radius">Rayon de recherche.</param>
+    /// <param name="ownerPlayerId">Identifiant du joueur à ignorer (propre joueur).</param>
+    /// <param name="target">Sortie contenant la structure trouvée ou null.</param>
+    /// <returns>True si une structure ennemie a été trouvée.</returns>
     public static bool TryFindNearestEnemyStructureInRadius(
         Vector3 origin,
         float radius,

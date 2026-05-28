@@ -2,12 +2,18 @@ using UnityEngine;
 
 public class ManagerController : MonoBehaviour
 {
+    /// <summary>
+    /// Initialise les GameObjects permanents du jeu (overlay UI et managers).
+    /// </summary>
     public static void initializePermanentGameObject()
     {
         initializePermanentOverlay();
         intializePermanentManager();
     }
 
+    /// <summary>
+    /// Charge et instancie le prefab de l'interface de jeu depuis Resources et assure l'EventSystem.
+    /// </summary>
     public static void initializePermanentOverlay()
     {
         GameObject permanentOverlay = UnityEngine.Resources.Load<GameObject>("Prefabs/Ui/GameInterface");
@@ -22,6 +28,9 @@ public class ManagerController : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Charge et instancie le prefab contenant les objets managers et assure l'EventSystem.
+    /// </summary>
     public static void intializePermanentManager()
     {
         GameObject managers = UnityEngine.Resources.Load<GameObject>("Prefabs/Managers");
@@ -36,6 +45,9 @@ public class ManagerController : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Crée un EventSystem si aucun n'est présent dans la scène (nécessaire pour l'UI).
+    /// </summary>
     public static void initializeEventSystem()
     {
         if (UnityEngine.EventSystems.EventSystem.current == null)

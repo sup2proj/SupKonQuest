@@ -21,6 +21,9 @@ public class UnitInstance : MonoBehaviour
     private StructureInstance protectorSourceStructure;
     private int lastAttackerPlayerId = -1;
 
+    /// <summary>
+    /// Initialise les références physiques et visuelles de l'unité au chargement.
+    /// </summary>
     void Awake()
     {
         animator = GetComponent<Animator>();
@@ -32,11 +35,17 @@ public class UnitInstance : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Retire l'unité du registre global lorsqu'elle est détruite.
+    /// </summary>
     private void OnDestroy()
     {
         UnitsRegistry.Unregister(this);
     }
 
+    /// <summary>
+    /// Initialise les données runtime, les registres et les éléments visuels de base.
+    /// </summary>
     void Start()
     {
         Initialize(unitData);
@@ -49,6 +58,9 @@ public class UnitInstance : MonoBehaviour
         InitHealthBar();
     }
 
+    /// <summary>
+    /// Met à jour l'orientation de la barre de vie et gère le test de dégâts temporaire.
+    /// </summary>
     void Update()
     {
         if (healthBar != null && healthBar.isActiveAndEnabled && Camera.main != null)
@@ -67,6 +79,9 @@ public class UnitInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Charge les données de l'unité et remet ses valeurs runtime à l'état initial.
+    /// </summary>
     public void Initialize(UnitData data)
     {
         unitData = data;
@@ -87,6 +102,9 @@ public class UnitInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Active ou désactive l'état neutre de l'unité.
+    /// </summary>
     public void SetNeutralState(bool neutral)
     {
         isNeutral = neutral;
@@ -96,6 +114,9 @@ public class UnitInstance : MonoBehaviour
             unitData.isNeutral = neutral;
     }
 
+    /// <summary>
+    /// Configure le cercle de sélection sous l'unité.
+    /// </summary>
     void InitSelectionCircle()
     {
         if (circleUnderFeet == null)
@@ -116,6 +137,9 @@ public class UnitInstance : MonoBehaviour
 
     // NOTE: player color mapping centralisée dans PlayerManager.GetPlayerColor
 
+    /// <summary>
+    /// Positionne et valide la barre de vie de l'unité.
+    /// </summary>
     private void InitHealthBar()
     {
         if (healthBar == null)
@@ -126,11 +150,17 @@ public class UnitInstance : MonoBehaviour
         healthBar.transform.localPosition = (1.1f * Vector3.up);
     }
 
+    /// <summary>
+    /// Mémorise la structure protectrice à prévenir en cas de mort.
+    /// </summary>
     public void SetProtectorSourceStructure(StructureInstance sourceStructure)
     {
         protectorSourceStructure = sourceStructure;
     }
 
+    /// <summary>
+    /// Retire de la santé à l'unité et déclenche la mort si nécessaire.
+    /// </summary>
     public void TakeDamage(float amount, UnitInstance attacker = null, int attackerPlayerId = -1)
     {
         if (unitData == null)
@@ -148,6 +178,9 @@ public class UnitInstance : MonoBehaviour
             Die();
     }
 
+    /// <summary>
+    /// Gère la destruction de l'unité et les effets de bord associés.
+    /// </summary>
     void Die()
     {
         if (unitData != null && unitData.isProtector && protectorSourceStructure != null)
@@ -170,6 +203,9 @@ public class UnitInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Applique une action de buff simple aux unités de type support.
+    /// </summary>
     public void ApplyBuff()
     {
         if (unitData == null)
@@ -180,6 +216,9 @@ public class UnitInstance : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Ajoute ou retire de la santé tout en respectant les limites de l'unité.
+    /// </summary>
     public void SetHealth(float healthChange)
     {
         if (unitData == null)

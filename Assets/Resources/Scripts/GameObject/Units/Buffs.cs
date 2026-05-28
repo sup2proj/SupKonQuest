@@ -4,6 +4,9 @@ using UnityEngine;
 
 public static class Buffs
 {
+    /// <summary>
+    /// Démarre ou remplace un effet de régénération sur une unité cible.
+    /// </summary>
     public static void ApplyRegen(
         MonoBehaviour owner,
         Dictionary<UnitInstance, Coroutine> regenByTarget,
@@ -25,6 +28,9 @@ public static class Buffs
         regenByTarget[target] = c;
     }
 
+    /// <summary>
+    /// Applique la régénération par ticks jusqu'à la fin de la durée.
+    /// </summary>
     private static IEnumerator RegenCoroutine(
         UnitInstance target,
         float totalHealAmount,
@@ -53,6 +59,9 @@ public static class Buffs
         regenByTarget.Remove(target);
     }
 
+    /// <summary>
+    /// Démarre ou remplace un buff de statistiques sur une unité cible.
+    /// </summary>
     public static void BuffStatistics(
         MonoBehaviour owner,
         Dictionary<UnitInstance, Coroutine> buffByTarget,
@@ -91,6 +100,9 @@ public static class Buffs
         buffByTarget[target] = c;
     }
 
+    /// <summary>
+    /// Applique temporairement un buff puis restaure la valeur d'origine à la fin.
+    /// </summary>
     private static IEnumerator BuffCoroutine(
         UnitInstance target,
         float duration,
@@ -118,6 +130,9 @@ public static class Buffs
         buffByTarget.Remove(target);
     }
 
+    /// <summary>
+    /// Lit la statistique concernée par un sort de buff.
+    /// </summary>
     private static bool TryGetSpellStat(UnitInstance target, int spell, out float value)
     {
         value = 0f;
@@ -142,6 +157,9 @@ public static class Buffs
         }
     }
 
+    /// <summary>
+    /// Écrit la statistique concernée par un sort de buff.
+    /// </summary>
     private static bool TrySetSpellStat(UnitInstance target, int spell, float value)
     {
         switch (spell)

@@ -6,6 +6,9 @@ public class SceneMusicChanger : MonoBehaviour
     public AudioClip newMusic;
     private AudioClip previousMusic;
 
+    /// <summary>
+    /// Sauvegarde la musique précédente et demande au PersistentAudio de jouer la nouvelle musique.
+    /// </summary>
     void Start()
     {
         if (PersistentAudio.current != null)
@@ -18,6 +21,9 @@ public class SceneMusicChanger : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Lors de la destruction, restaure la musique précédente si elle existe.
+    /// </summary>
     void OnDestroy()
     {
         if (PersistentAudio.current != null && previousMusic != null)

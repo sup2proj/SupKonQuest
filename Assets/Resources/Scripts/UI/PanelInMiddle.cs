@@ -14,26 +14,41 @@ public class PanelInMiddle : MonoBehaviour
 
     public bool HasAssignedPanelReferences => background != null || winOrDefeatTextField != null;
 
+    /// <summary>
+    /// Cache le panneau au démarrage.
+    /// </summary>
     private void Awake()
     {
         Hide();
     }
 
+    /// <summary>
+    /// Masque complètement le panneau.
+    /// </summary>
     public void Hide()
     {
         SetPanelVisible(false);
     }
 
+    /// <summary>
+    /// Affiche le message de victoire pour le joueur gagnant.
+    /// </summary>
     public void ShowVictory(int winnerPlayerId)
     {
         ShowMessage(FormatMessage(winText, winnerPlayerId, $"Victoire du joueur {winnerPlayerId}"), winTextColor);
     }
 
+    /// <summary>
+    /// Affiche le message de défaite pour le joueur concerné.
+    /// </summary>
     public void ShowDefeat(int playerId)
     {
         ShowMessage(FormatMessage(defeatText, playerId, $"Defaite du joueur {playerId}"), defeatTextColor);
     }
 
+    /// <summary>
+    /// Affiche un message personnalisé avec la couleur fournie.
+    /// </summary>
     private void ShowMessage(string message, Color textColor)
     {
         gameObject.SetActive(true);
@@ -46,6 +61,9 @@ public class PanelInMiddle : MonoBehaviour
         winOrDefeatTextField.color = GetVisibleTextColor(textColor);
     }
 
+    /// <summary>
+    /// Active ou désactive les éléments visuels du panneau.
+    /// </summary>
     private void SetPanelVisible(bool visible)
     {
         if (background != null)
@@ -55,6 +73,9 @@ public class PanelInMiddle : MonoBehaviour
             winOrDefeatTextField.gameObject.SetActive(visible);
     }
 
+    /// <summary>
+    /// Formate un message en remplaçant le placeholder joueur si nécessaire.
+    /// </summary>
     private string FormatMessage(string messageTemplate, int playerId, string fallback)
     {
         if (string.IsNullOrWhiteSpace(messageTemplate))
@@ -66,6 +87,9 @@ public class PanelInMiddle : MonoBehaviour
         return string.Format(messageTemplate, playerId);
     }
 
+    /// <summary>
+    /// Garantit que la couleur du texte reste visible.
+    /// </summary>
     private Color GetVisibleTextColor(Color color)
     {
         if (color.a <= 0f)

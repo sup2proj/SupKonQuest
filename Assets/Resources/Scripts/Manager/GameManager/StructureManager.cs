@@ -28,6 +28,9 @@ public class StructureManager : MonoBehaviour
         public GameObject prefab;
     }
 
+    /// <summary>
+    /// Construit l'index interne des préfabs d'unités par type.
+    /// </summary>
     void Awake()
     {
         Instance = this;
@@ -38,6 +41,9 @@ public class StructureManager : MonoBehaviour
     }
 
     // Enregistre une structure dans l'index interne et lui assigne les métadonnées de territoire
+    /// <summary>
+    /// Enregistre une structure dans l'index des structures d'un territoire.
+    /// </summary>
     public void RegisterStructure(StructureInstance si, int territoryId, string territoryName)
     {
         if (si == null) return;
@@ -57,6 +63,9 @@ public class StructureManager : MonoBehaviour
             list.Add(si);
     }
 
+    /// <summary>
+    /// Instancie une unité à partir de son type à une position donnée.
+    /// </summary>
     public bool SpawnUnitByTypeAtPosition(int playerId, UnitsType type, float x, float z, bool isPoweredUnit, bool isProtector, StructureInstance sourceStructure = null)
     {
         UnitData data = unitData.Find(d => d.type == type);
@@ -156,11 +165,17 @@ public class StructureManager : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Récupère le prefab associé à un type d'unité.
+    /// </summary>
     public bool TryGetUnitPrefab(UnitsType type, out GameObject prefab)
     {
         return unitPrefabDict.TryGetValue(type, out prefab) && prefab != null;
     }
 
+    /// <summary>
+    /// Applique une teinte colorée aux rendus de l'unité instanciée.
+    /// </summary>
     private void ApplyColorTint(GameObject unitGO, Color tint)
     {
         var excludedNames = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase)
@@ -180,6 +195,9 @@ public class StructureManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Détermine la position d'apparition la plus appropriée pour une unité.
+    /// </summary>
     private Vector3 ResolveSpawnPosition(UnitsType type, float x, float z, StructureInstance sourceStructure)
     {
         Vector3 fallback = new Vector3(x, 0f, z + DefaultSpawnZOffset);
@@ -194,6 +212,9 @@ public class StructureManager : MonoBehaviour
         return fallback;
     }
 
+    /// <summary>
+    /// Recherche une position d'apparition d'eau proche d'un port.
+    /// </summary>
     private bool TryFindNearestWaterSpawn(Vector3 harbourPosition, Vector3 preferredPosition, out Vector3 spawnPosition)
     {
         spawnPosition = preferredPosition;
@@ -202,9 +223,9 @@ public class StructureManager : MonoBehaviour
         if (map == null || map.allTiles == null || map.tileSize <= 0f)
             return false;
 
-        if (map.TryGetTileAtWorldPosition(preferredPosition, out TileData preferredTile) && MapTileUtility.IsNavigableWaterTile(preferredTile))
+        if (map.TryGetTileAtWorldPosition(preferredPosition, out TileData preferredTile) && TileData.IsNavigableWater(preferredTile))
         {
-            spawnPosition = MapTileUtility.TileToWorldPosition(map, preferredTile);
+            spawnPosition = TileData.ToWorldPosition(map, preferredTile);
             return true;
         }
 
@@ -217,20 +238,20 @@ public class StructureManager : MonoBehaviour
         int width = map.allTiles.GetLength(0);
         int height = map.allTiles.GetLength(1);
 
-        for (int tileX = 0; tileX < width; tileX++)
-        {
-            for (int tileY = 0; tileY < height; tileY++)
+            for (int tileX = 0; tileX < width; tileX++)
             {
-                TileData tile = map.allTiles[tileX, tileY];
-                if (!MapTileUtility.IsNavigableWaterTile(tile))
-                    continue;
+                for (int tileY = 0; tileY < height; tileY++)
+                {
+                    TileData tile = map.allTiles[tileX, tileY];
+                    if (!TileData.IsNavigableWater(tile))
+                        continue;
 
-                Vector3 candidate = MapTileUtility.TileToWorldPosition(map, tile);
-                float harbourDistanceSq = MapTileUtility.FlatDistanceSq(candidate, harbourPosition);
-                if (harbourDistanceSq > maxDistanceSq)
-                    continue;
+                    Vector3 candidate = TileData.ToWorldPosition(map, tile);
+                    float harbourDistanceSq = TileData.FlatDistanceSq(candidate, harbourPosition);
+                    if (harbourDistanceSq > maxDistanceSq)
+                        continue;
 
-                float preferredDistanceSq = MapTileUtility.FlatDistanceSq(candidate, preferredPosition);
+                    float preferredDistanceSq = TileData.FlatDistanceSq(candidate, preferredPosition);
                 if (preferredDistanceSq > bestPreferredDistanceSq)
                     continue;
 
@@ -247,6 +268,9 @@ public class StructureManager : MonoBehaviour
         return found;
     }
 
+    /// <summary>
+    /// Indique si le type d'unité correspond à un bateau.
+    /// </summary>
     private bool IsBoatType(UnitsType type)
     {
         switch (type)

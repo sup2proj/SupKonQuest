@@ -15,6 +15,9 @@ public class CameraMouvement : MonoBehaviour
     private Vector3 targetPosition;
     private Camera cam;
 
+    /// <summary>
+    /// Initialise la caméra en mode orthographique et positionne la targetPosition par défaut.
+    /// </summary>
     void Start()
     {
         cam = Camera.main;
@@ -26,6 +29,9 @@ public class CameraMouvement : MonoBehaviour
         targetPosition = cam.transform.position;
         targetPosition.y = 20f; 
     }
+    /// <summary>
+    /// Effectue le traitement par frame : déplacement, zoom et application des limites, puis applique la position à la caméra.
+    /// </summary>
     void Update()
     {
         if (Mouse.current == null) return;
@@ -37,6 +43,9 @@ public class CameraMouvement : MonoBehaviour
         cam.transform.position = targetPosition;
     }
     
+    /// <summary>
+    /// Configure la caméra avec les dimensions de la map et centre la vue sur la position de départ du joueur.
+    /// </summary>
     public void SetUpCamera(int width, int height, int targetX, int targetZ)
     {
         this.mapWidth = width;
@@ -59,6 +68,9 @@ public class CameraMouvement : MonoBehaviour
         
     }
     
+    /// <summary>
+    /// Calcule et applique le déplacement de la caméra en fonction de la position du curseur et des touches.
+    /// </summary>
     void CameraMove()
     {
         Vector2 mousePos = Mouse.current.position.ReadValue();
@@ -89,6 +101,9 @@ public class CameraMouvement : MonoBehaviour
         targetPosition += moveDirection * currentSpeed * Time.deltaTime;
     }
     
+    /// <summary>
+    /// Gère le zoom orthographique de la caméra via la molette de la souris.
+    /// </summary>
     void CameraZoom()
     {
         float scroll = Mouse.current.scroll.ReadValue().y;
@@ -99,6 +114,9 @@ public class CameraMouvement : MonoBehaviour
             cam.orthographicSize += 1;
     }
     
+    /// <summary>
+    /// Applique des limites à la targetPosition en fonction du niveau de zoom et de la taille de la map.
+    /// </summary>
     private void ApplyLimits()
     {
         float minX = 0f, maxX = 0f;

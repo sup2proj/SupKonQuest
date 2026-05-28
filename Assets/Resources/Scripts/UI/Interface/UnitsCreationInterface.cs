@@ -3,6 +3,9 @@ using UnityEngine.UI;
 
 public partial class InterfaceInstance
 {
+    /// <summary>
+    /// Affiche l'interface de création d'unités pour la structure sélectionnée si le joueur n'est pas défait.
+    /// </summary>
     public void showInterfaceForStructure()
     {
         int activePlayerId = GetSelectedPlayerId();
@@ -17,6 +20,9 @@ public partial class InterfaceInstance
         RefreshProgressBarVisibility();
     }
 
+    /// <summary>
+    /// Masque l'interface de création d'unités liée à la structure et réinitialise les éléments visuels associés.
+    /// </summary>
     public void HideStructureInterface()
     {
         SetGameObjectActive(unitsQueue, false);
@@ -26,11 +32,17 @@ public partial class InterfaceInstance
         HideProgressBarVisual(resetProgress: false);
     }
 
+    /// <summary>
+    /// Masque tous les emplacements d'UI destinés aux protecteurs d'unités.
+    /// </summary>
     private void hideUnitsProtectorSlots()
     {
         SetImageArrayActive(unitsProtectorSlots, false);
     }
 
+    /// <summary>
+    /// Attache les callbacks de clic pour chaque slot de protector afin de pouvoir spawn un protector via l'UI.
+    /// </summary>
     private void WireProtectorSlotClicks()
     {
         if (unitsProtectorSlots == null)
@@ -44,6 +56,11 @@ public partial class InterfaceInstance
         }
     }
 
+    /// <summary>
+    /// Initialise et paye la création d'une unité : débite l'or du joueur, ajoute la requête à la file
+    /// et démarre la coroutine de traitement si nécessaire.
+    /// Retourne true si la création a été acceptée.
+    /// </summary>
     public bool InitUnitsCreation(int unitIndex, UnitsType type, float x, float z, bool isPoweredUnit, bool isProtector)
     {
         int playerId = GetSelectedPlayerId();
@@ -102,6 +119,9 @@ public partial class InterfaceInstance
         return true;
     }
 
+    /// <summary>
+    /// Gère la demande de spawn d'un protector depuis l'interface en utilisant le slot cliqué.
+    /// </summary>
     private void SpawnStructProtectorOnInterface(int slotIndex)
     {
         ProtectorSlotToType.TryGetValue(slotIndex, out var type);
@@ -120,6 +140,9 @@ public partial class InterfaceInstance
         }
     }
 
+    /// <summary>
+    /// Affiche sur l'interface les unités/protectors disponibles pour la structure selon le type et le statut powered.
+    /// </summary>
     public void showUnitsNextToStructure(UnitsType type, bool isPoweredUnit)
     {
         WireProtectorSlotClicks();

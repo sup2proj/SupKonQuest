@@ -19,6 +19,14 @@ public class EasyProduction : MonoBehaviour
     private bool mapReady;
     private bool loggedWaitingForMap;
 
+    /// <summary>
+    /// Initialise le composant de production avec les références aux managers
+    /// et l'identifiant du joueur géré.
+    /// </summary>
+    /// <param name="pm">Instance de <see cref="PlayerManager"/>.</param>
+    /// <param name="sm">Instance de <see cref="StructureManager"/>.</param>
+    /// <param name="mg">Instance de <see cref="MapGenerator"/>.</param>
+    /// <param name="id">Identifiant du joueur associé.</param>
     public void Initialize(PlayerManager pm, StructureManager sm, MapGenerator mg, int id)
     {
         if (playerManager == null) 
@@ -30,11 +38,19 @@ public class EasyProduction : MonoBehaviour
         playerId = id;
     }
 
+    /// <summary>
+    /// Indique si la map et les structures sont prêtes pour la production.
+    /// </summary>
+    /// <param name="ready">True si la map est prête.</param>
     public void SetMapReady(bool ready)
     {
         mapReady = ready;
     }
 
+    /// <summary>
+    /// Appelé régulièrement pour vérifier si la production peut avoir lieu
+    /// et déclencher la création d'unités si les conditions sont réunies.
+    /// </summary>
     public void Tick()
     {
         if (playerManager == null)
@@ -72,6 +88,10 @@ public class EasyProduction : MonoBehaviour
         TryProduceUnit();
     }
 
+    /// <summary>
+    /// Tente de produire une unité en vérifiant les conditions : nombre maximum,
+    /// ressources disponibles et positions de spawn.
+    /// </summary>
     private void TryProduceUnit()
     {
         if (GetOwnedUnitCount() >= maxUnitCount)
@@ -138,6 +158,10 @@ public class EasyProduction : MonoBehaviour
         nextProductionReadyTime = Time.time + Mathf.Max(0.1f, chosenData.creationTime);
     }
 
+    /// <summary>
+    /// Compte le nombre d'unités appartenant au joueur géré par cette IA.
+    /// </summary>
+    /// <returns>Nombre d'unités possédées.</returns>
     private int GetOwnedUnitCount()
     {
         List<UnitInstance> units = UnitsRegistry.GetSnapshot();
@@ -156,6 +180,15 @@ public class EasyProduction : MonoBehaviour
         return count;
     }
 
+    /// <summary>
+    /// Sélectionne un <see cref="UnitData"/> candidat pour la production en
+    /// fonction de l'or disponible et des structures spéciales.
+    /// </summary>
+    /// <param name="gold">Or disponible.</param>
+    /// <param name="hasSpecialStructure">Indique si le joueur possède une structure spéciale.</param>
+    /// <param name="requirePowered">Si true, ne retourne que des unités "powered".</param>
+    /// <param name="powered">Sortie indiquant si l'unité choisie sera powered.</param>
+    /// <returns>UnitData sélectionné ou null si aucun éligible.</returns>
     private UnitData PickUnitForProduction(int gold, bool hasSpecialStructure, bool requirePowered, out bool powered)
     {
         powered = false;
@@ -211,6 +244,10 @@ public class EasyProduction : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Récupère la liste des structures appartenant à ce joueur (hors ports).
+    /// </summary>
+    /// <returns>Liste des <see cref="StructureInstance"/> possédées.</returns>
     private List<StructureInstance> GetOwnedStructures()
     {
         var result = new List<StructureInstance>();
@@ -226,6 +263,11 @@ public class EasyProduction : MonoBehaviour
         return result;
     }
 
+    /// <summary>
+    /// Indique si le joueur possède au moins une structure de type spécial
+    /// (par ex. NeutralStructure).
+    /// </summary>
+    /// <returns>True si une structure spéciale est présente.</returns>
     private bool HasSpecialStructure()
     {
         var structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
@@ -242,6 +284,12 @@ public class EasyProduction : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Tente de déterminer une position de spawn valide (fallback sur le centre
+    /// du générateur de carte actuellement).
+    /// </summary>
+    /// <param name="position">Sortie contenant la position de spawn choisie.</param>
+    /// <returns>True si une position a été fournie.</returns>
     private bool TryGetSpawnPosition(out Vector3 position)
     {
         position = Vector3.zero;
@@ -249,6 +297,10 @@ public class EasyProduction : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Indique si le type d'unité est un type naval (bateau) et doit être ignoré
+    /// pour la production terrestre automatique.
+    /// </summary>
     private bool IsBoatType(UnitsType type)
     {
         return type == UnitsType.Fregate || type == UnitsType.Destroyer || type == UnitsType.Transport;

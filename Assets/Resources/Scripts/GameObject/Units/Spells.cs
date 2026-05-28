@@ -29,6 +29,9 @@ public class Spells : MonoBehaviour
     private readonly Dictionary<UnitInstance, Coroutine> regenByTarget = new Dictionary<UnitInstance, Coroutine>();
     private readonly Dictionary<UnitInstance, Coroutine> AttackSpeedBuffByTarget = new Dictionary<UnitInstance, Coroutine>();
 
+    /// <summary>
+    /// Initialise le lanceur de sorts et détermine sa portée initiale.
+    /// </summary>
     private void Awake()
     {
         Instance = this;
@@ -39,6 +42,9 @@ public class Spells : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Indique si le sort actif est encore en temps de recharge.
+    /// </summary>
     public bool IsSpellOnCooldown
     {
         get
@@ -54,6 +60,9 @@ public class Spells : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Met à jour l'affichage de la portée du sort et sa visibilité.
+    /// </summary>
     private void Update()
     {
         if (circleHideAtTime >= 0f && Time.time >= circleHideAtTime)
@@ -72,6 +81,9 @@ public class Spells : MonoBehaviour
             UpdateRangeFillTransform(currentCircleColor);
     }
 
+    /// <summary>
+    /// Réagit à l'action utilisateur pour déclencher le sort correspondant.
+    /// </summary>
     public void ButtonListener(int choice)
     {
         if (casterUnit == null || casterUnit.unitData == null)
@@ -138,6 +150,9 @@ public class Spells : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Déclenche l'affichage de la zone du sort et le scan des unités alliées.
+    /// </summary>
     private void TriggerSpell(Color spellColor, int spell)
     {
         scanRadius = GetScanRadiusFromUnitsData();
@@ -146,6 +161,9 @@ public class Spells : MonoBehaviour
         ScanFriendlyUnits(spell);
     }
 
+    /// <summary>
+    /// Crée le contour circulaire de portée si nécessaire.
+    /// </summary>
     private void EnsureRangeCircle(Color circleColor)
     {
         if (rangeCircle != null)
@@ -178,6 +196,9 @@ public class Spells : MonoBehaviour
         UpdateRangeCirclePositions();
     }
 
+    /// <summary>
+    /// Crée le disque de remplissage de portée si nécessaire.
+    /// </summary>
     private void EnsureRangeFill(Color circleColor)
     {
         if (rangeFillRenderer != null && rangeFillFilter != null)
@@ -206,6 +227,9 @@ public class Spells : MonoBehaviour
         UpdateRangeFillTransform(circleColor);
     }
 
+    /// <summary>
+    /// Construit un maillage circulaire simple pour le disque de portée.
+    /// </summary>
     private static Mesh BuildDiscMesh(int segments)
     {
         var mesh = new Mesh();
@@ -246,6 +270,9 @@ public class Spells : MonoBehaviour
         return mesh;
     }
 
+    /// <summary>
+    /// Met à jour la transformation et la couleur du disque de portée.
+    /// </summary>
     private void UpdateRangeFillTransform(Color circleColor)
     {
         if (rangeFillRenderer == null)
@@ -263,6 +290,9 @@ public class Spells : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Affiche les éléments visuels de la zone du sort.
+    /// </summary>
     private void ShowRangeCircle(Color circleColor)
     {
         currentCircleColor = circleColor;
@@ -295,6 +325,9 @@ public class Spells : MonoBehaviour
         UpdateRangeFillTransform(circleColor);
     }
 
+    /// <summary>
+    /// Repositionne les points du contour circulaire autour du lanceur.
+    /// </summary>
     private void UpdateRangeCirclePositions()
     {
         if (rangeCircle == null)
@@ -316,6 +349,9 @@ public class Spells : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Scanne les unités alliées proches pour appliquer l'effet du sort.
+    /// </summary>
     private void ScanFriendlyUnits(int spell)
     {
         // On resynchronise au moment du cast, au cas où le UnitData a changé côté runtime.
@@ -364,6 +400,9 @@ public class Spells : MonoBehaviour
         Debug.Log($"[BuffSpell] Scan radius={scanRadius} => unités détectées={totalUnitsFound}, alliées (playerId={casterPlayerId})={friendlyUnitsFound}", this);
     }
 
+    /// <summary>
+    /// Retourne la durée du soin pour un lanceur de type healer.
+    /// </summary>
     private float GetHealingDuration()
     {
         if (casterUnit != null && casterUnit.unitData is UnitHealerData healerData && healerData.healDuration > 0f)
@@ -371,6 +410,9 @@ public class Spells : MonoBehaviour
         return 0f;
     }
 
+    /// <summary>
+    /// Retourne la durée du buff pour un lanceur de type support.
+    /// </summary>
     private float GetBuffSupportDuration()
     {
         if (casterUnit != null && casterUnit.unitData is UnitSupportData supportData && supportData.buffDuration > 0f)
@@ -378,6 +420,9 @@ public class Spells : MonoBehaviour
         return 0f;
     }
     
+    /// <summary>
+    /// Retourne le temps de recharge du sort de soin.
+    /// </summary>
     private float GetHealerCooldwon()
     {
         if (casterUnit != null && casterUnit.unitData is UnitHealerData healerData)
@@ -385,6 +430,9 @@ public class Spells : MonoBehaviour
         return 0f;
     }
     
+    /// <summary>
+    /// Retourne le temps de recharge du sort de support.
+    /// </summary>
     private float GetSupportCooldwon()
     {
         if (casterUnit != null && casterUnit.unitData is UnitSupportData supportData)
@@ -392,6 +440,9 @@ public class Spells : MonoBehaviour
         return 0f;
     }
 
+    /// <summary>
+    /// Détermine le rayon de scan à partir des données de l'unité.
+    /// </summary>
     private float GetScanRadiusFromUnitsData()
     {
         if (casterUnit != null && casterUnit.unitData is UnitHealerData hd && hd.healRange > 0f)
@@ -405,6 +456,9 @@ public class Spells : MonoBehaviour
         return scanRadius;
     }
 
+    /// <summary>
+    /// Calcule le multiplicateur de buff associé à un sort de support.
+    /// </summary>
     private float GetBuffMultiplicatorFromSpell(UnitSupportData supportData, int spell)
     {
         return spell switch

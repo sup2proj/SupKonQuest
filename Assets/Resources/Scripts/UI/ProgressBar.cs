@@ -16,17 +16,26 @@ public class ProgressBar : MonoBehaviour
 
 
 
+    /// <summary>
+    /// Prépare la barre de progression au chargement.
+    /// </summary>
     private void Awake()
     {
         WidthInitialized();
         SetNormalized(0f);
     }
 
+    /// <summary>
+    /// Rafraîchit l'affichage lorsque le composant est activé.
+    /// </summary>
     private void OnEnable()
     {
         RefreshVisualFromClock();
     }
 
+    /// <summary>
+    /// Met à jour la progression tant que l'animation est en cours.
+    /// </summary>
     private void Update()
     {
         if (!isRunning)
@@ -35,6 +44,9 @@ public class ProgressBar : MonoBehaviour
         RefreshVisualFromClock();
     }
 
+    /// <summary>
+    /// Démarre une nouvelle progression de création.
+    /// </summary>
     public void StartCreation(float creationTimeSeconds)
     {
         StopCreation(resetToZero: true);
@@ -57,6 +69,9 @@ public class ProgressBar : MonoBehaviour
         SetNormalized(0f);
     }
 
+    /// <summary>
+    /// Reprend une progression de création à partir du temps déjà écoulé.
+    /// </summary>
     public void StartCreationFromElapsed(float creationTimeSeconds, float elapsedAlreadySeconds)
     {
         WidthInitialized();
@@ -76,6 +91,9 @@ public class ProgressBar : MonoBehaviour
         SetNormalized(durationSeconds > 0f ? elapsedSeconds / durationSeconds : 0f);
     }
 
+    /// <summary>
+    /// Arrête la progression de création en cours.
+    /// </summary>
     public void StopCreation(bool resetToZero = false)
     {
         isRunning = false;
@@ -87,6 +105,9 @@ public class ProgressBar : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Affiche ou masque visuellement la barre.
+    /// </summary>
     public void SetFillVisible(bool visible)
     {
         if (progressBar == null)
@@ -95,6 +116,9 @@ public class ProgressBar : MonoBehaviour
         progressBar.gameObject.SetActive(visible);
     }
 
+    /// <summary>
+    /// Indique si la progression est terminée.
+    /// </summary>
     public bool IsFinished()
     {
         if (durationSeconds <= 0f)
@@ -106,6 +130,9 @@ public class ProgressBar : MonoBehaviour
         return (Time.time - creationStartTime) >= durationSeconds;
     }
 
+    /// <summary>
+    /// Synchronise l'affichage de la barre avec le temps écoulé réel.
+    /// </summary>
     private void RefreshVisualFromClock()
     {
         if (durationSeconds <= 0f)
@@ -120,6 +147,9 @@ public class ProgressBar : MonoBehaviour
         SetNormalized(t);
     }
 
+    /// <summary>
+    /// Met à jour la largeur affichée à partir d'une valeur normalisée.
+    /// </summary>
     private void SetNormalized(float t)
     {
         if (progressBar == null)
@@ -129,6 +159,9 @@ public class ProgressBar : MonoBehaviour
         progressBar.sizeDelta = new Vector2(newWidth, height);
     }
 
+    /// <summary>
+    /// Détermine la largeur de référence de la barre si elle n'est pas définie.
+    /// </summary>
     private void WidthInitialized()
     {
         if (progressBar == null)

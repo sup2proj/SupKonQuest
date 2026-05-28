@@ -22,6 +22,9 @@ public class PlayerManager : MonoBehaviour
     private float timer = 0f;
 
 
+    /// <summary>
+    /// Initialise les sessions de joueurs et configure l'IA automatiquement si nécessaire.
+    /// </summary>
     private void Awake()
     {
         Instance = this;
@@ -56,12 +59,18 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Définit le joueur actif au démarrage.
+    /// </summary>
     private void Start()
     {
         SetActivePlayer(1);
     }
         //TEMPORAIRRRREEEE
 
+    /// <summary>
+    /// Accorde périodiquement de l'or au joueur actif tant qu'il n'est pas vaincu.
+    /// </summary>
     private void Update()
     {
         int playerId = GetActivePlayerId();
@@ -76,6 +85,9 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Crée une session pour un joueur si elle n'existe pas déjà.
+    /// </summary>
     public PlayerSession CreateSessionForPlayer(int id, int startGold = 500, int startUnitCount = 1, int startStructureCount = 1)
     {
         if (sessionsById.ContainsKey(id))
@@ -92,6 +104,9 @@ public class PlayerManager : MonoBehaviour
         return newSession;
     }
 
+    /// <summary>
+    /// Définit l'identifiant du joueur actuellement actif.
+    /// </summary>
     public void SetActivePlayer(int playerId)
     {
         if (!sessionsById.ContainsKey(playerId))
@@ -103,17 +118,26 @@ public class PlayerManager : MonoBehaviour
         var s = GetSession(activePlayerId);
     }
 
+    /// <summary>
+    /// Récupère la session associée à un identifiant de joueur.
+    /// </summary>
     public PlayerSession GetSession(int id)
     {
         sessionsById.TryGetValue(id, out PlayerSession session);
         return session;
     }
 
+    /// <summary>
+    /// Retourne l'identifiant du joueur actif.
+    /// </summary>
     public int GetActivePlayerId()
     {
         return activePlayerId;
     }
 
+    /// <summary>
+    /// Calcule et ajoute le gain d'or périodique à un joueur.
+    /// </summary>
     public void GetGoldForPlayer(int playerId)
     {
         if (Defeat.IsPlayerDefeated(playerId))
@@ -143,6 +167,9 @@ public class PlayerManager : MonoBehaviour
     }
 
     // Recherche par nom de type dans tous les assemblies chargés
+    /// <summary>
+    /// Recherche un type par nom dans tous les assemblys chargés.
+    /// </summary>
     private Type FindTypeInAssemblies(string typeName)
     {
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -170,6 +197,9 @@ public class PlayerManager : MonoBehaviour
     }
 
     // Fournit une couleur de sélection/identification pour un playerId
+    /// <summary>
+    /// Fournit une couleur associée à un identifiant de joueur.
+    /// </summary>
     public static Color GetPlayerColor(int id)
     {
         switch (id)

@@ -92,6 +92,9 @@ public class DamageTable : ScriptableObject
         new DamageRelation { attackerType = UnitsType.Destroyer, defenderStructureType = StructureType.Harbour,    damageMultiplier = 1.3f },
     };
 
+    /// <summary>
+    /// Calcule le multiplicateur de dégâts en fonction de l'attaquant et de la cible.
+    /// </summary>
     public float GetMultiplier(UnitInstance attacker, UnitInstance target, StructureInstance targetStructure = null)
     {
         Debug.Log($"[DamageTable] Calculating multiplier for {attacker?.name} attacking {target?.name}");

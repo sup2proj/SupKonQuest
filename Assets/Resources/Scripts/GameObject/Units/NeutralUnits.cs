@@ -15,6 +15,9 @@ public class NeutralUnits : MonoBehaviour
     private float nextScanAt;
     private bool visualsApplied;
 
+    /// <summary>
+    /// Convertit toutes les unités d'un joueur défait en unités neutres.
+    /// </summary>
     public static void ConvertPlayerUnitsToNeutral(int defeatedPlayerId, bool removeAiRandomMovement)
     {
         if (defeatedPlayerId <= 0)
@@ -44,6 +47,9 @@ public class NeutralUnits : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Récupère les composants nécessaires au comportement neutre.
+    /// </summary>
     private void Awake()
     {
         unit = GetComponent<UnitInstance>();
@@ -51,12 +57,18 @@ public class NeutralUnits : MonoBehaviour
         movementManager = GetComponent<MovementManager>();
     }
 
+    /// <summary>
+    /// Réapplique la configuration neutre lorsque le composant est activé.
+    /// </summary>
     private void OnEnable()
     {
         if (unit != null && unit.isNeutral)
             ApplyNeutralSetup();
     }
 
+    /// <summary>
+    /// Cherche des ennemis à portée et orchestre l'engagement automatique.
+    /// </summary>
     private void Update()
     {
         if (unit == null || !unit.isNeutral || unit.currentHealth <= 0f)
@@ -88,6 +100,9 @@ public class NeutralUnits : MonoBehaviour
             movementManager.MoveToTarget(enemy.transform, engageDistance);
     }
 
+    /// <summary>
+    /// Initialise l'état neutre, les visuels et l'arrêt du mouvement.
+    /// </summary>
     private void ApplyNeutralSetup()
     {
         if (unit == null)
@@ -103,6 +118,9 @@ public class NeutralUnits : MonoBehaviour
             movementManager.StopMovement();
     }
 
+    /// <summary>
+    /// Indique si l'unité neutre peut réellement attaquer avec des dégâts.
+    /// </summary>
     private bool CanAttackWithDamage()
     {
         if (unit == null || unit.unitData == null)
@@ -112,6 +130,9 @@ public class NeutralUnits : MonoBehaviour
         return type != UnitsType.Support && type != UnitsType.Healer;
     }
 
+    /// <summary>
+    /// Retourne la portée d'attaque de l'unité neutre.
+    /// </summary>
     private float GetAttackRange()
     {
         if (unit != null && unit.unitData is UnitCombatData combatData)
@@ -120,6 +141,9 @@ public class NeutralUnits : MonoBehaviour
         return 0.1f;
     }
 
+    /// <summary>
+    /// Recherche l'ennemi le plus proche dans le rayon de détection.
+    /// </summary>
     private UnitInstance FindNearestEnemyInRadius()
     {
         List<UnitInstance> units = UnitsRegistry.GetSnapshot();
@@ -154,6 +178,9 @@ public class NeutralUnits : MonoBehaviour
         return best;
     }
 
+    /// <summary>
+    /// Applique les visuels neutres une seule fois sur l'unité.
+    /// </summary>
     private void ApplyNeutralVisuals()
     {
         if (visualsApplied)

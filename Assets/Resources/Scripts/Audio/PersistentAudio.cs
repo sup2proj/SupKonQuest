@@ -11,6 +11,9 @@ public class PersistentAudio : MonoBehaviour
     [Header("Audio Source")]
     public AudioSource audioSource;
 
+    /// <summary>
+    /// Initialise l'instance persistante audio (singleton) et empêche la destruction lors du chargement de scènes.
+    /// </summary>
     void Awake()
     {
         if (current == null)
@@ -24,6 +27,9 @@ public class PersistentAudio : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Initialise la source audio si nécessaire et applique les volumes sauvegardés depuis PlayerPrefs.
+    /// </summary>
     void Start()
     {
         if (audioSource == null)
@@ -37,6 +43,9 @@ public class PersistentAudio : MonoBehaviour
         ApplyVolumes(savedMusicVolume, savedSfxVolume);
     }
 
+    /// <summary>
+    /// Applique les valeurs de volume au mixer audio en utilisant une échelle logarithmique adaptée.
+    /// </summary>
     void ApplyVolumes(float musicValue, float sfxValue)
     {
         if (audioMixer != null)
@@ -61,6 +70,9 @@ public class PersistentAudio : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Change la musique jouée par l'AudioSource si elle est différente de la musique courante.
+    /// </summary>
     public void ChangeMusic(AudioClip newMusic)
     {
         if (audioSource != null && newMusic != null && audioSource.clip != newMusic)

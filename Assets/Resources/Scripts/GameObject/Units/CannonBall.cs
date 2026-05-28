@@ -12,6 +12,9 @@ public class CannonBall : MonoBehaviour
     private Transform target;
     private Transform launcher;
 
+    /// <summary>
+    /// Instancie un projectile de canon et initialise sa trajectoire vers la cible.
+    /// </summary>
     public static CannonBall Spawn(GameObject prefab, Vector3 from, Transform target, float speed, System.Action<Vector3> onArrival, Transform launcher = null, float arcHeight = 3f, float scale = 1f)
     {
         GameObject go = Instantiate(prefab, from, Quaternion.identity);
@@ -32,6 +35,9 @@ public class CannonBall : MonoBehaviour
         return ball;
     }
 
+    /// <summary>
+    /// Déplace le projectile sur une trajectoire en arc jusqu'à son arrivée ou sa destruction.
+    /// </summary>
     void Update()
     {
         if (arrived) return;
@@ -69,6 +75,9 @@ public class CannonBall : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Vérifie si la cible du projectile est déjà détruite.
+    /// </summary>
     private bool IsTargetDead()
     {
         if (target == null)

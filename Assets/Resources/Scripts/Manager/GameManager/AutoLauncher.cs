@@ -10,6 +10,9 @@ public class AutoLauncher : MonoBehaviour
     private static int pendingAiCount = 1;
     private static int pendingAiDifficulty = 2;
 
+    /// <summary>
+    /// Assure l'unicité de l'AutoLauncher et le conserve entre les scènes.
+    /// </summary>
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -22,22 +25,34 @@ public class AutoLauncher : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    /// <summary>
+    /// S'abonne à l'événement de chargement de scène.
+    /// </summary>
     private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
+    /// <summary>
+    /// Se désabonne de l'événement de chargement de scène.
+    /// </summary>
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    /// <summary>
+    /// Réinitialise l'instance statique si cet AutoLauncher est détruit.
+    /// </summary>
     private void OnDestroy()
     {
         if (Instance == this)
             Instance = null;
     }
 
+    /// <summary>
+    /// Demande le lancement d'une partie avec les paramètres fournis.
+    /// </summary>
     public static void Request(string folder, int aiCount = 1, int aiDifficulty = 2)
     {
         pendingMapFolder = string.IsNullOrWhiteSpace(folder) ? "TEST" : folder;
@@ -52,6 +67,9 @@ public class AutoLauncher : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Déclenche la création de la partie lorsque la scène Game est chargée.
+    /// </summary>
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (!launchRequested || scene.name != "Game")
@@ -61,6 +79,9 @@ public class AutoLauncher : MonoBehaviour
         CreateGame(pendingMapFolder, pendingAiCount, pendingAiDifficulty);
     }
 
+    /// <summary>
+    /// Crée et lance la partie : génère la map, configure les camps et la caméra.
+    /// </summary>
     /// <summary>
     /// Crée et lance la partie : génère la map, configure les camps et la caméra.
     /// </summary>
@@ -105,6 +126,9 @@ public class AutoLauncher : MonoBehaviour
         InstantiateAIs(aiCount, aiDifficulty);
     }
 
+    /// <summary>
+    /// Prépare l'attribution aléatoire des structures aux joueurs.
+    /// </summary>
     private StructureAttribution PrepareStructureAttribution(string mapFolderName, int aiCount)
     {
         var campAssignment = new StructureAttribution();
@@ -117,6 +141,9 @@ public class AutoLauncher : MonoBehaviour
         return campAssignment;
     }
 
+    /// <summary>
+    /// Journalise les propriétaires des points de départ après attribution.
+    /// </summary>
     private void LogStartPointOwnersAfterAttribution()
     {
         MapJsonData modifiedData = StructureAttribution.LastModifiedJsonData;
@@ -130,6 +157,9 @@ public class AutoLauncher : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Recrée le générateur de carte et relance la génération avec les nouvelles données.
+    /// </summary>
     private MapGenerator CreateFreshMapGeneratorAndGenerate(string mapFolderName)
     {
         MapGenerator mapGenerator = Object.FindAnyObjectByType<MapGenerator>();
@@ -149,6 +179,9 @@ public class AutoLauncher : MonoBehaviour
         return mapGenerator;
     }
 
+    /// <summary>
+    /// Instancie les IA demandées avec la difficulté spécifiée.
+    /// </summary>
     private void InstantiateAIs(int aiCount, int aiDifficulty)
     {
         IAInstance[] existingAis = Object.FindObjectsByType<IAInstance>(FindObjectsSortMode.None);

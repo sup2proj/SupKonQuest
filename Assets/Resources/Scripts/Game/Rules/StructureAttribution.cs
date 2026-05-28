@@ -14,6 +14,9 @@ public class StructureAttribution
 
     public List<Assignment> campAssignments = new List<Assignment>();
     
+    /// <summary>
+    /// Charge les données de la carte depuis le dossier spécifié et prépare les assignations de joueurs.
+    /// </summary>
     public void Setup(string folderName)
     {
         string path = "Maps/" + folderName + "/";
@@ -25,6 +28,9 @@ public class StructureAttribution
         }
     }
 
+    /// <summary>
+    /// Crée et ajoute une assignation de joueur (nom, numéro, type) en utilisant les startPoints JSON.
+    /// </summary>
     void AssignPlayer(string playerName, int playerNumber, string playerType)
     {
         Assignment newAssignment = new Assignment
@@ -38,6 +44,9 @@ public class StructureAttribution
         campAssignments.Add(newAssignment);
 
     }
+    /// <summary>
+    /// Assigne aléatoirement les joueurs humains aux camps disponibles en remplaçant des AIs.
+    /// </summary>
     public void SetCampAssignment(string[] playerList)
     {
         List<int> availableIndices = new List<int>();
@@ -57,6 +66,9 @@ public class StructureAttribution
         }
     }
     
+    /// <summary>
+    /// Retourne la position de départ de la caméra (x,y) pour le joueur nommé, ou (0,0) si non trouvé.
+    /// </summary>
     public (int, int) GetPlayerCameraStartPosition(string playerName)
     {
         foreach (Assignment assignment in campAssignments)
@@ -69,6 +81,10 @@ public class StructureAttribution
         return (0, 0); 
     }
     
+    /// <summary>
+    /// Attribue aléatoirement des propriétaires aux points de départ en veillant à répartir
+    /// les joueurs et ajouter des neutres si nécessaire. Met à jour LastModifiedJsonData.
+    /// </summary>
     public void AssignRandomOwners(int numberOfPlayers)
     {
         if (jsonData == null || numberOfPlayers <= 0)

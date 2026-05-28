@@ -7,6 +7,9 @@ public class Victory : MonoBehaviour
     public bool HasWinner { get; private set; }
     public int WinnerPlayerId { get; private set; } = -1;
 
+    /// <summary>
+    /// Vérifie chaque frame si une condition de victoire est remplie (dernier joueur ou par territoires).
+    /// </summary>
     private void Update()
     {
         if (HasWinner)
@@ -21,6 +24,9 @@ public class Victory : MonoBehaviour
         TryDeclareWinnerByTerritories();
     }
 
+    /// <summary>
+    /// Tente de déclarer un gagnant si un joueur contrôle suffisamment de territoires.
+    /// </summary>
     public bool TryDeclareWinnerByTerritories()
     {
         if (HasWinner)
@@ -35,6 +41,9 @@ public class Victory : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Vérifie si le joueur donné contrôle assez de territoires pour gagner et le déclare si c'est le cas.
+    /// </summary>
     public bool TryDeclareWinnerIfPlayerControlsEnoughTerritories(int playerId)
     {
         if (HasWinner || playerId <= 0)
@@ -48,6 +57,9 @@ public class Victory : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Déclare le joueur comme gagnant s'il est le dernier joueur possédant des structures.
+    /// </summary>
     public bool TryDeclareWinnerIfOnlyPlayerWithStructures(int playerId)
     {
         if (HasWinner || playerId <= 0)
@@ -57,6 +69,9 @@ public class Victory : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Tente de récupérer l'ID du seul joueur restant (si un seul PlayerSession existe).
+    /// </summary>
     private bool TryGetSoloPlayerId(out int playerId)
     {
         playerId = -1;
@@ -69,6 +84,9 @@ public class Victory : MonoBehaviour
         return playerId > 0;
     }
 
+    /// <summary>
+    /// Déclare formellement le gagnant, met à jour l'état et affiche le panneau de victoire.
+    /// </summary>
     private void DeclareWinner(int playerId, string reason)
     {
         HasWinner = true;
@@ -84,6 +102,10 @@ public class Victory : MonoBehaviour
             interfaceInstance.ShowVictoryPanel(playerId);
     }
     
+    /// <summary>
+    /// Vérifie la condition de victoire après la capture d'un territoire pour le joueur spécifié.
+    /// Si aucune instance Victory n'existe, applique une logique par défaut.
+    /// </summary>
     public static bool CheckVictoryAfterCapture(int playerIdToCheck)
     {
         Victory victory = FindFirstObjectByType<Victory>(FindObjectsInactive.Include);
@@ -104,6 +126,10 @@ public class Victory : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Vérifie la condition de victoire après l'élimination d'un joueur (dernier joueur avec structures).
+    /// Si aucune instance Victory n'existe, affiche le panneau de victoire directement.
+    /// </summary>
     public static bool CheckVictoryAfterElimination(int playerIdToCheck)
     {
         Victory victory = FindFirstObjectByType<Victory>(FindObjectsInactive.Include);

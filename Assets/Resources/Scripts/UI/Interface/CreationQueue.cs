@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 public partial class InterfaceInstance
 {
+    /// <summary>
+    /// Ajoute l'icône d'une unité à la file de création de la structure actuellement affichée.
+    /// </summary>
     public void addUnitToQueue(GameObject clickedUnit)
     {
         int structureId = GetCurrentStructureId();
@@ -25,6 +28,9 @@ public partial class InterfaceInstance
         RefreshQueueSlotsVisibility();
     }
 
+    /// <summary>
+    /// Remplit l'image d'un emplacement de file avec le sprite provenant de l'unité cliquée.
+    /// </summary>
     public void FillSlotImage(int slotIndex, GameObject clickedUnit)
     {
         if (queueSlots == null || slotIndex < 0 || slotIndex >= queueSlots.Length)
@@ -44,6 +50,10 @@ public partial class InterfaceInstance
         target.sprite = source.sprite;
     }
 
+    /// <summary>
+    /// Coroutine qui traite la file de création pour une structure donnée : attend la durée de création,
+    /// spawn l'unité et décale la file.
+    /// </summary>
     private IEnumerator ProcessCreationQueue(int structureId)
     {
         if (structureId == -1)
@@ -113,6 +123,9 @@ public partial class InterfaceInstance
             HideProgressBarVisual(resetProgress: true);
     }
 
+    /// <summary>
+    /// Décale la file de création vers la gauche après la création d'une unité pour la structure donnée.
+    /// </summary>
     private void ShiftQueueLeft(int structureId)
     {
         if (structureId == -1)
@@ -124,11 +137,17 @@ public partial class InterfaceInstance
         RefreshQueueSlotsVisibility();
     }
 
+    /// <summary>
+    /// Active ou désactive tous les emplacements visuels de la file de création.
+    /// </summary>
     private void SetAllQueueSlotsActive(bool active)
     {
         SetImageArrayActive(queueSlots, active);
     }
 
+    /// <summary>
+    /// Met à jour la visibilité et les sprites des emplacements de file en fonction de la file courante.
+    /// </summary>
     private void RefreshQueueSlotsVisibility()
     {
         if (queueSlots == null) return;
@@ -148,6 +167,9 @@ public partial class InterfaceInstance
         }
     }
 
+    /// <summary>
+    /// Retourne l'ID de la structure actuellement affichée pour la file, ou -1 si aucune.
+    /// </summary>
     private int GetCurrentStructureId()
     {
         if (displayedStructure == null)
@@ -155,6 +177,9 @@ public partial class InterfaceInstance
         return displayedStructure != null ? displayedStructure.GetInstanceID() : -1;
     }
 
+    /// <summary>
+    /// Récupère ou crée la liste de sprites représentant la file pour la structure donnée.
+    /// </summary>
     private List<Sprite> GetOrCreateStructureQueue(int structureId)
     {
         if (!queuedSpritesByStructure.TryGetValue(structureId, out var queue))
@@ -165,6 +190,9 @@ public partial class InterfaceInstance
         return queue;
     }
 
+    /// <summary>
+    /// Récupère ou crée l'état de création pour la structure spécifiée (file, coroutine, état).
+    /// </summary>
     private BuildingCreationState GetOrCreateCreationState(int structureId)
     {
         if (!creationStateByStructure.TryGetValue(structureId, out var state))
@@ -175,6 +203,9 @@ public partial class InterfaceInstance
         return state;
     }
 
+    /// <summary>
+    /// Met à jour l'affichage de la barre de progression selon l'état de création en cours.
+    /// </summary>
     private void RefreshProgressBarVisibility()
     {
         if (progressBar == null)
@@ -192,6 +223,9 @@ public partial class InterfaceInstance
         progressBar.SetFillVisible(shouldShow);
     }
 
+    /// <summary>
+    /// Cache la barre de progression et optionnellement réinitialise son état de progression.
+    /// </summary>
     private void HideProgressBarVisual(bool resetProgress)
     {
         if (progressBar == null)

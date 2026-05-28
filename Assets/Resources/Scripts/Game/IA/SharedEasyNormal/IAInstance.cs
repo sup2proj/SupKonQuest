@@ -27,16 +27,33 @@ public class IAInstance : MonoBehaviour
     // Expose playerId so other systems can detect IA-owned structures/units
     public int PlayerId => playerId;
 
+    /// <summary>
+    /// Indique si un joueur donné est géré par une IA (présence d'une instance).
+    /// </summary>
+    /// <param name="id">Identifiant du joueur à vérifier.</param>
+    /// <returns>True si une IA existe pour ce joueur.</returns>
     public static bool IsAIPlayer(int id)
     {
         return instancesByPlayerId.ContainsKey(id);
     }
 
+    /// <summary>
+    /// Tente de récupérer l'instance d'IA associée à un joueur.
+    /// </summary>
+    /// <param name="id">Identifiant du joueur.</param>
+    /// <param name="instance">Sortie contenant l'instance trouvée (ou null).</param>
+    /// <returns>True si une instance a été trouvée.</returns>
     public static bool TryGetAIForPlayer(int id, out IAInstance instance)
     {
         return instancesByPlayerId.TryGetValue(id, out instance);
     }
 
+    /// <summary>
+    /// Vérifie si le joueur <paramref name="id"/> possède une IA avec la difficulté donnée.
+    /// </summary>
+    /// <param name="id">Identifiant du joueur.</param>
+    /// <param name="difficulty">Difficulté à comparer.</param>
+    /// <returns>True si l'IA du joueur a cette difficulté.</returns>
     public static bool IsDifficultyForPlayer(int id, int difficulty)
     {
         return instancesByPlayerId.TryGetValue(id, out IAInstance instance) && instance != null && instance.DifficultyIA == difficulty;
@@ -45,12 +62,21 @@ public class IAInstance : MonoBehaviour
     private float decisionTimer;
     private int playerId = -1;
 
+    /// <summary>
+    /// Configure cette instance d'IA avec un nouvel identifiant de joueur et une difficulté.
+    /// </summary>
+    /// <param name="newPlayerId">Nouvel identifiant du joueur (min 1).</param>
+    /// <param name="newDifficulty">Nouvelle difficulté (clampée entre 1 et 2).</param>
     public void Configure(int newPlayerId, int newDifficulty)
     {
         configuredPlayerId = Mathf.Max(1, newPlayerId);
         difficultyIA = Mathf.Clamp(newDifficulty, 1, 2);
     }
 
+    /// <summary>
+    /// Initialisation au chargement : récupère les singletons et crée
+    /// un composant de production si nécessaire.
+    /// </summary>
     private void Awake()
     {
         if (playerManager == null)
@@ -73,6 +99,10 @@ public class IAInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Démarrage de l'instance : enregistre l'IA pour le joueur, crée une session
+    /// joueur et initialise la production si nécessaire.
+    /// </summary>
     private void Start()
     {
         playerId = Mathf.Max(1, configuredPlayerId);
@@ -90,6 +120,10 @@ public class IAInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Tick principal appelé chaque frame : maintient les références, met à jour
+    /// la logique de production et gère le timer de décision de l'IA.
+    /// </summary>
     private void Update()
     {
         if (playerManager == null)
@@ -125,6 +159,10 @@ public class IAInstance : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Nettoyage lors de la destruction : retire l'instance du dictionnaire global
+    /// si elle correspond à cette IA.
+    /// </summary>
     private void OnDestroy()
     {
         if (instancesByPlayerId.TryGetValue(playerId, out IAInstance current) && current == this)

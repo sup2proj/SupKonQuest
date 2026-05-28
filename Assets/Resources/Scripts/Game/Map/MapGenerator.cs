@@ -51,17 +51,26 @@ public class MapGenerator : MonoBehaviour
     private Transform structuresFolder;
     private Transform natureFolder;
 
+    /// <summary>
+    /// Initialise l'instance singleton du MapGenerator.
+    /// </summary>
     void Awake()
     {
         Instance = this;
     }
 
+    /// <summary>
+    /// Nettoie l'instance singleton lors de la destruction de l'objet.
+    /// </summary>
     void OnDestroy()
     {
         if (Instance == this)
             Instance = null;
     }
 
+    /// <summary>
+    /// Méthode Start (placeholder) — la génération est déclenchée explicitement via LoadAndGenerate.
+    /// </summary>
     void Start()
     {
         // LoadAndGenerate("EUROPE");
@@ -69,6 +78,10 @@ public class MapGenerator : MonoBehaviour
         // LoadAndGenerate("LOL");
     }
 
+    /// <summary>
+    /// Charge les ressources de la carte depuis le dossier et génère la géométrie, place les structures
+    /// et bake le NavMesh. Appelle OnMapReady lorsque terminé.
+    /// </summary>
     public void LoadAndGenerate(string folderName)
     {
         SetupResources();
@@ -127,6 +140,9 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Récupère un enfant Transform existant portant le nom demandé ou crée un nouveau GameObject.
+    /// </summary>
     private Transform GetOrCreateFolder(string name)
     {
         Transform existing = transform.Find(name);
@@ -138,6 +154,9 @@ public class MapGenerator : MonoBehaviour
         return folder.transform;
     }
 
+    /// <summary>
+    /// Génère la grille de tuiles à partir de la texture mapLayout et instancie les GameObjects de sol.
+    /// </summary>
     void GenerateWorld()
     {
         allTiles = new TileData[mapWidth, mapHeight];
@@ -170,6 +189,9 @@ public class MapGenerator : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Tente d'obtenir la TileData correspondant à une position monde donnée.
+    /// </summary>
     public bool TryGetTileAtWorldPosition(Vector3 worldPosition, out TileData tile)
     {
         tile = null;
@@ -187,6 +209,9 @@ public class MapGenerator : MonoBehaviour
         return tile != null;
     }
 
+    /// <summary>
+    /// Configure le layer, le NavMeshModifier et les paramètres de navigation pour la tuile passée.
+    /// </summary>
     private void ConfigureTileNavigation(GameObject tileObject, GroundType type)
     {
         if (tileObject == null)
@@ -206,6 +231,9 @@ public class MapGenerator : MonoBehaviour
             modifier.area = area;
     }
 
+    /// <summary>
+    /// Applique récursivement le layer à l'objet et tous ses enfants.
+    /// </summary>
     private void SetLayerRecursively(GameObject target, int layer)
     {
         target.layer = layer;
@@ -214,6 +242,9 @@ public class MapGenerator : MonoBehaviour
             SetLayerRecursively(child.gameObject, layer);
     }
 
+    /// <summary>
+    /// Place les structures définies dans les données JSON (châteaux, ports, etc.).
+    /// </summary>
     void PlaceStructures(MapJsonData data)
     {
         SpawnStructureGroup(data.startPoints, StructureCastle, StructureType.Structure, 1, spawnProtectorOnStart: true);
@@ -222,6 +253,9 @@ public class MapGenerator : MonoBehaviour
         SpawnStructureGroup(data.special, StructureSpecial, StructureType.NeutralStructure, 1, spawnProtectorOnStart: true);
     }
 
+    /// <summary>
+    /// Instancie un groupe de structures à partir d'une liste de PointData en initialisant les StructureInstance.
+    /// </summary>
     void SpawnStructureGroup(List<PointData> points, GameObject prefab, StructureType type, int income, bool spawnProtectorOnStart = false)
     {
         if (points == null || prefab == null) return;
@@ -287,6 +321,9 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Bloque la pose de nature autour d'une structure en définissant CanPlaceNature=false dans un rayon.
+    /// </summary>
     void BlockNature(int x, int y)
     {
         int voisinX = 0;
@@ -306,6 +343,9 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Parcourt les tuiles et instancie des arbres aléatoirement sur les tuiles éligibles.
+    /// </summary>
     void AddNature()
     {
         for (int x = 0; x < mapWidth; x++)
@@ -342,11 +382,17 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Compare deux couleurs en ne tenant compte que des composantes R,G,B.
+    /// </summary>
     bool IsColor(Color32 c1, Color32 c2)
     {
         return c1.r == c2.r && c1.g == c2.g && c1.b == c2.b;
     }
 
+    /// <summary>
+    /// Retourne le GroundType et le prefab associé selon la couleur de la texture de map.
+    /// </summary>
     (GroundType type, GameObject prefab) GetGroundDatas(Color32 c)
     {
         if (IsColor(c, _colorWater)) return (GroundType.Water, groundWater);
@@ -355,6 +401,9 @@ public class MapGenerator : MonoBehaviour
         return (GroundType.Grass, groundGrass);
     }
 
+    /// <summary>
+    /// Charge depuis Resources les prefabs nécessaires si certaines références ne sont pas assignées.
+    /// </summary>
     void SetupResources()
     {
         string environmentPath = "Prefabs/Environment/";
