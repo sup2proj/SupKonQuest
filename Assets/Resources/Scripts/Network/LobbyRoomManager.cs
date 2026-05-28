@@ -342,7 +342,7 @@ public class LobbyRoomManager : MonoBehaviour
             };
             currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
             
-            RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
+            RelayServerData relayServerData = new RelayServerData(allocation, "udp");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             NetworkManager.Singleton.StartHost();
             
@@ -374,7 +374,7 @@ public class LobbyRoomManager : MonoBehaviour
                         JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
                         Debug.Log("Client connecté au Relay");
                         
-                        RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+                        RelayServerData relayServerData = new RelayServerData(joinAllocation, "udp");
                         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                         
                         NetworkManager.Singleton.StartClient();
