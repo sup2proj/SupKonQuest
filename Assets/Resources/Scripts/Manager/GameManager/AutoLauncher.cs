@@ -55,7 +55,7 @@ public class AutoLauncher : MonoBehaviour
     /// <summary>
     /// Demande le lancement d'une partie avec les paramètres fournis.
     /// </summary>
-    public static void Request(string folder, int aiCount = 1, int aiDifficulty = 2, int mapSeed)
+    public static void Request(string folder, int aiCount = 1, int aiDifficulty = 2, int mapSeed = -1)
     {
         pendingMapFolder = string.IsNullOrWhiteSpace(folder) ? "TEST" : folder;
         pendingAiCount = Mathf.Max(0, aiCount);
