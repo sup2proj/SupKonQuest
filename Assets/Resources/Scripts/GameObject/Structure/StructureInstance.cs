@@ -126,7 +126,6 @@ public partial class StructureInstance : MonoBehaviour
         if (!Input.GetMouseButtonDown(0))
             return;
 
-        // Ignorer les clics sur l'UI
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;
 
@@ -135,31 +134,21 @@ public partial class StructureInstance : MonoBehaviour
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         
-        // Utiliser RaycastAll pour trouver TOUS les colliders, y compris les Triggers
         RaycastHit[] hits = Physics.RaycastAll(ray);
-        
-        Debug.Log($"[StructureClick] Raycasting detecte {hits.Length} colliders");
-
         StructureInstance closestStructure = null;
         float closestDistance = float.MaxValue;
 
-        // Parcourir tous les hits et trouver la structure la plus proche
         for (int i = 0; i < hits.Length; i++)
         {
             RaycastHit hit = hits[i];
-            Debug.Log($"[StructureClick] Hit {i}: {hit.collider.gameObject.name} a distance {hit.distance}");
-
-            // Chercher une StructureInstance sur ce collider ou ses parents
             StructureInstance structure = hit.collider.GetComponent<StructureInstance>();
             if (structure == null)
             {
                 structure = hit.collider.GetComponentInParent<StructureInstance>();
             }
 
-            // Garder la structure la plus proche
             if (structure != null && hit.distance < closestDistance)
             {
-                Debug.Log($"[StructureClick] Structure trouvee: {structure.name} a distance {hit.distance}");
                 closestStructure = structure;
                 closestDistance = hit.distance;
             }
@@ -167,13 +156,10 @@ public partial class StructureInstance : MonoBehaviour
 
         if (closestStructure != null)
         {
-            Debug.Log($"[StructureClick] Selection: {closestStructure.name}");
             closestStructure.OnStructureClicked();
         }
         else
         {
-            // Le clic n'a touche aucune structure - deselectionner si une structure est selectionnee
-            Debug.Log($"[StructureClick] Aucune structure trouvee");
             if (currentlySelected != null)
             {
                 currentlySelected.UnSelected();
@@ -184,32 +170,17 @@ public partial class StructureInstance : MonoBehaviour
     }
 
     /// <summary>
-    /// Appele quand cette structure est cliquee
-    /// </summary>
-    /// <summary>
     /// Traite la sélection d'une structure après un clic.
     /// </summary>
     private void OnStructureClicked()
     {
-        Debug.Log($"[{name}] Structure cliquee (PlayerId: {playerId})");
         int currentPlayerId = PlayerManager.Instance.GetActivePlayerId();
-        Debug.Log($"[{name}] PlayerActif: {currentPlayerId}");
 
         if (Defeat.IsPlayerDefeated(currentPlayerId))
-        {
-            Debug.Log($"[{name}] Selection refusee: le joueur {currentPlayerId} est elimine.");
             return;
-        }
         
         if (playerId == currentPlayerId)
-        {
-            Debug.Log($"[{name}] Selection accordee!");
             Selected();
-        }
-        else
-        {
-            Debug.Log($"[{name}] Selection refusee (PlayerId: {playerId} != {currentPlayerId})");
-        }
     }
 
     /// <summary>
@@ -218,10 +189,7 @@ public partial class StructureInstance : MonoBehaviour
     private void InitHealthBar()
     {
         if (healthBar == null)
-        {
-            Debug.LogWarning($"[StructureInstance] {name} : healthBar non assignee dans l'inspector.", this);
             return;
-        }
 
         healthBar.transform.localPosition = (1.1f * Vector3.up);
         healthBar.SetMaxHealth(health);
@@ -251,25 +219,18 @@ public partial class StructureInstance : MonoBehaviour
             if (IAInstance.IsAIPlayer(playerId))
             {
                 if (unitQueue.Count >= maxQueueSize)
-                {
-                    Debug.LogWarning($"[StructureInstance] {name} cannot enqueue protector {type}: protector-queue full ({unitQueue.Count}/{maxQueueSize}).");
                     return;
-                }
             }
         }
 
         if (unitQueue.Count >= maxQueueSize)
-        {
-            Debug.LogWarning($"[StructureInstance] {name} cannot enqueue {type}: queue full ({unitQueue.Count}/{maxQueueSize}).");
             return;
-        }
         
         UnitData data = StructureManager.Instance.unitData.Find(d => d.type == type);
         if (data != null)
         {
             unitQueue.Enqueue(data);
             unitQueueProtectorFlags.Enqueue(isProtector);
-            Debug.Log($"[StructureInstance] {name} : Enqueued unit {type} (isProtector={isProtector}). QueueSize={unitQueue.Count}");
         }
     }
 
@@ -286,7 +247,6 @@ public partial class StructureInstance : MonoBehaviour
                 bool isProtector = false;
                 if (unitQueueProtectorFlags.Count > 0)
                     isProtector = unitQueueProtectorFlags.Dequeue();
-                Debug.Log($"[StructureInstance] {name} : Dequeued unit {data?.type.ToString() ?? "null"} (isProtector={isProtector}). RemainingQueue={unitQueue.Count}");
                 if (data == null)
                 {
                     yield return null;
@@ -307,8 +267,6 @@ public partial class StructureInstance : MonoBehaviour
                         isProtector,
                         this
                     );
-
-                    Debug.Log($"[StructureInstance] {name} : Spawn queued unit {data.type} (protector={isProtector}) -> {(spawned ? "OK" : "FAILED")}");
                 }
             }
 
@@ -321,23 +279,15 @@ public partial class StructureInstance : MonoBehaviour
     /// </summary>
     public void Selected()
     {
-        Debug.Log($"Structure {name} selectionnee (Type: {structureType}).");
-
-        // Si une autre structure etait deja selectionnee, on la deselectionne
         if (currentlySelected != null && currentlySelected != this)
         {
             currentlySelected.UnSelected();
         }
 
-        // Cette structure devient la structure selectionnee
         currentlySelected = this;
 
         if (outline != null)
             outline.enabled = true;
-        else
-            Debug.LogWarning($"[StructureInstance] Composant Outline manquant sur {name}.");
-
-        // Transmettre les coordonnees de la structure a l'ActionInterface
         ActionInterface.SetSelectedStructure(this, structurePosition);
         ActionInterface.ShowStructureButtons(structureType);
 
@@ -355,13 +305,9 @@ public partial class StructureInstance : MonoBehaviour
 
             foreach (var t in uniqueTypes)
                 if (structureType == StructureType.NeutralStructure)
-                {
                     InterfaceInstance.Instance.showUnitsNextToStructure(t, true);
-                }
                 else
-                {
                     InterfaceInstance.Instance.showUnitsNextToStructure(t, false);
-                }
         }
     }
 
@@ -370,15 +316,11 @@ public partial class StructureInstance : MonoBehaviour
     /// </summary>
     public void UnSelected()
     {
-        Debug.Log($"Structure {name} deselectionnee.");
-
-        // Si c'est la structure actuellement selectionnee, on efface la reference
         if (currentlySelected == this)
         {
             currentlySelected = null;
         }
 
-        // Restaure la couleur du batiment
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)
             renderer.material.color = Color.white;
@@ -423,12 +365,10 @@ public partial class StructureInstance : MonoBehaviour
         {
             if (unit == null) continue;
             if (unit.playerId != playerId) continue;
-            Debug.Log($"Checking unit {unit.name} at position {unit.transform.position} against structure {name} at position {center} with radius {radius}.");
             Vector3 d = unit.transform.position - center;
             if (d.sqrMagnitude <= r2)
             {
                 result.Add(unit);
-                Debug.Log($"Unit {unit.name} is within radius {radius} of structure {name}.");
             }
         }
 
@@ -443,7 +383,6 @@ public partial class StructureInstance : MonoBehaviour
         return GetUnitsWithinRadius(unitsFarRadius);
     }
 
-    // Centralise l'application du nom de territoire et adapte la couleur selon le playerId
     /// <summary>
     /// Applique ou met à jour le nom du territoire affiché par la structure.
     /// </summary>

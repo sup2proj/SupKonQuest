@@ -55,15 +55,11 @@ public partial class UnitsAnimation : MonoBehaviour
         if (movementManager != null)
         {
             movementManager.OnMovementComplete += OnMovementCompleted;
-            // Les méthodes d'attaque, de mouvement et de gestion des spells ont été déplacées
-            // dans des fichiers partiels séparés : Attack.cs, Movement.cs et Spell.cs.
-            // Elles sont toujours accessibles via cette classe partielle `UnitsAnimation`.
         }
     }
 
     void Update()
     {
-        // Les méthodes appelées sont définies dans les fichiers partiels
         HandleAutoAttack();
         RefreshMovingArcherModel();
     }
@@ -84,7 +80,6 @@ public partial class UnitsAnimation : MonoBehaviour
     /// </summary>
     private void SetAttackVisuals(bool visible)
     {
-        // SetAttackAnimationState est défini dans la partie Attack.cs
         SetAttackAnimationState(visible);
         SetObjectModelVisible(visible);
     }

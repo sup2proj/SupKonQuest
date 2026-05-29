@@ -1,13 +1,3 @@
-// Si l'ia est attaqué alors elle essaie de créer des unités qui défendent sa structure
-
-// Le pourcentage de création d'unité protectrice augmente considérablement
-
-// Et on créer des unités uniquement dans la structure attaqué 
-
-// Il suffit qu'elle recoit un seul dégat pour déclencher plein de création d'unité dans la structure
-
-// L'ia va envoyer va avoir un rayon dans laquelle on va rappeler toutes les unités pour attaquer l'unité qui attaque. On se servira des methodes qu'il y a dans unitsregistry et structure manager
-
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,22 +53,6 @@ public class NormalDefense : MonoBehaviour
         }
 
         CallUnitsInRadiusForProtect();
-    }
-
-    /// <summary>
-    /// Appelée pour indiquer que la période de défense est terminée. Réinitialise
-    /// l'état si le délai de défense est écoulé.
-    /// </summary>
-    public void MyStructureDefended()
-    {
-        if (!isDefending)
-            return;
-
-        if (Time.time < defendUntilTime)
-            return;
-
-        isDefending = false;
-        lastAttacker = null;
     }
 
     /// <summary>
@@ -168,16 +142,11 @@ public class NormalDefense : MonoBehaviour
         }
 
         string typesStr = nearbyTypes.Count > 0 ? string.Join(",", nearbyTypes.Select(t => t.ToString())) : "<none>";
-        Debug.Log($"[NormalDefense] Nearby ally types for {structureInstance.name}: {typesStr}");
 
         var allUnitDatas = StructureManager.Instance.unitData;
         if (allUnitDatas == null || allUnitDatas.Count == 0)
-        {
-            Debug.LogWarning($"[NormalDefense] {structureInstance.name} No unitData configured in StructureManager.");
             return;
-        }
 
-        // Première passe: sélectionner les types qui sont présents à proximité (préférence)
         List<UnitData> candidates = new List<UnitData>();
         for (int i = 0; i < allUnitDatas.Count; i++)
         {
@@ -189,7 +158,6 @@ public class NormalDefense : MonoBehaviour
             }
         }
 
-        // Si aucun candidat correspondant aux types proches, fallback sur les unitDatas marquées isProtector
         if (candidates.Count == 0)
         {
             for (int i = 0; i < allUnitDatas.Count; i++)
@@ -201,7 +169,6 @@ public class NormalDefense : MonoBehaviour
             }
         }
 
-        // Dernier fallback: toutes les unités de combat disponibles
         if (candidates.Count == 0)
         {
             for (int i = 0; i < allUnitDatas.Count; i++)
@@ -216,55 +183,13 @@ public class NormalDefense : MonoBehaviour
         }
 
         if (candidates.Count == 0)
-        {
-            Debug.LogWarning($"[NormalDefense] {structureInstance.name} no valid protector candidates found.");
             return;
-        }
 
         int spawnCount = Mathf.Max(1, Mathf.CeilToInt(protectSpawnMultiplier));
-        Debug.Log($"[NormalDefense] {structureInstance.name} will enqueue {spawnCount} protectors (candidates={candidates.Count}).");
         for (int i = 0; i < spawnCount; i++)
         {
             UnitData chosen = candidates[Random.Range(0, candidates.Count)];
             structureInstance.AddToQueue(chosen.type, true);
-            Debug.Log($"[NormalDefense] enqueued protector {chosen.type} in structure {structureInstance.name} (isProtector=true)");
         }
-    }
-
-    /// <summary>
-    /// Force le spawn immédiat d'une unité protectrice pour débogage ou
-    /// situation d'urgence (choisit un type de combat disponible).
-    /// </summary>
-    public void ForceSpawnProtectorNow()
-    {
-        if (structureInstance == null || StructureManager.Instance == null)
-        {
-            Debug.LogWarning("[NormalDefense] Cannot force spawn: missing references.");
-            return;
-        }
-
-        var allUnitDatas = StructureManager.Instance.unitData;
-        if (allUnitDatas == null || allUnitDatas.Count == 0)
-        {
-            Debug.LogWarning("[NormalDefense] No unitData available to spawn.");
-            return;
-        }
-
-        // pick any combat unit as protector for debug
-        UnitData chosen = allUnitDatas.FirstOrDefault(d => d != null && d is UnitCombatData && d.type != UnitsType.Support && d.type != UnitsType.Healer);
-        if (chosen == null)
-        {
-            chosen = allUnitDatas.FirstOrDefault(d => d != null);
-        }
-
-        if (chosen == null)
-        {
-            Debug.LogWarning("[NormalDefense] No candidate found for forced spawn.");
-            return;
-        }
-
-        Vector3 pos = structureInstance != null ? structureInstance.StructurePosition : transform.position;
-        bool spawned = StructureManager.Instance.SpawnUnitByTypeAtPosition(structureInstance.playerId, chosen.type, pos.x, pos.z, false, true, structureInstance);
-        Debug.Log($"[NormalDefense] ForceSpawnProtectorNow: tried to spawn {chosen.type} -> {(spawned ? "OK" : "FAILED")}");
     }
 }

@@ -94,9 +94,6 @@ public class AutoLauncher : MonoBehaviour
     /// <summary>
     /// Crée et lance la partie : génère la map, configure les camps et la caméra.
     /// </summary>
-    /// <summary>
-    /// Crée et lance la partie : génère la map, configure les camps et la caméra.
-    /// </summary>
     public void CreateGame(string mapFolderName = "TEST", int aiCount = 1, int aiDifficulty = 2)
     {
         // On récupère la graine (par défaut au hasard pour le local)

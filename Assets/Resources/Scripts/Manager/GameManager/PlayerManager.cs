@@ -17,8 +17,6 @@ public class PlayerManager : MonoBehaviour
 
     [Header("Active player (runtime)")]
     [SerializeField, Min(1)] private int activePlayerId = 1;
-    public int ActivePlayerId => activePlayerId;
-    
     private float timer = 0f;
 
 
@@ -166,7 +164,6 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    // Recherche par nom de type dans tous les assemblies chargés
     /// <summary>
     /// Recherche un type par nom dans tous les assemblys chargés.
     /// </summary>
@@ -196,7 +193,6 @@ public class PlayerManager : MonoBehaviour
         return null;
     }
 
-    // Fournit une couleur de sélection/identification pour un playerId
     /// <summary>
     /// Fournit une couleur associée à un identifiant de joueur.
     /// </summary>

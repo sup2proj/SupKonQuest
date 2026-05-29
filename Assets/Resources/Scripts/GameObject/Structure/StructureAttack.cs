@@ -33,7 +33,6 @@ public class StructureAttack : MonoBehaviour
         if (Time.time - lastAttackTime < attackCooldown)
             return;
 
-        // Scan toutes les unités ennemies dans le rayon
         UnitInstance[] allUnits = FindObjectsByType<UnitInstance>(FindObjectsSortMode.None);
         foreach (UnitInstance unit in allUnits)
         {
@@ -48,7 +47,7 @@ public class StructureAttack : MonoBehaviour
             {
                 lastAttackTime = Time.time;
                 ShootAt(unit);
-                break; // une seule cible à la fois
+                break;
             }
         }
     }

@@ -3,7 +3,7 @@ using System.Collections;
 
 /// <summary>
 /// Méthodes liées aux attaques (corps-à-corps, projectiles, mortier) de l'unité.
-/// Ce fichier contient la partie attaque de la classe partielle `UnitsAnimation`.
+/// Ce fichier contient la partie attaque de la classe `UnitsAnimation`.
 /// </summary>
 public partial class UnitsAnimation : MonoBehaviour
 {
@@ -34,17 +34,10 @@ public partial class UnitsAnimation : MonoBehaviour
 	{
 		UnitInstance unit = cachedUnit;
 		if (!CanAttackWithDamage(unit))
-		{
-			Debug.Log("[UnitsAnimation] StartAttackWithDamage ignored for support/healer " + gameObject.name, this);
 			return;
-		}
 
 		if (attackTarget == null)
-		{
-			Debug.LogWarning("[StartAttackWithDamage] attackTarget null");
 			return;
-		}
-
 		BeginAttackLoop();
 	}
 
@@ -192,7 +185,6 @@ public partial class UnitsAnimation : MonoBehaviour
                 float dist = Vector3.Distance(hitUnit.transform.position, impactPos);
                 if (dist <= impactRadius)
                 {
-                    Debug.Log($"[Mortar] Dégâts sur {hitUnit.name} (dist={dist:F2})");
                     float damageMultiplier = 1f + (impactRadius - dist);
                     hitUnit.TakeDamage(attack * damageMultiplier);
                     UnitsAnimation anim = hitUnit.GetComponent<UnitsAnimation>();
@@ -437,16 +429,10 @@ public partial class UnitsAnimation : MonoBehaviour
 	{
 		UnitInstance attacker = cachedUnit;
 		if (attacker == null)
-		{
-			Debug.LogError("attacker NULL");
 			return 0f;
-		}
 
 		if (!(attacker.unitData is UnitCombatData combatData))
-		{
-			Debug.LogError("attacker.unitData NULL");
 			return 0f;
-		}
 
 		if (targetStructure != null)
 		{
@@ -457,22 +443,13 @@ public partial class UnitsAnimation : MonoBehaviour
 		}
 
 		if (targetUnit == null)
-		{
-			Debug.LogError("target NULL");
 			return 0f;
-		}
 
 		if (targetUnit.unitData == null)
-		{
-			Debug.LogError("target.unitData NULL");
 			return 0f;
-		}
 
 		if (damageTable == null)
-		{
-			Debug.LogError("damageTable NULL");
 			return 0f;
-		}
 
 		float damage = combatData.attack * damageTable.GetMultiplier(attacker, targetUnit);
 		return Mathf.Max(0f, damage);

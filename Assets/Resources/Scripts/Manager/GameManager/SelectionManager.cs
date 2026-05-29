@@ -169,108 +169,83 @@ public class SelectionManager : MonoBehaviour
     /// Envoie un ordre de déplacement de groupe vers la position cliquée.
     /// </summary>
     private void TryIssueGroupMoveOrder()
-{
-    if (IsActivePlayerDefeated())
-        return;
-
-    if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0 || Camera.main == null)
-        return;
-
-    Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-    if (!Physics.Raycast(ray, out RaycastHit hit))
-        return;
-
-    int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
-    List<UnitInstance> groupUnits = CollectSelectedPlayerUnits(activePlayerId);
-
-    if (groupUnits.Count == 0)
-        return;
-
-    List<Vector3> slots = GetFormationPositions(hit.point, groupUnits.Count);
-
-    for (int i = 0; i < groupUnits.Count; i++)
     {
-        UnitInstance unit = groupUnits[i];
-        Vector3 destination = slots[i];
-        destination.y = unit.transform.position.y;
-        MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, destination, groupMoveStoppingDistance);
+        if (IsActivePlayerDefeated())
+            return;
+
+        if (CurrentlySelectedObjects == null || CurrentlySelectedObjects.Count == 0 || Camera.main == null)
+            return;
+
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        if (!Physics.Raycast(ray, out RaycastHit hit))
+            return;
+
+        int activePlayerId = PlayerManager.Instance.GetActivePlayerId();
+        List<UnitInstance> groupUnits = CollectSelectedPlayerUnits(activePlayerId);
+
+        if (groupUnits.Count == 0)
+            return;
+
+        List<Vector3> slots = GetFormationPositions(hit.point, groupUnits.Count);
+
+        for (int i = 0; i < groupUnits.Count; i++)
+        {
+            UnitInstance unit = groupUnits[i];
+            Vector3 destination = slots[i];
+            destination.y = unit.transform.position.y;
+            MovementManager.Instance.MoveBoatsUnitToPositionAsGroup(unit, destination, groupMoveStoppingDistance);
+        }
     }
-}
 
     /// <summary>
     /// Génère des positions de formation autour d'un point central.
     /// </summary>
-private List<Vector3> GetFormationPositions(Vector3 center, int total)
-{
-    List<Vector3> slots = new List<Vector3>();
-
-    if (total == 1)
+    private List<Vector3> GetFormationPositions(Vector3 center, int total)
     {
-        slots.Add(SampleNavMesh(center));
-        return slots;
-    }
+        List<Vector3> slots = new List<Vector3>();
 
-    float unitSpacing = 1f; // distance entre deux unités voisines
-
-    // Cercle 0 : le centre lui-même
-    slots.Add(SampleNavMesh(center));
-    if (slots.Count >= total) return slots;
-
-    // Cercles concentriques
-    int ring = 1;
-    while (slots.Count < total)
-    {
-        float radius = ring * unitSpacing;
-        // Nombre d'unités qui tiennent sur ce cercle (circonférence / espacement)
-        int unitsOnRing = Mathf.Max(1, Mathf.RoundToInt(2f * Mathf.PI * radius / unitSpacing));
-        int toPlace = Mathf.Min(unitsOnRing, total - slots.Count);
-
-        for (int i = 0; i < toPlace; i++)
+        if (total == 1)
         {
-            float angle = i * (360f / unitsOnRing) * Mathf.Deg2Rad;
-            Vector3 candidate = center + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
-            slots.Add(SampleNavMesh(candidate));
+            slots.Add(SampleNavMesh(center));
+            return slots;
         }
 
-        ring++;
-    }
+        float unitSpacing = 1f; // distance entre deux unités voisines
 
-    return slots;
-}
+        // Cercle 0 : le centre lui-même
+        slots.Add(SampleNavMesh(center));
+        if (slots.Count >= total) return slots;
+
+        // Cercles concentriques
+        int ring = 1;
+        while (slots.Count < total)
+        {
+            float radius = ring * unitSpacing;
+            // Nombre d'unités qui tiennent sur ce cercle (circonférence / espacement)
+            int unitsOnRing = Mathf.Max(1, Mathf.RoundToInt(2f * Mathf.PI * radius / unitSpacing));
+            int toPlace = Mathf.Min(unitsOnRing, total - slots.Count);
+
+            for (int i = 0; i < toPlace; i++)
+            {
+                float angle = i * (360f / unitsOnRing) * Mathf.Deg2Rad;
+                Vector3 candidate = center + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+                slots.Add(SampleNavMesh(candidate));
+            }
+
+            ring++;
+        }
+
+        return slots;
+    }
 
     /// <summary>
     /// Ajuste une position candidate sur le NavMesh si possible.
     /// </summary>
-private Vector3 SampleNavMesh(Vector3 candidate)
-{
-    if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 2f, NavMesh.AllAreas))
-        return hit.position;
-    return candidate;
-}
-
-    /// <summary>
-    /// Retourne l'unité la plus proche d'un point donné.
-    /// </summary>
-    private UnitInstance GetClosestUnitToPoint(List<UnitInstance> units, Vector3 point)
+    private Vector3 SampleNavMesh(Vector3 candidate)
     {
-        UnitInstance closest = null;
-        float bestDistSq = float.MaxValue;
-
-        for (int i = 0; i < units.Count; i++)
-        {
-            UnitInstance unit = units[i];
-            if (unit == null)
-                continue;
-
-            float distSq = (unit.transform.position - point).sqrMagnitude;
-            if (distSq < bestDistSq)
-            {
-                bestDistSq = distSq;
-                closest = unit;
-            }
-        }
-
-        return closest;
+        if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+            return hit.position;
+        return candidate;
     }
 
     /// <summary>
@@ -428,7 +403,7 @@ private Vector3 SampleNavMesh(Vector3 candidate)
     }
 
     /// <summary>
-    /// Recherche le meilleur point de rendez-vous entre la rive et le bateau.
+    /// Recherche le meilleur point de rendez-vous entre la rive et le bateau quand on veut déposer les unités d'un bateau.
     /// </summary>
     private bool TryFindBestShoreRendezvous(List<UnitInstance> landUnits, UnitInstance targetBoat, out Vector3 landDestination, out Vector3 waterDestination)
     {
@@ -628,10 +603,6 @@ private Vector3 SampleNavMesh(Vector3 candidate)
             InterfaceInstance.Instance.RefreshBuffIconsForSelection();
     }
 
-    // Règle d'ordre d'attaque/déplacement :
-    // - Si la sélection contient uniquement des Supports/Healers => on consomme le clic mais on ne déplace personne.
-    // - Si la sélection contient au moins une unité de combat => on déplace TOUTES les unités valides (combat + support + healer)
-    //   vers la cible ennemie. Les unités de combat s'arrêtent à leur attackRange, les autres suivent sans portée propre.
     /// <summary>
     /// Tente d'envoyer un ordre d'attaque sur l'unité ou la structure sous la souris.
     /// </summary>
@@ -830,7 +801,7 @@ private Vector3 SampleNavMesh(Vector3 candidate)
     }
 
     /// <summary>
-    /// Vérifie si la sélection contient au moins une unité de combat.
+    /// Vérifie si la sélection contient au moins une unité de combat. Pour vérifier si on peut lancer l'attaque
     /// </summary>
     private bool SelectionHasCombatUnit(List<UnitInstance> units)
     {
