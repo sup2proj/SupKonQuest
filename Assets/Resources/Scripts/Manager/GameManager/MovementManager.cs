@@ -2,8 +2,9 @@ using Enums.Environment;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
-public class MovementManager : MonoBehaviour
+public class MovementManager : NetworkBehaviour
 {
     public static MovementManager Instance;
 
@@ -66,20 +67,33 @@ public class MovementManager : MonoBehaviour
 
     /// <summary>
     /// Gère les entrées de déplacement et met à jour le comportement de mouvement.
+    /// Bloque la physique chez le client pour laisser l'autorité au Serveur.
     /// </summary>
     private void Update()
     {
         if (SelectionManager.Instance == null)
             HandleMouseClick();
 
+        // Seul le Serveur (l'Hôte) a le droit de faire bouger l'objet ou de calculer le chemin NavMesh.
+        // Les Clients se contentent de regarder l'objet bouger grâce au NetworkTransform !
+        if (NetworkManager.Singleton != null && IsClient && !IsServer)
+        {
+            UpdateMovementAnimation(); // Le client gère juste ses animations visuelles
+            return;
+        }
+
         HandleMovement();
     }
 
     /// <summary>
-    /// Déplace l'unité vers la position cliquée avec le bouton droit.
+    /// Déplace l'unité vers la position cliquée avec le bouton droit si le joueur en est le propriétaire.
     /// </summary>
     private void HandleMouseClick()
     {
+        // Seul le propriétaire de l'unité peut lui donner des ordres
+        if (unitInstance == null || unitInstance.playerId != PlayerManager.Instance.GetActivePlayerId()) 
+            return;
+
         if (Mouse.current == null || Camera.main == null)
             return;
 
@@ -92,21 +106,94 @@ public class MovementManager : MonoBehaviour
 
         Vector3 destination = hit.point;
         destination.y = transform.position.y;
+        
         MoveToPosition(destination, stoppingDistance);
     }
 
     /// <summary>
-    /// Orchestre la mise à jour du déplacement selon le mode disponible.
+    /// (RÉSEAU) Envoie une requête radio au serveur pour déplacer cette unité vers des coordonnées précises.
+    /// </summary>
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    public void RequestMoveToPositionServerRpc(Vector3 destination, float stopDistance)
+    {
+        // Le Serveur reçoit l'ordre et le fait exécuter !
+        MoveToPosition(destination, stopDistance);
+    }
+
+    /// <summary>
+    /// Lance un déplacement vers une position du monde autorisée. 
+    /// Relaie automatiquement l'ordre au serveur si appelé par un Client.
+    /// </summary>
+    public void MoveToPosition(Vector3 destination, float stopDistance)
+    {
+        if (NetworkManager.Singleton != null && IsClient && !IsServer)
+        {
+            // Je suis un Client : j'envoie l'ordre par radio au Serveur
+            RequestMoveToPositionServerRpc(destination, stopDistance);
+            return;
+        }
+
+        // La suite s'exécute uniquement sur le Serveur (ou en mode Solo)
+        if (!CanMoveOnWorldPosition(destination)) 
+            return;
+
+        SetPositionDestination(destination, stopDistance, clearPendingBoarding: true);
+    }
+
+    /// <summary>
+    /// Lance un déplacement de groupe vers une position donnée.
+    /// </summary>
+    public void MoveToPositionAsGroup(Vector3 destination, float stopDistance)
+    {
+        StopAttackForMovement();
+        MoveToPosition(destination, stopDistance);
+    }
+
+    /// <summary>
+    /// (RÉSEAU) Envoie une requête radio au serveur pour que cette unité suive/attaque une cible réseau.
+    /// </summary>
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    public void RequestMoveToTargetServerRpc(ulong networkObjectId, float stopDistance)
+    {
+        // Le serveur retrouve l'objet réseau grâce à son ID unique et lui dit d'attaquer
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject targetNetObj))
+        {
+            MoveToTarget(targetNetObj.transform, stopDistance);
+        }
+    }
+
+    /// <summary>
+    /// Lance un déplacement vers une cible en annulant l'attaque en cours.
+    /// Relaie l'ordre au serveur si la cible est un objet réseau.
+    /// </summary>
+    public void MoveToTarget(Transform target, float stopDistance)
+    {
+        if (NetworkManager.Singleton != null && IsClient && !IsServer)
+        {
+            // Si la cible est un objet réseau (unité, bâtiment), on envoie son ID au serveur
+            NetworkObject targetNetObj = target.GetComponent<NetworkObject>();
+            if (targetNetObj != null)
+            {
+                RequestMoveToTargetServerRpc(targetNetObj.NetworkObjectId, stopDistance);
+            }
+            return;
+        }
+
+        StopAttackForMovement();
+        MoveToTargetInternal(target, Mathf.Max(0f, stopDistance));
+    }
+
+    /// <summary>
+    /// Orchestre la mise à jour du déplacement selon le mode disponible (NavMesh ou Transform).
     /// </summary>
     private void HandleMovement()
     {
         RefreshAgentSettings();
-
-        if (CanUseNavMeshAgent())
+        if (CanUseNavMeshAgent()) 
             HandleNavMeshMovement();
-        else
+        else 
             HandleTransformMovement();
-
+            
         UpdateMovementAnimation();
     }
 
@@ -115,7 +202,7 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     private void HandleNavMeshMovement()
     {
-        if (!isMovingToTarget)
+        if (!isMovingToTarget) 
             return;
 
         if (followTarget != null && followTargetPosition)
@@ -137,9 +224,7 @@ public class MovementManager : MonoBehaviour
     private bool HasReachedAgentDestination()
     {
         float dynamicStoppingDistance = Mathf.Max(agent.stoppingDistance, agent.speed * 0.1f);
-        return !agent.pathPending
-            && agent.remainingDistance <= dynamicStoppingDistance
-            && agent.velocity.sqrMagnitude < AgentStoppedSqrVelocity;
+        return !agent.pathPending && agent.remainingDistance <= dynamicStoppingDistance && agent.velocity.sqrMagnitude < AgentStoppedSqrVelocity;
     }
 
     /// <summary>
@@ -147,12 +232,11 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     private bool IsAgentStuckTimedOut()
     {
-        if (agent.velocity.magnitude >= AgentStuckVelocityThreshold)
-        {
-            stuckTimer = 0f;
-            return false;
+        if (agent.velocity.magnitude >= AgentStuckVelocityThreshold) 
+        { 
+            stuckTimer = 0f; 
+            return false; 
         }
-
         stuckTimer += Time.deltaTime;
         return stuckTimer > AgentStuckTimeout;
     }
@@ -164,28 +248,24 @@ public class MovementManager : MonoBehaviour
     {
         isMovingToTarget = false;
         stuckTimer = 0f;
-
-        if (clearVelocity)
+        if (clearVelocity) 
             agent.velocity = Vector3.zero;
-
         agent.ResetPath();
-
-        if (notifyComplete)
+        if (notifyComplete) 
             NotifyMovementComplete();
     }
 
     /// <summary>
-    /// Met à jour le déplacement manuel basé sur le transform.
+    /// Met à jour le déplacement manuel basé sur le transform (hors NavMesh).
     /// </summary>
     private void HandleTransformMovement()
     {
-        if (!isMovingToTarget)
-        {
-            movement = Vector3.zero;
-            return;
+        if (!isMovingToTarget) 
+        { 
+            movement = Vector3.zero; 
+            return; 
         }
-
-        if (followTarget != null && followTargetPosition)
+        if (followTarget != null && followTargetPosition) 
             targetPosition = followTarget.position;
 
         Vector3 toTarget = targetPosition - transform.position;
@@ -200,7 +280,6 @@ public class MovementManager : MonoBehaviour
         }
 
         movement = toTarget.normalized;
-
         transform.position += movement * GetUnitSpeed() * Time.deltaTime;
         Quaternion targetRotation = Quaternion.LookRotation(movement, Vector3.up);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
@@ -211,20 +290,27 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     private void UpdateMovementAnimation()
     {
-        if (animator == null)
+        if (animator == null) 
             return;
-
         animator.SetBool("isMoving", IsActuallyMoving());
     }
 
     /// <summary>
-    /// Détermine si l'unité est réellement en train de se déplacer.
+    /// Détermine si l'unité est réellement en train de se déplacer physiquement.
     /// </summary>
     private bool IsActuallyMoving()
     {
-        if (CanUseNavMeshAgent())
-            return isMovingToTarget && agent.velocity.magnitude > AnimationMoveVelocityThreshold;
+        // Petite sécurité supplémentaire pour le client qui lit les infos du réseau
+        if (NetworkManager.Singleton != null && IsClient && !IsServer)
+        {
+            // Chez le client, on regarde si le NetworkTransform bouge vraiment physiquement
+            return GetComponent<Rigidbody>() != null && GetComponent<Rigidbody>().linearVelocity.sqrMagnitude > AnimationMoveVelocityThreshold 
+                   || movement.sqrMagnitude > TransformMoveSqrThreshold;
+        }
 
+        if (CanUseNavMeshAgent()) 
+            return isMovingToTarget && agent.velocity.magnitude > AnimationMoveVelocityThreshold;
+            
         return isMovingToTarget && movement.sqrMagnitude > TransformMoveSqrThreshold;
     }
 
@@ -233,9 +319,9 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     private float GetUnitSpeed()
     {
-        if (unitInstance != null && unitInstance.unitData != null && unitInstance.unitData.speed > 0f)
+        if (unitInstance != null && unitInstance.unitData != null && unitInstance.unitData.speed > 0f) 
             return unitInstance.unitData.speed;
-
+            
         return moveSpeed;
     }
 
@@ -244,40 +330,10 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     private void RefreshAgentSettings()
     {
-        if (agent == null)
+        if (agent == null) 
             return;
-
         agent.speed = GetUnitSpeed();
         agent.areaMask = GetAllowedNavMeshAreaMask();
-    }
-
-    /// <summary>
-    /// Lance un déplacement vers une position du monde autorisée.
-    /// </summary>
-    public void MoveToPosition(Vector3 destination, float stopDistance)
-    {
-        if (!CanMoveOnWorldPosition(destination))
-            return;
-
-        SetPositionDestination(destination, stopDistance, clearPendingBoarding: true);
-    }
-
-    /// <summary>
-    /// Lance un déplacement de groupe vers une position donnée.
-    /// </summary>
-    public void MoveToPositionAsGroup(Vector3 destination, float stopDistance)
-    {
-        StopAttackForMovement();
-        MoveToPosition(destination, stopDistance);
-    }
-
-    /// <summary>
-    /// Lance un déplacement vers une cible en annulant l'attaque en cours.
-    /// </summary>
-    public void MoveToTarget(Transform target, float stopDistance)
-    {
-        StopAttackForMovement();
-        MoveToTargetInternal(target, Mathf.Max(0f, stopDistance));
     }
 
     /// <summary>
@@ -286,63 +342,50 @@ public class MovementManager : MonoBehaviour
     private void MoveToTargetInternal(Transform target, float stopDistance)
     {
         BoatTransport.ClearPendingBoarding(unitInstance);
-
         followTarget = target;
         followTargetPosition = false;
 
         Vector3 destination = target != null ? target.position : transform.position;
         if (target != null)
         {
-            StructureInstance structure = target.GetComponent<StructureInstance>();
-            if (structure == null)
-                structure = target.GetComponentInParent<StructureInstance>();
-            if (structure == null)
-                structure = target.GetComponentInChildren<StructureInstance>();
-
-            if (structure != null)
-            {
-                followTargetPosition = false;
-                if (!TryGetApproachDestinationForTarget(target, stopDistance, out destination))
-                    return;
+            StructureInstance structure = target.GetComponent<StructureInstance>() ?? target.GetComponentInParent<StructureInstance>() ?? target.GetComponentInChildren<StructureInstance>();
+            if (structure != null) 
+            { 
+                followTargetPosition = false; 
+                if (!TryGetApproachDestinationForTarget(target, stopDistance, out destination)) 
+                    return; 
             }
-            else if (CanMoveOnWorldPosition(target.position))
-            {
-                followTargetPosition = true;
-                destination = target.position;
+            else if (CanMoveOnWorldPosition(target.position)) 
+            { 
+                followTargetPosition = true; 
+                destination = target.position; 
             }
-            else if (!TryGetApproachDestinationForTarget(target, stopDistance, out destination))
+            else if (!TryGetApproachDestinationForTarget(target, stopDistance, out destination)) 
             {
                 return;
             }
         }
 
-        if (target != null)
+        if (target != null) 
             targetPosition = destination;
-
+            
         StartMovement(GetUnitAttackRange(stopDistance));
-
-        if (target != null)
+        
+        if (target != null) 
             ApplyAgentDestination(destination);
     }
-    
-    // On va chercher le point le plus proche pour que les unités n'aillent pas dans l'eau.
+
     /// <summary>
     /// Cherche un point d'approche valide autour d'une cible pour éviter les zones interdites.
     /// </summary>
     private bool TryGetApproachDestinationForTarget(Transform target, float stopDistance, out Vector3 destination)
     {
         destination = target != null ? target.position : transform.position;
-
-        if (target == null)
+        if (target == null) 
             return false;
 
-        StructureInstance structure = target.GetComponent<StructureInstance>();
-        if (structure == null)
-            structure = target.GetComponentInParent<StructureInstance>();
-        if (structure == null)
-            structure = target.GetComponentInChildren<StructureInstance>();
-
-        if (structure == null)
+        StructureInstance structure = target.GetComponent<StructureInstance>() ?? target.GetComponentInParent<StructureInstance>() ?? target.GetComponentInChildren<StructureInstance>();
+        if (structure == null) 
             return false;
 
         int areaMask = agent != null ? agent.areaMask : NavMesh.AllAreas;
@@ -357,7 +400,6 @@ public class MovementManager : MonoBehaviour
             {
                 float angle = (Mathf.PI * 2f * i) / directionCount;
                 Vector3 candidate = center + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
-
                 if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, NavMeshSampleDistance, areaMask))
                 {
                     destination = hit.position;
@@ -365,13 +407,13 @@ public class MovementManager : MonoBehaviour
                 }
             }
         }
-
-        if (NavMesh.SamplePosition(center, out NavMeshHit centerHit, NavMeshSampleDistance * 2f, areaMask))
-        {
-            destination = centerHit.position;
-            return true;
+        
+        if (NavMesh.SamplePosition(center, out NavMeshHit centerHit, NavMeshSampleDistance * 2f, areaMask)) 
+        { 
+            destination = centerHit.position; 
+            return true; 
         }
-
+        
         return false;
     }
 
@@ -380,9 +422,9 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     private void SetPositionDestination(Vector3 destination, float stopDistance, bool clearPendingBoarding)
     {
-        if (clearPendingBoarding)
+        if (clearPendingBoarding) 
             BoatTransport.ClearPendingBoarding(unitInstance);
-
+            
         followTarget = null;
         followTargetPosition = true;
         targetPosition = destination;
@@ -404,9 +446,9 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     private void ApplyAgentDestination(Vector3 destination)
     {
-        if (!CanUseNavMeshAgent())
+        if (!CanUseNavMeshAgent()) 
             return;
-
+            
         RefreshAgentSettings();
         agent.stoppingDistance = stoppingDistance;
         agent.ResetPath();
@@ -419,35 +461,38 @@ public class MovementManager : MonoBehaviour
     private void StopAttackForMovement()
     {
         UnitsAnimation animatedMover = GetComponent<UnitsAnimation>();
-        if (animatedMover != null)
+        if (animatedMover != null) 
             animatedMover.StopAttackForMovement();
     }
 
     /// <summary>
-    /// Arrête immédiatement tout déplacement en cours.
+    /// Arrête immédiatement tout déplacement en cours (Autorité Serveur).
     /// </summary>
     public void StopMovement()
     {
-        BoatTransport.ClearPendingBoarding(unitInstance);
+        // Seul le Serveur arrête le mouvement physique
+        if (NetworkManager.Singleton != null && IsClient && !IsServer) 
+            return;
 
+        BoatTransport.ClearPendingBoarding(unitInstance);
         isMovingToTarget = false;
         movement = Vector3.zero;
         followTarget = null;
         followTargetPosition = true;
 
-        if (animator != null)
+        if (animator != null) 
             animator.SetBool("isMoving", false);
-
-        if (CanUseNavMeshAgent())
+            
+        if (CanUseNavMeshAgent()) 
             agent.ResetPath();
     }
 
     /// <summary>
     /// Indique si l'unité est en train de se déplacer.
     /// </summary>
-    public bool IsMoving()
-    {
-        return isMovingToTarget;
+    public bool IsMoving() 
+    { 
+        return isMovingToTarget; 
     }
 
     /// <summary>
@@ -455,9 +500,9 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     private float GetUnitAttackRange(float fallback)
     {
-        if (unitInstance != null && unitInstance.unitData is UnitCombatData combatData)
+        if (unitInstance != null && unitInstance.unitData is UnitCombatData combatData) 
             return Mathf.Max(0f, combatData.attackRange);
-
+            
         return fallback;
     }
 
@@ -467,35 +512,21 @@ public class MovementManager : MonoBehaviour
     public bool CanMoveOnWorldPosition(Vector3 worldPosition)
     {
         MapGenerator map = GetMapGenerator();
-        if (map == null)
+        if (map == null) 
             return true;
-
-        if (!map.TryGetTileAtWorldPosition(worldPosition, out TileData tile))
+            
+        if (!map.TryGetTileAtWorldPosition(worldPosition, out TileData tile)) 
             return false;
-
-        bool allowed = IsGroundAllowed(tile.groundType);
-        if (!allowed)
-            Debug.Log($"[MovementManager] Destination refusee: unit={GetUnitTypeName()}, tile={tile.groundType}, position={worldPosition}.", this);
-
-        return allowed;
+            
+        return IsGroundAllowed(tile.groundType);
     }
 
     /// <summary>
     /// Indique si le terrain est compatible avec l'unité courante.
     /// </summary>
-    private bool IsGroundAllowed(GroundType groundType)
-    {
-        return IsBoatUnit() ? groundType == GroundType.Water : groundType != GroundType.Water;
-    }
-
-    /// <summary>
-    /// Retourne le nom de type de l'unité courante pour les journaux.
-    /// </summary>
-    private string GetUnitTypeName()
-    {
-        return unitInstance != null && unitInstance.unitData != null
-            ? unitInstance.unitData.type.ToString()
-            : "Unknown";
+    private bool IsGroundAllowed(GroundType groundType) 
+    { 
+        return IsBoatUnit() ? groundType == GroundType.Water : groundType != GroundType.Water; 
     }
 
     /// <summary>
@@ -503,9 +534,9 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     private MapGenerator GetMapGenerator()
     {
-        if (mapGenerator == null)
+        if (mapGenerator == null) 
             mapGenerator = MapGenerator.Instance != null ? MapGenerator.Instance : FindFirstObjectByType<MapGenerator>();
-
+            
         return mapGenerator;
     }
 
@@ -519,7 +550,6 @@ public class MovementManager : MonoBehaviour
             int waterArea = NavMesh.GetAreaFromName("Water");
             return waterArea >= 0 ? 1 << waterArea : NavMesh.AllAreas;
         }
-
         int walkableArea = NavMesh.GetAreaFromName("Walkable");
         return walkableArea >= 0 ? 1 << walkableArea : NavMesh.AllAreas;
     }
@@ -529,19 +559,19 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     private bool IsBoatUnit()
     {
-        if (unitInstance == null || unitInstance.unitData == null)
+        if (unitInstance == null || unitInstance.unitData == null) 
             return false;
-
-        if (unitInstance.unitData is UnitBoat)
+            
+        if (unitInstance.unitData is UnitBoat) 
             return true;
-
+            
         switch (unitInstance.unitData.type)
         {
-            case UnitsType.Fregate:
-            case UnitsType.Destroyer:
-            case UnitsType.Transport:
+            case UnitsType.Fregate: 
+            case UnitsType.Destroyer: 
+            case UnitsType.Transport: 
                 return true;
-            default:
+            default: 
                 return false;
         }
     }
@@ -549,28 +579,27 @@ public class MovementManager : MonoBehaviour
     /// <summary>
     /// Vérifie si l'agent NavMesh peut être utilisé pour le déplacement.
     /// </summary>
-    private bool CanUseNavMeshAgent()
-    {
-        return agent != null && agent.enabled && agent.isOnNavMesh;
+    private bool CanUseNavMeshAgent() 
+    { 
+        return agent != null && agent.enabled && agent.isOnNavMesh; 
     }
 
     /// <summary>
     /// Retourne la direction actuelle de déplacement.
     /// </summary>
-    public Vector3 GetMovementDirection()
-    {
-        return movement;
+    public Vector3 GetMovementDirection() 
+    { 
+        return movement; 
     }
 
     public System.Action<Transform> OnMovementComplete;
-
+    
     /// <summary>
     /// Notifie les abonnés que le déplacement est terminé.
     /// </summary>
-    private void NotifyMovementComplete()
-    {
-        if (OnMovementComplete != null)
-            OnMovementComplete(followTarget);
+    private void NotifyMovementComplete() 
+    { 
+        if (OnMovementComplete != null) OnMovementComplete(followTarget); 
     }
 
     /// <summary>
@@ -578,10 +607,10 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     public void MoveBoatsUnitToPositionAsGroup(UnitInstance unit, Vector3 destination, float stopDistance)
     {
-        if (!TryGetMovementForUnit(unit, destination, out MovementManager movement))
+        if (!TryGetMovementForUnit(unit, destination, out MovementManager move)) 
             return;
-
-        movement.MoveToPositionAsGroup(destination, stopDistance);
+            
+        move.MoveToPositionAsGroup(destination, stopDistance);
     }
 
     /// <summary>
@@ -589,34 +618,34 @@ public class MovementManager : MonoBehaviour
     /// </summary>
     public void MoveBoatsUnitToTarget(UnitInstance unit, Transform target, float stopDistance)
     {
-        if (unit == null || target == null)
+        if (unit == null || target == null) 
             return;
-
-        MovementManager movement = unit.GetComponent<MovementManager>();
-        if (movement == null)
+            
+        MovementManager move = unit.GetComponent<MovementManager>();
+        if (move == null) 
             return;
-
-        movement.MoveToTarget(target, stopDistance);
+            
+        move.MoveToTarget(target, stopDistance);
     }
 
     /// <summary>
     /// Récupère le MovementManager d'une unité et vérifie si la destination est valide.
     /// </summary>
-    private bool TryGetMovementForUnit(UnitInstance unit, Vector3 destination, out MovementManager movement)
+    private bool TryGetMovementForUnit(UnitInstance unit, Vector3 destination, out MovementManager move)
     {
-        movement = null;
-        if (unit == null)
+        move = null;
+        if (unit == null) 
             return false;
-
-        movement = unit.GetComponent<MovementManager>();
-        return movement != null && movement.CanMoveOnWorldPosition(destination);
+            
+        move = unit.GetComponent<MovementManager>();
+        return move != null && move.CanMoveOnWorldPosition(destination);
     }
 
     /// <summary>
     /// Force un déplacement direct sans nettoyage des réservations en attente.
     /// </summary>
-    public void ForceMoveToPosition(Vector3 destination, float stopDistance)
-    {
-        SetPositionDestination(destination, stopDistance, clearPendingBoarding: false);
+    public void ForceMoveToPosition(Vector3 destination, float stopDistance) 
+    { 
+        SetPositionDestination(destination, stopDistance, clearPendingBoarding: false); 
     }
 }
