@@ -162,6 +162,7 @@
     <Compile Include="Assets\Resources\Scripts\Game\Assignment\Assignment.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
     <Compile Include="Assets\Resources\Scripts\GameObject\Units\Animation\Spell.cs" />
+    <Compile Include="Assets\Resources\Scripts\Network\NetworkSpawner.cs" />
     <Compile Include="Assets\Resources\Scripts\Manager\GameManager\StructureManager.cs" />
     <Compile Include="Assets\Resources\Scripts\Camera\CameraMouvement.cs" />
     <Compile Include="Assets\Resources\Scripts\Game\IA\SharedEasyNormal\MovementEasyNormal.cs" />

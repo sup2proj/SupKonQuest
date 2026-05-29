@@ -298,15 +298,35 @@ public partial class StructureInstance : MonoBehaviour
                 if (StructureManager.Instance != null)
                 {
                     Vector3 spawnPosition = transform.position;
-                    bool spawned = StructureManager.Instance.SpawnUnitByTypeAtPosition(
-                        playerId,
-                        data.type,
-                        spawnPosition.x,
-                        spawnPosition.z,
-                        false,
-                        isProtector,
-                        this
-                    );
+                    bool spawned = false;
+
+                    if (Unity.Netcode.NetworkManager.Singleton != null && 
+                        Unity.Netcode.NetworkManager.Singleton.IsClient && 
+                        !Unity.Netcode.NetworkManager.Singleton.IsServer)
+                    {
+                        NetworkSpawner.Instance.RequestSpawnUnitServerRpc(
+                            playerId, 
+                            data.type, 
+                            spawnPosition.x, 
+                            spawnPosition.z, 
+                            false,
+                            isProtector
+                        );
+                        spawned = true;
+                    }
+                    else
+                    {
+                        // Le Serveur (ou le mode Solo) crée directement l'unité
+                        spawned = StructureManager.Instance.SpawnUnitByTypeAtPosition(
+                            playerId,
+                            data.type,
+                            spawnPosition.x,
+                            spawnPosition.z,
+                            false,
+                            isProtector,
+                            this
+                        );
+                    }
 
                     Debug.Log($"[StructureInstance] {name} : Spawn queued unit {data.type} (protector={isProtector}) -> {(spawned ? "OK" : "FAILED")}");
                 }
