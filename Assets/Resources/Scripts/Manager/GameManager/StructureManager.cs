@@ -111,6 +111,14 @@ public class StructureManager : MonoBehaviour
         }
 
         Vector3 position = ResolveSpawnPosition(type, x, z, sourceStructure);
+        
+        // Si je suis Client, j'arrête tout ici. Je laisse le Serveur.
+        if (Unity.Netcode.NetworkManager.Singleton != null && 
+            Unity.Netcode.NetworkManager.Singleton.IsClient && 
+            !Unity.Netcode.NetworkManager.Singleton.IsServer)
+        {
+            return true; 
+        }
 
         GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
 
