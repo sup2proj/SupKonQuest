@@ -183,15 +183,34 @@ public class UnitInstance : MonoBehaviour
     /// </summary>
     void Die()
     {
+        // J'attends que le Serveur détruise l'objet, ce qui le fera disparaître de mon écran
+        if (Unity.Netcode.NetworkManager.Singleton != null && 
+            Unity.Netcode.NetworkManager.Singleton.IsClient && 
+            !Unity.Netcode.NetworkManager.Singleton.IsServer)
+        {
+            return; 
+        }
+
         if (unitData != null && unitData.isProtector && protectorSourceStructure != null)
         {
             protectorSourceStructure.HandleProtectorDeath(this, lastAttackerPlayerId);
             protectorSourceStructure = null;
         }
 
-        Destroy(circleUnderFeet, 0f);
-        Destroy(healthBar, 0f);
-        Destroy(gameObject, 0f);
+        // On détruit les effets visuels (s'ils ne sont pas enfants du gameObject, sinon c'est automatique)
+        if (circleUnderFeet != null) Destroy(circleUnderFeet, 0f);
+        if (healthBar != null) Destroy(healthBar, 0f);
+
+        // Destruction propre pour le réseau : si on a un NetworkObject, on le Despawn. Sinon, Destroy classique.
+        Unity.Netcode.NetworkObject netObj = GetComponent<Unity.Netcode.NetworkObject>();
+        if (netObj != null && netObj.IsSpawned)
+        {
+            netObj.Despawn(true); // Despawn(true) le retire du réseau ET détruit le GameObject
+        }
+        else
+        {
+            Destroy(gameObject, 0f);
+        }
 
         var pm = PlayerManager.Instance;
         var session = pm != null ? pm.GetSession(playerId) : null;
