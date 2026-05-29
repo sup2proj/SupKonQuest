@@ -57,6 +57,18 @@ public class MovementManager : NetworkBehaviour
     /// </summary>
     private void Start()
     {
+        if (NetworkManager.Singleton != null && IsClient && !IsServer)
+        {
+            if (agent != null) 
+                agent.enabled = false;
+            
+            Rigidbody rb = GetComponent<Rigidbody>();
+            if (rb != null) 
+                rb.isKinematic = true;
+                
+            return;
+        }
+
         if (agent == null)
             return;
 
