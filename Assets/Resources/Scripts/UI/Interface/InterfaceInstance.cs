@@ -20,6 +20,9 @@ public partial class InterfaceInstance : MonoBehaviour
 	[Header("Player Statistics")]
 	[SerializeField] private StatisticsInterface statisticsInterface;
 	[SerializeField] private GameObject tabMenuStatistics;
+    [SerializeField] private GameObject exitMenu;
+    
+    [SerializeField] private bool isExitMenuActive = false;
     
     [Header("Buff (support/healer)")]
     [SerializeField] private Image[] buffSlots;
@@ -160,6 +163,10 @@ public partial class InterfaceInstance : MonoBehaviour
          // Initialiser tabMenuStatistics masqué
          if (tabMenuStatistics != null)
              SetGameObjectActive(tabMenuStatistics, false);
+
+        // Initialiser exitMenu masqué
+        if (exitMenu != null)
+            SetGameObjectActive(exitMenu, false);
      }
 
      /// <summary>
@@ -168,18 +175,32 @@ public partial class InterfaceInstance : MonoBehaviour
      void Update()
      {
          // Gestion de la touche TAB pour afficher/masquer les statistiques
-         if (Input.GetKeyDown(KeyCode.Tab))
-         {
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
              if (tabMenuStatistics != null)
                  SetGameObjectActive(tabMenuStatistics, true);
-         }
+        }
          
-         if (Input.GetKeyUp(KeyCode.Tab))
-         {
+        if (Input.GetKeyUp(KeyCode.Tab))
+        {
              if (tabMenuStatistics != null)
                  SetGameObjectActive(tabMenuStatistics, false);
-         }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (exitMenu != null) {
+                isExitMenuActive = !isExitMenuActive;
+                SetGameObjectActive(exitMenu, isExitMenuActive);
+            }
+        }
      }
+
+    public void CloseExitMenu()
+    {
+        isExitMenuActive = false;
+        SetGameObjectActive(exitMenu, false);
+    }
 
     /// <summary>
     /// Cache l'ensemble de l'interface HUD (structures, buffs, boutons, liste joueurs, statistiques).
