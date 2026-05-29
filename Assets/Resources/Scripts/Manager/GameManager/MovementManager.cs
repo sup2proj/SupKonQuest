@@ -302,8 +302,9 @@ public class MovementManager : NetworkBehaviour
     /// </summary>
     private void UpdateMovementAnimation()
     {
-        if (animator == null) 
+        if (animator == null || animator.runtimeAnimatorController == null) 
             return;
+            
         animator.SetBool("isMoving", IsActuallyMoving());
     }
 
