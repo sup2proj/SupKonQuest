@@ -11,6 +11,7 @@ using Unity.Services.Relay.Models;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using System.IO;
 
 /// <summary>
 /// Gère la salle d'attente (Lobby Room) une fois qu'un joueur a créé ou rejoint une partie. Gère le chat, les paramètres de la partie, l'état "Prêt" des joueurs et la transition vers le jeu en réseau (Relay).
@@ -49,9 +50,19 @@ public class LobbyRoomManager : MonoBehaviour
     private string currentMap = "Europe";
     private int currentMaxPlayers = 4;
     private Dictionary<string, string> lastProcessedMessages = new Dictionary<string, string>();
+    
+    [Header("Interface (UI) Map")]
+    public Image mapImageDisplay;
+    
+    [Header("Map Rotation Settings")]
+    public string[] mapNames; 
+    private int currentMapIndex = 0;
+    private string mapPath;
 
     async void Start()
     {
+        mapPath = Path.Combine(Application.dataPath, "Resources", "Maps");
+        LoadFoldersOnly();
         if (IsHost)
         {
             hostControlsPanel.SetActive(true);
@@ -476,6 +487,30 @@ public class LobbyRoomManager : MonoBehaviour
 
     if (mapNameText != null)
         mapNameText.SetDynamicTranslations("Map: " + currentLobby.Data["Map"].Value, "Carte : " + currentLobby.Data["Map"].Value, "Mappa : "+currentLobby.Data["Map"].Value);
+    
+    if (mapImageDisplay != null && currentLobby.Data.ContainsKey("Map"))
+    {
+        string currentMapName = currentLobby.Data["Map"].Value;
+        string resourcePath = "Maps/" + currentMapName + "/MapLayout";
+        
+        Texture2D loadedTexture = Resources.Load<Texture2D>(resourcePath);
+
+        if (loadedTexture != null)
+        {
+            Sprite newSprite = Sprite.Create(
+                loadedTexture, 
+                new Rect(0, 0, loadedTexture.width, loadedTexture.height), 
+                new Vector2(0.5f, 0.5f)
+            );
+            
+            mapImageDisplay.sprite = newSprite;
+        }
+        else
+        {
+            Debug.LogWarning($"Impossible de charger l'image à l'emplacement : Resources/{resourcePath}");
+            mapImageDisplay.sprite = null;
+        }
+    }
         
     if (maxPlayersText != null)
         maxPlayersText.SetDynamicTranslations("Slots: " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers, "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers,"Posti : "+currentLobby.Players.Count + " / " + currentLobby.MaxPlayers);
@@ -536,5 +571,68 @@ public class LobbyRoomManager : MonoBehaviour
         PlayerPrefs.SetString("DisconnectReasonFR", reasonFR);
         PlayerPrefs.SetString("DisconnectReasonIT", reasonIT);
         SceneManager.LoadScene("MultiplayerScene");
+    }
+    /// <summary>
+    /// Récupère dynamiquement les noms des dossiers de cartes dans l'éditeur. 
+    /// En Build, il conserve la dernière liste détectée sans écraser les données.
+    /// </summary>
+    void LoadFoldersOnly()
+    {
+        #if UNITY_EDITOR
+        if (Directory.Exists(mapPath))
+        {
+            string[] rawDirectories = Directory.GetDirectories(mapPath);
+            mapNames = new string[rawDirectories.Length];
+
+            for (int i = 0; i < rawDirectories.Length; i++)
+            {
+                DirectoryInfo dirInfo = new DirectoryInfo(rawDirectories[i]);
+                mapNames[i] = dirInfo.Name;
+            }
+            
+            UnityEditor.EditorUtility.SetDirty(this);
+            Debug.Log($"[Lobby Room] {mapNames.Length} dossiers de cartes détectés de manière dynamique !");
+        }
+        else
+        {
+            Debug.LogError("Le dossier spécifié n'existe pas : " + mapPath);
+        }
+        #else
+        // En mode Build final, le tableau 'mapNames' contiendra automatiquement 
+        // les données détectées lors de ta dernière session dans l'éditeur.
+        Debug.Log($"[Lobby Build] Chargement de {mapNames.Length} cartes depuis l'index sauvegardé.");
+        #endif
+    }
+    
+    /// <summary>
+    /// Passe à la carte suivante et met à jour le salon.
+    /// </summary>
+    public void NextMap()
+    {
+        if (!IsHost || currentLobby == null || mapNames == null || mapNames.Length == 0) return;
+
+        currentMapIndex++;
+        if (currentMapIndex > mapNames.Length - 1)
+        {
+            currentMapIndex = 0;
+        }
+
+        ChangeMap(mapNames[currentMapIndex]);
+    }
+    
+    /// <summary>
+    /// Revient à la carte précédente et met à jour le salon.
+    /// </summary>
+    public void PreviousMap()
+    {
+        if (!IsHost || currentLobby == null || mapNames == null || mapNames.Length == 0) return;
+
+        currentMapIndex--;
+        if (currentMapIndex < 0)
+        {
+            currentMapIndex = mapNames.Length - 1;
+        }
+
+        ChangeMap(mapNames[currentMapIndex]);
     }
 }
