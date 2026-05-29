@@ -58,8 +58,13 @@ public class UnitInstance : NetworkBehaviour
             if (healthBar != null) healthBar.SetHealth(currentHealth);
         };
 
-        // Client
-        if (IsClient && !IsServer)
+        netPlayerId.OnValueChanged += (oldValue, newValue) => 
+        {
+            playerId = newValue;
+            InitSelectionCircle(); 
+        };
+
+        if (NetworkManager.Singleton != null)
         {
             playerId = netPlayerId.Value;
             currentHealth = netHealth.Value;
@@ -113,8 +118,8 @@ public class UnitInstance : NetworkBehaviour
         playerId = unitData.playerId;
         isNeutral = unitData.isNeutral;
         currentHealth = unitData.maxHealth;
-
-        if (IsServer || NetworkManager.Singleton == null)
+        
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
         {
             netPlayerId.Value = playerId;
             netMaxHealth.Value = unitData.maxHealth;
