@@ -140,12 +140,10 @@ public class MovementManager : NetworkBehaviour
     {
         if (NetworkManager.Singleton != null && IsClient && !IsServer)
         {
-            // Je suis un Client : j'envoie l'ordre par radio au Serveur
             RequestMoveToPositionServerRpc(destination, stopDistance);
             return;
         }
 
-        // La suite s'exécute uniquement sur le Serveur (ou en mode Solo)
         if (!CanMoveOnWorldPosition(destination)) 
             return;
 
@@ -162,12 +160,11 @@ public class MovementManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// (RÉSEAU) Envoie une requête radio au serveur pour que cette unité suive/attaque une cible réseau.
+    /// Envoie une requête radio au serveur pour que cette unité suive/attaque une cible réseau.
     /// </summary>
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void RequestMoveToTargetServerRpc(ulong networkObjectId, float stopDistance)
     {
-        // Le serveur retrouve l'objet réseau grâce à son ID unique et lui dit d'attaquer
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject targetNetObj))
         {
             MoveToTarget(targetNetObj.transform, stopDistance);
@@ -182,7 +179,6 @@ public class MovementManager : NetworkBehaviour
     {
         if (NetworkManager.Singleton != null && IsClient && !IsServer)
         {
-            // Si la cible est un objet réseau (unité, bâtiment), on envoie son ID au serveur
             NetworkObject targetNetObj = target.GetComponent<NetworkObject>();
             if (targetNetObj != null)
             {
@@ -196,7 +192,7 @@ public class MovementManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// Orchestre la mise à jour du déplacement selon le mode disponible (NavMesh ou Transform).
+    /// Orchestre la mise à jour du déplacement selon le mode disponible.
     /// </summary>
     private void HandleMovement()
     {
@@ -313,10 +309,8 @@ public class MovementManager : NetworkBehaviour
     /// </summary>
     private bool IsActuallyMoving()
     {
-        // Petite sécurité supplémentaire pour le client qui lit les infos du réseau
         if (NetworkManager.Singleton != null && IsClient && !IsServer)
         {
-            // Chez le client, on regarde si le NetworkTransform bouge vraiment physiquement
             return GetComponent<Rigidbody>() != null && GetComponent<Rigidbody>().linearVelocity.sqrMagnitude > AnimationMoveVelocityThreshold 
                    || movement.sqrMagnitude > TransformMoveSqrThreshold;
         }
@@ -483,7 +477,6 @@ public class MovementManager : NetworkBehaviour
     /// </summary>
     public void StopMovement()
     {
-        // Seul le Serveur arrête le mouvement physique
         if (NetworkManager.Singleton != null && IsClient && !IsServer) 
             return;
 

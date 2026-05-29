@@ -105,7 +105,6 @@ public partial class InterfaceInstance
                     Unity.Netcode.NetworkManager.Singleton.IsClient && 
                     !Unity.Netcode.NetworkManager.Singleton.IsServer)
                 {
-                    // Le Client demande au Serveur !
                     NetworkSpawner.Instance.RequestSpawnUnitServerRpc(
                         req.buildingPlayerId,
                         req.type,
@@ -117,7 +116,6 @@ public partial class InterfaceInstance
                 }
                 else
                 {
-                    // Le Serveur (ou le mode Solo) crée directement l'unité
                     StructureManager.Instance.SpawnUnitByTypeAtPosition(
                         req.buildingPlayerId,
                         req.type,

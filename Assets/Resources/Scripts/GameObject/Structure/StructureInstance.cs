@@ -107,7 +107,6 @@ public partial class StructureInstance : MonoBehaviour
             healthBar.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
         }
 
-        // Gestion centralisee des clics (une seule fois par frame)
         if (Instance == this)
         {
             HandleGlobalStructureClick();
@@ -117,8 +116,6 @@ public partial class StructureInstance : MonoBehaviour
     /// <summary>
     /// Gestion centralisee des clics sur les structures
     /// Cette methode n'est executee qu'une fois par frame (par l'Instance principale)
-    /// </summary>
-    /// <summary>
     /// Détecte le clic global sur les structures et sélectionne la plus proche.
     /// </summary>
     private void HandleGlobalStructureClick()
@@ -126,7 +123,6 @@ public partial class StructureInstance : MonoBehaviour
         if (!Input.GetMouseButtonDown(0))
             return;
 
-        // Ignorer les clics sur l'UI
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             return;
 
@@ -135,7 +131,6 @@ public partial class StructureInstance : MonoBehaviour
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         
-        // Utiliser RaycastAll pour trouver TOUS les colliders, y compris les Triggers
         RaycastHit[] hits = Physics.RaycastAll(ray);
         
         Debug.Log($"[StructureClick] Raycasting detecte {hits.Length} colliders");
@@ -143,20 +138,17 @@ public partial class StructureInstance : MonoBehaviour
         StructureInstance closestStructure = null;
         float closestDistance = float.MaxValue;
 
-        // Parcourir tous les hits et trouver la structure la plus proche
         for (int i = 0; i < hits.Length; i++)
         {
             RaycastHit hit = hits[i];
             Debug.Log($"[StructureClick] Hit {i}: {hit.collider.gameObject.name} a distance {hit.distance}");
 
-            // Chercher une StructureInstance sur ce collider ou ses parents
             StructureInstance structure = hit.collider.GetComponent<StructureInstance>();
             if (structure == null)
             {
                 structure = hit.collider.GetComponentInParent<StructureInstance>();
             }
 
-            // Garder la structure la plus proche
             if (structure != null && hit.distance < closestDistance)
             {
                 Debug.Log($"[StructureClick] Structure trouvee: {structure.name} a distance {hit.distance}");
@@ -172,7 +164,6 @@ public partial class StructureInstance : MonoBehaviour
         }
         else
         {
-            // Le clic n'a touche aucune structure - deselectionner si une structure est selectionnee
             Debug.Log($"[StructureClick] Aucune structure trouvee");
             if (currentlySelected != null)
             {
@@ -185,8 +176,6 @@ public partial class StructureInstance : MonoBehaviour
 
     /// <summary>
     /// Appele quand cette structure est cliquee
-    /// </summary>
-    /// <summary>
     /// Traite la sélection d'une structure après un clic.
     /// </summary>
     private void OnStructureClicked()
@@ -243,9 +232,7 @@ public partial class StructureInstance : MonoBehaviour
     {
         if (StructureManager.Instance == null)
             return;
-
-        // If this enqueue is for a protector and the structure belongs to the IA player,
-        // enforce maxQueueSize to avoid infinite protector spawns.
+        
         if (isProtector)
         {
             if (IAInstance.IsAIPlayer(playerId))
@@ -316,7 +303,6 @@ public partial class StructureInstance : MonoBehaviour
                     }
                     else
                     {
-                        // Le Serveur (ou le mode Solo) crée directement l'unité
                         spawned = StructureManager.Instance.SpawnUnitByTypeAtPosition(
                             playerId,
                             data.type,
@@ -343,13 +329,11 @@ public partial class StructureInstance : MonoBehaviour
     {
         Debug.Log($"Structure {name} selectionnee (Type: {structureType}).");
 
-        // Si une autre structure etait deja selectionnee, on la deselectionne
         if (currentlySelected != null && currentlySelected != this)
         {
             currentlySelected.UnSelected();
         }
 
-        // Cette structure devient la structure selectionnee
         currentlySelected = this;
 
         if (outline != null)
@@ -357,7 +341,6 @@ public partial class StructureInstance : MonoBehaviour
         else
             Debug.LogWarning($"[StructureInstance] Composant Outline manquant sur {name}.");
 
-        // Transmettre les coordonnees de la structure a l'ActionInterface
         ActionInterface.SetSelectedStructure(this, structurePosition);
         ActionInterface.ShowStructureButtons(structureType);
 
@@ -392,13 +375,11 @@ public partial class StructureInstance : MonoBehaviour
     {
         Debug.Log($"Structure {name} deselectionnee.");
 
-        // Si c'est la structure actuellement selectionnee, on efface la reference
         if (currentlySelected == this)
         {
             currentlySelected = null;
         }
 
-        // Restaure la couleur du batiment
         Renderer renderer = GetComponent<Renderer>();
         if (renderer != null)
             renderer.material.color = Color.white;
@@ -463,8 +444,9 @@ public partial class StructureInstance : MonoBehaviour
         return GetUnitsWithinRadius(unitsFarRadius);
     }
 
-    // Centralise l'application du nom de territoire et adapte la couleur selon le playerId
+    
     /// <summary>
+    /// Centralise l'application du nom de territoire et adapte la couleur selon le playerId
     /// Applique ou met à jour le nom du territoire affiché par la structure.
     /// </summary>
     public void ApplyTerritoryName(string territory)

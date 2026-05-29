@@ -337,7 +337,7 @@ public class LobbyRoomManager : MonoBehaviour
                 {
                     { "GameStarted", new DataObject(DataObject.VisibilityOptions.Member, "True") },
                     { "RelayCode", new DataObject(DataObject.VisibilityOptions.Member, joinCode) },
-                    { "MapSeed", new DataObject(DataObject.VisibilityOptions.Member, randomSeed.ToString()) } // On sauvegarde la graine
+                    { "MapSeed", new DataObject(DataObject.VisibilityOptions.Member, randomSeed.ToString()) }
                 }
             };
             currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
@@ -346,7 +346,6 @@ public class LobbyRoomManager : MonoBehaviour
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             NetworkManager.Singleton.StartHost();
             
-            // L'hôte récupère le nom de la carte et transmet le nombre de joueurs ET la graine générée
             string mapFolder = currentLobby.Data.ContainsKey("Map") ? currentLobby.Data["Map"].Value : "TEST";
             AutoLauncher.Request(mapFolder, currentLobby.Players.Count, 0, 2, randomSeed);          
             NetworkManager.Singleton.SceneManager.LoadScene("Game", LoadSceneMode.Single);
@@ -471,7 +470,6 @@ public class LobbyRoomManager : MonoBehaviour
     /// </summary>
     private void RefreshUI()
 {
-    // Si l'interface graphique a été détruite, on ne met plus rien à jour
     if (this == null || gameObject == null || playerListContainer == null) return;
 
     if (currentLobby == null) return;
