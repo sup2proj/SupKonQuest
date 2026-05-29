@@ -12,7 +12,7 @@ public class NetworkSpawner : NetworkBehaviour
     }
 
     // Le client appelle cette fonction, mais elle s'exécute sur hôte
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void RequestSpawnUnitServerRpc(int playerId, UnitsType type, float x, float z, bool isPoweredUnit, bool isProtector)
     {
         Debug.Log($"[NetworkSpawner] L'hôte a reçu la demande du joueur {playerId} pour créer {type}");

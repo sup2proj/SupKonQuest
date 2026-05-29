@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
-public class UnitInstance : MonoBehaviour
+public class UnitInstance : NetworkBehaviour
 {
     [Header("Data")]
     [SerializeField] public UnitData unitData;
@@ -21,6 +22,10 @@ public class UnitInstance : MonoBehaviour
     private StructureInstance protectorSourceStructure;
     private int lastAttackerPlayerId = -1;
 
+    public NetworkVariable<int> netPlayerId = new NetworkVariable<int>(-1);
+    public NetworkVariable<float> netMaxHealth = new NetworkVariable<float>(100f);
+    public NetworkVariable<float> netHealth = new NetworkVariable<float>(100f);
+
     /// <summary>
     /// Initialise les références physiques et visuelles de l'unité au chargement.
     /// </summary>
@@ -32,23 +37,34 @@ public class UnitInstance : MonoBehaviour
         {
             rb.freezeRotation = true;
         }
-
     }
 
     /// <summary>
     /// Retire l'unité du registre global lorsqu'elle est détruite.
     /// </summary>
-    private void OnDestroy()
+    public override void OnDestroy()
     {
+        base.OnDestroy(); 
         UnitsRegistry.Unregister(this);
     }
 
-    /// <summary>
-    /// Initialise les données runtime, les registres et les éléments visuels de base.
-    /// </summary>
-    void Start()
+    public override void OnNetworkSpawn()
     {
-        Initialize(unitData);
+        base.OnNetworkSpawn();
+
+        netHealth.OnValueChanged += (oldValue, newValue) => 
+        {
+            currentHealth = newValue;
+            if (healthBar != null) healthBar.SetHealth(currentHealth);
+        };
+
+        // Client
+        if (IsClient && !IsServer)
+        {
+            playerId = netPlayerId.Value;
+            currentHealth = netHealth.Value;
+        }
+
         UnitsRegistry.Register(this, playerId);
 
         if (objectModel != null)
@@ -56,6 +72,12 @@ public class UnitInstance : MonoBehaviour
 
         InitSelectionCircle();
         InitHealthBar();
+
+        if (IsClient && !IsServer && healthBar != null)
+        {
+            healthBar.SetMaxHealth(netMaxHealth.Value);
+            healthBar.SetHealth(currentHealth);
+        }
     }
 
     /// <summary>
@@ -69,13 +91,10 @@ public class UnitInstance : MonoBehaviour
             healthBar.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
         }
 
-        
         if (Input.GetKeyDown("b"))
         {
-            if (unitData == null)
-                return;
-            const float damageAmount = 10f;
-            TakeDamage(damageAmount);
+            if (unitData == null) return;
+            TakeDamage(10f);
         }
     }
 
@@ -95,6 +114,13 @@ public class UnitInstance : MonoBehaviour
         isNeutral = unitData.isNeutral;
         currentHealth = unitData.maxHealth;
 
+        if (IsServer || NetworkManager.Singleton == null)
+        {
+            netPlayerId.Value = playerId;
+            netMaxHealth.Value = unitData.maxHealth;
+            netHealth.Value = currentHealth;
+        }
+
         if (healthBar != null)
         {
             healthBar.SetMaxHealth(unitData.maxHealth);
@@ -108,8 +134,6 @@ public class UnitInstance : MonoBehaviour
     public void SetNeutralState(bool neutral)
     {
         isNeutral = neutral;
-
-        // Reste compatible avec les systèmes qui lisent encore l'info depuis UnitData.
         if (unitData != null)
             unitData.isNeutral = neutral;
     }
@@ -119,11 +143,9 @@ public class UnitInstance : MonoBehaviour
     /// </summary>
     void InitSelectionCircle()
     {
-        if (circleUnderFeet == null)
-            return;
+        if (circleUnderFeet == null) return;
 
         circleUnderFeet.SetActive(true);
-
         Vector3 localPos = circleUnderFeet.transform.localPosition;
         localPos.y = 0f;
         circleUnderFeet.transform.localPosition = localPos;
@@ -135,18 +157,12 @@ public class UnitInstance : MonoBehaviour
         }
     }
 
-    // NOTE: player color mapping centralisée dans PlayerManager.GetPlayerColor
-
     /// <summary>
     /// Positionne et valide la barre de vie de l'unité.
     /// </summary>
     private void InitHealthBar()
     {
-        if (healthBar == null)
-        {
-            Debug.LogWarning($"[UnitInstance] {name} : healthBar non assignée dans l'inspector.", this);
-            return;
-        }
+        if (healthBar == null) return;
         healthBar.transform.localPosition = (1.1f * Vector3.up);
     }
 
@@ -158,18 +174,24 @@ public class UnitInstance : MonoBehaviour
         protectorSourceStructure = sourceStructure;
     }
 
-    /// <summary>
+    // <summary>
     /// Retire de la santé à l'unité et déclenche la mort si nécessaire.
     /// </summary>
     public void TakeDamage(float amount, UnitInstance attacker = null, int attackerPlayerId = -1)
     {
-        if (unitData == null)
-            return;
+        if (unitData == null) return;
+
+        if (NetworkManager.Singleton != null && IsClient && !IsServer) return;
 
         lastAttackerPlayerId = attacker != null ? attacker.playerId : attackerPlayerId;
 
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, unitData.maxHealth);
+
+        if (NetworkManager.Singleton != null && IsServer)
+        {
+            netHealth.Value = currentHealth;
+        }
 
         if (healthBar != null)
             healthBar.SetHealth(currentHealth);
@@ -183,7 +205,6 @@ public class UnitInstance : MonoBehaviour
     /// </summary>
     void Die()
     {
-        // J'attends que le Serveur détruise l'objet, ce qui le fera disparaître de mon écran
         if (Unity.Netcode.NetworkManager.Singleton != null && 
             Unity.Netcode.NetworkManager.Singleton.IsClient && 
             !Unity.Netcode.NetworkManager.Singleton.IsServer)
@@ -197,15 +218,13 @@ public class UnitInstance : MonoBehaviour
             protectorSourceStructure = null;
         }
 
-        // On détruit les effets visuels (s'ils ne sont pas enfants du gameObject, sinon c'est automatique)
         if (circleUnderFeet != null) Destroy(circleUnderFeet, 0f);
         if (healthBar != null) Destroy(healthBar, 0f);
 
-        // Destruction propre pour le réseau : si on a un NetworkObject, on le Despawn. Sinon, Destroy classique.
         Unity.Netcode.NetworkObject netObj = GetComponent<Unity.Netcode.NetworkObject>();
         if (netObj != null && netObj.IsSpawned)
         {
-            netObj.Despawn(true); // Despawn(true) le retire du réseau ET détruit le GameObject
+            netObj.Despawn(true);
         }
         else
         {
@@ -227,24 +246,27 @@ public class UnitInstance : MonoBehaviour
     /// </summary>
     public void ApplyBuff()
     {
-        if (unitData == null)
-            return;
-        if (!(unitData is UnitSupportData))
-            return;
+        if (unitData == null) return;
+        if (!(unitData is UnitSupportData)) return;
         Debug.Log("Buff applied to " + unitData.type);
     }
-
 
     /// <summary>
     /// Ajoute ou retire de la santé tout en respectant les limites de l'unité.
     /// </summary>
     public void SetHealth(float healthChange)
     {
-        if (unitData == null)
-            return;
+        if (unitData == null) return;
+        
+        if (NetworkManager.Singleton != null && IsClient && !IsServer) return;
 
         currentHealth += healthChange;
         currentHealth = Mathf.Clamp(currentHealth, 0f, unitData.maxHealth);
+
+        if (NetworkManager.Singleton != null && IsServer)
+        {
+            netHealth.Value = currentHealth;
+        }
 
         if (healthBar != null)
             healthBar.SetHealth(currentHealth);

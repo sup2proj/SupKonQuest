@@ -470,54 +470,57 @@ public class LobbyRoomManager : MonoBehaviour
     /// Met à jour toute l'interface visuelle (liste des joueurs, état du bouton "Lancer", chat, carte) en fonction des dernières données récupérées du serveur.
     /// </summary>
     private void RefreshUI()
+{
+    // Si l'interface graphique a été détruite, on ne met plus rien à jour
+    if (this == null || gameObject == null || playerListContainer == null) return;
+
+    if (currentLobby == null) return;
+
+    if (mapNameText != null)
+        mapNameText.SetDynamicTranslations("Map: " + currentLobby.Data["Map"].Value, "Carte : " + currentLobby.Data["Map"].Value, "Mappa : "+currentLobby.Data["Map"].Value);
+        
+    if (maxPlayersText != null)
+        maxPlayersText.SetDynamicTranslations("Slots: " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers, "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers,"Posti : "+currentLobby.Players.Count + " / " + currentLobby.MaxPlayers);
+
+    foreach (Transform child in playerListContainer)
     {
-        if (currentLobby == null) return;
+        Destroy(child.gameObject);
+    }
 
-        if (mapNameText != null)
-            mapNameText.SetDynamicTranslations("Map: " + currentLobby.Data["Map"].Value, "Carte : " + currentLobby.Data["Map"].Value, "Mappa : "+currentLobby.Data["Map"].Value);
-            
-        if (maxPlayersText != null)
-            maxPlayersText.SetDynamicTranslations("Slots: " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers, "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers,"Posti : "+currentLobby.Players.Count + " / " + currentLobby.MaxPlayers);
+    int readyCount = 0;
+    string myId = AuthenticationService.Instance.PlayerId;
 
-        foreach (Transform child in playerListContainer)
+    foreach (var player in currentLobby.Players)
+    {
+        string playerName = player.Data != null && player.Data.ContainsKey("PlayerName") ? player.Data["PlayerName"].Value : player.Id;
+        bool isReady = player.Data != null && player.Data.ContainsKey("IsReady") && player.Data["IsReady"].Value == "True";
+        
+        if (isReady) readyCount++;
+
+        GameObject newPlayerItem = Instantiate(playerListItemPrefab, playerListContainer);
+        PlayerListItem itemScript = newPlayerItem.GetComponent<PlayerListItem>();
+        
+        bool isMe = (player.Id == myId);
+        itemScript.Setup(player.Id, playerName, isReady, IsHost, isMe);
+    }
+
+    if (IsHost && startGameBtn != null)
+    {
+        startGameBtn.interactable = (readyCount == currentLobby.Players.Count);
+    }
+    if (currentLobby.Data.ContainsKey("ChatLog"))
+    {
+        if (chatHistoryText.text != currentLobby.Data["ChatLog"].Value)
         {
-            Destroy(child.gameObject);
-        }
-
-        int readyCount = 0;
-        string myId = AuthenticationService.Instance.PlayerId;
-
-        foreach (var player in currentLobby.Players)
-        {
-            string playerName = player.Data != null && player.Data.ContainsKey("PlayerName") ? player.Data["PlayerName"].Value : player.Id;
-            bool isReady = player.Data != null && player.Data.ContainsKey("IsReady") && player.Data["IsReady"].Value == "True";
-            
-            if (isReady) readyCount++;
-
-            GameObject newPlayerItem = Instantiate(playerListItemPrefab, playerListContainer);
-            PlayerListItem itemScript = newPlayerItem.GetComponent<PlayerListItem>();
-            
-            bool isMe = (player.Id == myId);
-            itemScript.Setup(player.Id, playerName, isReady, IsHost, isMe);
-        }
-
-        if (IsHost && startGameBtn != null)
-        {
-            startGameBtn.interactable = (readyCount == currentLobby.Players.Count);
-        }
-        if (currentLobby.Data.ContainsKey("ChatLog"))
-        {
-            if (chatHistoryText.text != currentLobby.Data["ChatLog"].Value)
+            chatHistoryText.text = currentLobby.Data["ChatLog"].Value;
+            Canvas.ForceUpdateCanvases();
+            if (chatScrollRect != null)
             {
-                chatHistoryText.text = currentLobby.Data["ChatLog"].Value;
-                Canvas.ForceUpdateCanvases();
-                if (chatScrollRect != null)
-                {
-                    chatScrollRect.verticalNormalizedPosition = 0f;
-                }
+                chatScrollRect.verticalNormalizedPosition = 0f;
             }
         }
     }
+}
 
     /// <summary>
     /// Gère le retour forcé au menu multijoueur (en cas d'expulsion ou de perte de connexion) et sauvegarde la raison exacte pour l'afficher proprement au joueur à son retour au menu.

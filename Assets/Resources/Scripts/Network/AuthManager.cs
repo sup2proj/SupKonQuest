@@ -66,7 +66,8 @@ public class AuthManager : MonoBehaviour
             
         try
         {
-            await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(usernameInput.text, passwordInput.text);
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            await AuthenticationService.Instance.AddUsernamePasswordAsync(usernameInput.text, passwordInput.text);
 
             PlayerPrefs.SetString("PlayerName", usernameInput.text);
             
