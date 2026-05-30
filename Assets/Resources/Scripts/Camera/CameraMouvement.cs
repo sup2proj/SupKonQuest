@@ -173,4 +173,17 @@ public class CameraMouvement : MonoBehaviour
         targetPosition.x = Mathf.Clamp(targetPosition.x, minX, maxX);
         targetPosition.z = Mathf.Clamp(targetPosition.z, minZ, maxZ);
     }
+    
+    /// <summary>
+    /// Reçoit les coordonnées ciblées depuis un clic sur la minimap et déplace la caméra.
+    /// </summary>
+    public void SetTargetFromMinimap(float targetX, float targetZ)
+    {
+        Vector3 targetGroundPosition = new Vector3(targetX, 0f, targetZ);
+        float currentDistance = cam.transform.position.y / Mathf.Abs(cam.transform.forward.y);
+        targetPosition = targetGroundPosition - (cam.transform.forward * currentDistance);
+        targetPosition.y = 20f; 
+        ApplyLimits();
+    }
+    
 }
