@@ -14,12 +14,18 @@ public class ExitMenu : MonoBehaviour
             quitButton.onClick.AddListener(Quit);
     }
 
+    /// <summary>
+    /// Ferme le menu de sortie et reprend le jeu.
+    /// </summary>
     public void Resume()
     {
         if (InterfaceInstance.Instance != null)
             InterfaceInstance.Instance.CloseExitMenu();
     }
 
+    /// <summary>
+    /// Quitte le jeu et revient au menu principal.
+    /// </summary>
     public void Quit()
     {
         if (InterfaceInstance.Instance != null)
