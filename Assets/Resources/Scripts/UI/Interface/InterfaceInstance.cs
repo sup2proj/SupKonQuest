@@ -202,6 +202,11 @@ public partial class InterfaceInstance : MonoBehaviour
         SetGameObjectActive(exitMenu, false);
     }
 
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
     /// <summary>
     /// Cache l'ensemble de l'interface HUD (structures, buffs, boutons, liste joueurs, statistiques).
     /// </summary>
