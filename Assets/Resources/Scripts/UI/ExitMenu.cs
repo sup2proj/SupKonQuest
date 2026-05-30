@@ -23,6 +23,8 @@ public class ExitMenu : MonoBehaviour
     public void Quit()
     {
         if (InterfaceInstance.Instance != null)
+        {
             InterfaceInstance.Instance.QuitGame();
+        }
     }
 }

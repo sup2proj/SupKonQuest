@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public partial class InterfaceInstance : MonoBehaviour
 {
@@ -204,7 +205,8 @@ public partial class InterfaceInstance : MonoBehaviour
 
     public void QuitGame()
     {
-        Application.Quit();
+        Debug.Log("[InterfaceInstance] Quitter le jeu.");
+        SceneManager.LoadScene("MainMenu");
     }
 
     /// <summary>
