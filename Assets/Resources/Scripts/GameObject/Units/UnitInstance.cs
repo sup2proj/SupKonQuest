@@ -48,10 +48,22 @@ public class UnitInstance : NetworkBehaviour
         UnitsRegistry.Unregister(this);
     }
 
-    
+    /// <summary>
+    /// Déclenché au moment où l'unité apparaît sur le réseau. 
+    /// Le Serveur y diffuse ses valeurs initiales (ID du propriétaire, santé maximale), 
+    /// tandis que les Clients mettent à jour leurs données locales pour respecter l'autorité du Serveur.
+    /// Initialise également les abonnements aux changements d'état et l'interface visuelle.
+    /// </summary>
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+
+        if (IsServer)
+        {
+            netPlayerId.Value = playerId;
+            netMaxHealth.Value = unitData != null ? unitData.maxHealth : 100f;
+            netHealth.Value = currentHealth;
+        }
 
         netHealth.OnValueChanged += (oldValue, newValue) => 
         {
@@ -65,7 +77,7 @@ public class UnitInstance : NetworkBehaviour
             InitSelectionCircle(); 
         };
 
-        if (NetworkManager.Singleton != null)
+        if (IsClient && !IsServer)
         {
             playerId = netPlayerId.Value;
             currentHealth = netHealth.Value;
