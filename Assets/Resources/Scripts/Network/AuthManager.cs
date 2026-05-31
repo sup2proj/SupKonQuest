@@ -66,12 +66,18 @@ public class AuthManager : MonoBehaviour
             
         try
         {
+            if (AuthenticationService.Instance.IsSignedIn)
+            {
+                AuthenticationService.Instance.SignOut();
+            }
+            AuthenticationService.Instance.ClearSessionToken();
+
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
             await AuthenticationService.Instance.AddUsernamePasswordAsync(usernameInput.text, passwordInput.text);
 
             PlayerPrefs.SetString("PlayerName", usernameInput.text);
             
-            if (statusText != null) statusText.SetDynamicTranslations("Account created and connected successfully!", "Compte créé et connecté avec succès !", "Account creato e accesso effettuato con successo!");
+            if (statusText != null) statusText.SetDynamicTranslations("Account created and connected successfully !", "Compte créé et connecté avec succès !", "Account creato e accesso effettuato con successo !");
                 
             SceneManager.LoadScene("MultiplayerScene");
             Debug.Log("Compte créé. ID Unique du joueur : " + AuthenticationService.Instance.PlayerId);
