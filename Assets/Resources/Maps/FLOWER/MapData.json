@@ -1,35 +1,35 @@
 {
   "startPoints": [
-    { "x": 32, "y": 8, "owner": -1, "territory": "Valombre", "territoryId" : 1 },
-    { "x": 49, "y": 13, "owner": -1, "territory": "Briseterre", "territoryId" : 2 },
-    { "x": 54, "y": 31, "owner": -1, "territory": "Sombrelune", "territoryId" : 3 },
-    { "x": 48, "y": 48, "owner": -1, "territory": "Ravenciel", "territoryId" : 4 },
-    { "x": 32, "y": 54, "owner": -1, "territory": "Aurencourt", "territoryId" : 5 },
-    { "x": 14, "y": 49, "owner": -1, "territory": "Hauteforge", "territoryId" : 6 },
-    { "x": 9, "y": 32, "owner": -1, "territory": "Aigleroche", "territoryId" : 7 },
-    { "x": 14, "y": 14, "owner": -1, "territory": "Clairval", "territoryId" : 8 }
+    { "x": 32, "y": 8, "owner": -1, "territory": "Valombre", "territoryId": 1 },
+    { "x": 49, "y": 13, "owner": -1, "territory": "Briseterre", "territoryId": 2 },
+    { "x": 54, "y": 31, "owner": -1, "territory": "Sombrelune", "territoryId": 3 },
+    { "x": 48, "y": 48, "owner": -1, "territory": "Ravenciel", "territoryId": 4 },
+    { "x": 32, "y": 54, "owner": -1, "territory": "Aurencourt", "territoryId": 5 },
+    { "x": 14, "y": 49, "owner": -1, "territory": "Valombre", "territoryId": 1 },
+    { "x": 9, "y": 32, "owner": -1, "territory": "Briseterre", "territoryId": 2 },
+    { "x": 14, "y": 14, "owner": -1, "territory": "Sombrelune", "territoryId": 3 }
   ],
   "castles":[
-    { "x": 32, "y": 19, "owner": -1, "territory": "Valombre"},
-    { "x": 42, "y": 23, "owner": -1, "territory": "Briseterre"},
-    { "x": 45, "y": 31, "owner": -1, "territory": "Sombrelune"},
-    { "x": 42, "y": 42, "owner": -1, "territory": "Ravenciel" },
-    { "x": 32, "y": 45, "owner": -1, "territory": "Aurencourt" },
-    { "x": 23, "y": 41, "owner": -1, "territory": "Hauteforge" },
-    { "x": 20, "y": 32, "owner": -1, "territory": "Aigleroche" },
-    { "x": 23, "y": 23, "owner": -1, "territory": "Clairval" }
+    { "x": 32, "y": 19, "owner": -1, "territory": "Valombre", "territoryId": 1},
+    { "x": 42, "y": 23, "owner": -1, "territory": "Briseterre", "territoryId": 2},
+    { "x": 45, "y": 31, "owner": -1, "territory": "Sombrelune", "territoryId": 3},
+    { "x": 42, "y": 42, "owner": -1, "territory": "Ravenciel", "territoryId": 4},
+    { "x": 32, "y": 45, "owner": -1, "territory": "Aurencourt", "territoryId": 5},
+    { "x": 23, "y": 41, "owner": -1, "territory": "Valombre", "territoryId": 1},
+    { "x": 20, "y": 32, "owner": -1, "territory": "Briseterre", "territoryId": 2},
+    { "x": 23, "y": 23, "owner": -1, "territory": "Sombrelune", "territoryId": 3}
   ],
   "harbours":[
-    { "x": 38, "y": 7, "owner": -1, "territory" : "Petroville"},
-    { "x": 57, "y": 12, "owner": -1, "territory" : "Petroville"},
-    { "x": 56, "y": 38, "owner": -1, "territory" : "Petroville"},
-    { "x": 45, "y": 53, "owner": -1, "territory" : "Petroville"},
-    { "x": 25, "y": 57, "owner": -1, "territory" : "Petroville"},
-    { "x": 9, "y": 44, "owner": -1, "territory" : "Petroville"},
-    { "x": 7, "y": 26, "owner": -1, "territory" : "Petroville"},
-    { "x": 13, "y": 7, "owner": -1, "territory" : "Petroville"}
+    { "x": 38, "y": 7, "owner": -1, "territory": "Petroville"},
+    { "x": 57, "y": 12, "owner": -1, "territory": "Petroville"},
+    { "x": 56, "y": 38, "owner": -1, "territory": "Petroville"},
+    { "x": 45, "y": 53, "owner": -1, "territory": "Petroville"},
+    { "x": 25, "y": 57, "owner": -1, "territory": "Petroville"},
+    { "x": 9, "y": 44, "owner": -1, "territory": "Petroville"},
+    { "x": 7, "y": 26, "owner": -1, "territory": "Petroville"},
+    { "x": 13, "y": 7, "owner": -1, "territory": "Petroville"}
   ],
   "special":[
-    { "x": 32, "y": 32, "owner": -1, "territory" : "Neutral"}
+    { "x": 32, "y": 32, "owner": -1, "territory": "Neutral"}
   ]
 }
