@@ -32,39 +32,9 @@ public class PlayerManager : MonoBehaviour
             if (!sessionsById.ContainsKey(i))
                 CreateSessionForPlayer(i, autoStartGold, startUnitCount: 0, startStructureCount: 1);
         }
-        //TEMPORAIRRRREEEE
-        if (!sessionsById.ContainsKey(1))
-            CreateSessionForPlayer(1, autoStartGold, startUnitCount: 0, startStructureCount: 1);
-
-        SetActivePlayer(1);
-
-        // Instancier l'IA via reflection pour éviter une dépendance forte au type AIEasy
-        Type aiType = FindTypeInAssemblies("IAInstance");
-        if (aiType != null)
-        {
-            // Vérifier s'il existe déjà une instance
-            var existing = FindFirstObjectByType(aiType, FindObjectsInactive.Include);
-            if (existing == null)
-            {
-                GameObject aiGO = new GameObject("IAInstance_Player2");
-                var comp = aiGO.AddComponent(aiType);
-                Debug.Log("[PlayerManager] IAInstance créée automatiquement pour le joueur IA (difficulty=2).");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("[PlayerManager] Type 'IAInstance' introuvable dans les assemblies — l'IA ne sera pas instanciée automatiquement.");
-        }
-    }
-
-    /// <summary>
-    /// Définit le joueur actif au démarrage.
-    /// </summary>
-    private void Start()
-    {
+        // Create default sessions based on autoCreatePlayerCount and set active player to 1.
         SetActivePlayer(1);
     }
-        //TEMPORAIRRRREEEE
 
     /// <summary>
     /// Accorde périodiquement de l'or au joueur actif tant qu'il n'est pas vaincu.
@@ -208,7 +178,7 @@ public class PlayerManager : MonoBehaviour
             case 6: return Color.cyan;
             case 7: return new Color(1f, 0.5f, 0f, 1f); // orange
             case 8: return new Color(0.6f, 0f, 1f, 1f); // violet
-            default: return Color.gray;
+            default: return Color.brown;
         }
     }
 
