@@ -260,8 +260,11 @@ public partial class UnitsAnimation : MonoBehaviour
 	/// </summary>
 	private void SetAttackAnimationState(bool isAttacking)
 	{
-		if (animator != null)
-			animator.SetBool("isAttacking", isAttacking);
+		if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null)
+		{
+			return;
+		}
+		animator.SetBool("isAttacking", isAttacking);
 	}
 
 	/// <summary>
