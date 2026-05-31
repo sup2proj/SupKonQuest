@@ -263,7 +263,6 @@ public partial class StructureInstance : MonoBehaviour
                         isProtector,
                         this
                     );
-                    bool spawned = false;
 
                     if (Unity.Netcode.NetworkManager.Singleton != null && 
                         Unity.Netcode.NetworkManager.Singleton.IsClient && 

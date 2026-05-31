@@ -8,6 +8,7 @@ public class AutoLauncher : MonoBehaviour
 
     private static bool launchRequested;
     public static string pendingMapFolder = "TEST";
+    private static int pendingHumanCount = 1;
     private static int pendingAiCount = 1;
     private static int pendingAiDifficulty = 2;
     private static int pendingMapSeed = -1;
