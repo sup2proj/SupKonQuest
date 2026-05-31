@@ -229,6 +229,9 @@ public partial class InterfaceInstance : MonoBehaviour
     /// </summary>
     public void ShowVictoryPanel(int winnerPlayerId)
     {
+        if (!IsLocalPlayerPanel(winnerPlayerId))
+            return;
+
         if (!TryPreparePanelInMiddle())
             return;
 
@@ -240,6 +243,9 @@ public partial class InterfaceInstance : MonoBehaviour
     /// </summary>
     public void ShowDefeatPanel(int defeatedPlayerId)
     {
+        if (!IsLocalPlayerPanel(defeatedPlayerId))
+            return;
+
         if (!TryPreparePanelInMiddle())
             return;
 
@@ -437,6 +443,18 @@ public partial class InterfaceInstance : MonoBehaviour
 
         Debug.Log("[InterfaceInstance] Aucun PlayerManager, fallback sur Player 1.", this);
         return 1;
+    }
+
+    /// <summary>
+    /// Vérifie si le panneau courant correspond au joueur local/actif de cette interface.
+    /// </summary>
+    private bool IsLocalPlayerPanel(int playerId)
+    {
+        if (playerId <= 0)
+            return false;
+
+        int selectedPlayerId = GetSelectedPlayerId();
+        return selectedPlayerId == playerId;
     }
     /// <summary>
     /// Cache la liste UI des joueurs.

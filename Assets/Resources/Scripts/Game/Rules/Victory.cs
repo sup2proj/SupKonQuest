@@ -17,7 +17,7 @@ public class Victory : MonoBehaviour
 
         if (TryGetSoloPlayerId(out int soloPlayerId))
         {
-            DeclareWinner(soloPlayerId, "il ne reste plus qu'un seul joueur");
+            DeclareWinner(soloPlayerId);
             return;
         }
 
@@ -34,7 +34,7 @@ public class Victory : MonoBehaviour
 
         if (TerritoryControlUtility.TryGetWinnerByTerritories(territoriesToWin, out int territoryWinnerId))
         {
-            DeclareWinner(territoryWinnerId, $"a controle {territoriesToWin} territoires");
+            DeclareWinner(territoryWinnerId);
             return true;
         }
 
@@ -53,7 +53,7 @@ public class Victory : MonoBehaviour
         if (controlledTerritories < territoriesToWin)
             return false;
 
-        DeclareWinner(playerId, $"a controle {controlledTerritories} territoires");
+        DeclareWinner(playerId);
         return true;
     }
 
@@ -65,7 +65,7 @@ public class Victory : MonoBehaviour
         if (HasWinner || playerId <= 0)
             return false;
 
-        DeclareWinner(playerId, "il est le dernier joueur avec des structures");
+        DeclareWinner(playerId);
         return true;
     }
 
@@ -87,7 +87,7 @@ public class Victory : MonoBehaviour
     /// <summary>
     /// Déclare formellement le gagnant, met à jour l'état et affiche le panneau de victoire.
     /// </summary>
-    private void DeclareWinner(int playerId, string reason)
+    private void DeclareWinner(int playerId)
     {
         HasWinner = true;
         WinnerPlayerId = playerId;
