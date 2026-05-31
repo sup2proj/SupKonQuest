@@ -48,16 +48,10 @@ public class UnitInstance : NetworkBehaviour
         UnitsRegistry.Unregister(this);
     }
 
+    
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-
-        if (IsServer)
-        {
-            netPlayerId.Value = playerId;
-            netMaxHealth.Value = unitData != null ? unitData.maxHealth : 100f;
-            netHealth.Value = currentHealth;
-        }
 
         netHealth.OnValueChanged += (oldValue, newValue) => 
         {
@@ -77,19 +71,22 @@ public class UnitInstance : NetworkBehaviour
             currentHealth = netHealth.Value;
         }
 
-        UnitsRegistry.Register(this, playerId);
-
-        if (objectModel != null)
-            objectModel.SetActive(false);
-
-        InitSelectionCircle();
-        InitHealthBar();
+        ApplyRuntimePresentation();
 
         if (IsClient && !IsServer && healthBar != null)
         {
             healthBar.SetMaxHealth(netMaxHealth.Value);
             healthBar.SetHealth(currentHealth);
         }
+    }
+
+    /// <summary>
+    /// Initialise aussi les visuels et l'enregistrement local quand aucun spawn réseau n'est utilisé.
+    /// </summary>
+    private void Start()
+    {
+        if (NetworkManager.Singleton == null || !IsSpawned)
+            ApplyRuntimePresentation();
     }
 
     /// <summary>
@@ -266,5 +263,19 @@ public class UnitInstance : NetworkBehaviour
 
         if (healthBar != null)
             healthBar.SetHealth(currentHealth);
+    }
+
+    /// <summary>
+    /// Applique les états runtime partagés entre local et réseau.
+    /// </summary>
+    private void ApplyRuntimePresentation()
+    {
+        UnitsRegistry.Register(this, playerId);
+
+        if (objectModel != null)
+            objectModel.SetActive(false);
+
+        InitSelectionCircle();
+        InitHealthBar();
     }
 }

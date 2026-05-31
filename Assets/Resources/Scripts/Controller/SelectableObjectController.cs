@@ -36,7 +36,7 @@ public class SelectableObject : MonoBehaviour
     {
         UnitInstance unitInstance = gameObject.GetComponent<UnitInstance>();
         int playerUnitsId = unitInstance.playerId;
-        int playerId = PlayerManager.Instance.GetActivePlayerId();
+        int playerId = PlayerManager.Instance != null ? PlayerManager.Instance.GetActivePlayerId() : playerUnitsId;
         if (Defeat.IsPlayerDefeated(playerId))
             return;
 
