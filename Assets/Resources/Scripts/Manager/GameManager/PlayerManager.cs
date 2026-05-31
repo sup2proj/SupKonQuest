@@ -60,7 +60,6 @@ public class PlayerManager : MonoBehaviour
     {
         if (sessionsById.ContainsKey(id))
         {
-            Debug.LogWarning($"Session deja existante pour le joueur {id}");
             return sessionsById[id];
         }
 
@@ -79,7 +78,6 @@ public class PlayerManager : MonoBehaviour
     {
         if (!sessionsById.ContainsKey(playerId))
         {
-            Debug.LogWarning($"[PlayerManager] SetActivePlayer: aucune session pour playerId={playerId} (création auto).", this);
             CreateSessionForPlayer(playerId, autoStartGold, startUnitCount: 0, startStructureCount: 0);
         }
         activePlayerId = playerId;
@@ -132,35 +130,6 @@ public class PlayerManager : MonoBehaviour
                 StatisticsInterface.Instance.Refresh();
             }
         }
-    }
-
-    /// <summary>
-    /// Recherche un type par nom dans tous les assemblys chargés.
-    /// </summary>
-    private Type FindTypeInAssemblies(string typeName)
-    {
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-        foreach (var asm in assemblies)
-        {
-            try
-            {
-                var t = asm.GetType(typeName);
-                if (t != null)
-                    return t;
-
-                // essayer de retrouver par nom simple
-                foreach (var tp in asm.GetTypes())
-                {
-                    if (tp.Name == typeName)
-                        return tp;
-                }
-            }
-            catch
-            {
-                // ignorer les assemblys qui posent problème
-            }
-        }
-        return null;
     }
 
     /// <summary>
