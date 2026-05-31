@@ -3,8 +3,6 @@ using UnityEngine;
 public class SelectableObject : MonoBehaviour
 {
     public GameObject SelectionMarker;
-    public MeshRenderer MyMeshRenderer;
-    public Material RedMat, GreenMat; 
     public bool IsSelected { get; private set; }
 
     private Color originalColor;

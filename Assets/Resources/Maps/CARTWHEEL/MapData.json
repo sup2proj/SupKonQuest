@@ -1,23 +1,13 @@
 {
   "startPoints": [
-    { "x": 88, "y": 8, "owner": -1, "territory": "Valombre", "territoryId" : 1},
-    { "x": 118, "y": 38, "owner": -1, "territory": "Briseterre", "territoryId" : 2},
-    { "x": 118, "y": 88, "owner": -1, "territory": "Sombrelune", "territoryId" : 3},
-    { "x": 88, "y": 118, "owner": -1, "territory": "Ravenciel", "territoryId" : 4},
-    { "x": 38, "y": 118, "owner": -1, "territory": "test", "territoryId" : 5},
-    { "x": 10, "y": 88, "owner": -1, "territory": "test", "territoryId" : 6},
-    { "x": 10, "y": 88, "owner": -1, "territory": "test", "territoryId" : 7},
-    { "x": 38, "y": 8, "owner": -1, "territory": "test", "territoryId" : 8}
-  ],
-  "castles":[
-    { "x": 19, "y": 19, "owner": -1},
-    { "x": 53, "y": 2, "owner": -1},
-    { "x": 97, "y": 6, "owner": -1},
-    { "x": 54, "y": 37, "owner": -1},
-    { "x": 15, "y": 118, "owner": -1},
-    { "x": 66, "y": 117, "owner": -1},
-    { "x": 120, "y": 100, "owner": -1},
-    { "x": 120, "y": 50, "owner": -1}
+    { "x": 88, "y": 8, "owner": -1},
+    { "x": 118, "y": 38, "owner": -1},
+    { "x": 118, "y": 88, "owner": -1},
+    { "x": 88, "y": 118, "owner": -1},
+    { "x": 38, "y": 118, "owner": -1},
+    { "x": 10, "y": 88, "owner": -1},
+    { "x": 10, "y": 38, "owner": -1},
+    { "x": 38, "y": 8, "owner": -1}
   ],
   "harbours":[
     { "x": 80, "y": 24, "owner": -1, "territory" : "Petroville"},
