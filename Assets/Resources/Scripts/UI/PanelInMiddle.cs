@@ -71,6 +71,9 @@ public class PanelInMiddle : MonoBehaviour
 
         if (winOrDefeatTextField != null)
             winOrDefeatTextField.gameObject.SetActive(visible);
+        
+        if (quitButton != null)
+            quitButton.gameObject.SetActive(visible);
     }
 
     /// <summary>
