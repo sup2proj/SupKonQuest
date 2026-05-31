@@ -11,12 +11,15 @@ public class PanelInMiddle : MonoBehaviour
     [SerializeField] private string winText;
     [SerializeField] private Color defeatTextColor;
     [SerializeField] private Color winTextColor;
+    [SerializeField] private Button quitButton;
 
     public bool HasAssignedPanelReferences => background != null || winOrDefeatTextField != null;
 
     private void Awake()
     {
         Hide();
+        if (quitButton != null)
+            quitButton.onClick.AddListener(Quit);
     }
 
     /// <summary>
@@ -68,6 +71,9 @@ public class PanelInMiddle : MonoBehaviour
 
         if (winOrDefeatTextField != null)
             winOrDefeatTextField.gameObject.SetActive(visible);
+        
+        if (quitButton != null)
+            quitButton.gameObject.SetActive(visible);
     }
 
     /// <summary>
@@ -93,5 +99,13 @@ public class PanelInMiddle : MonoBehaviour
             color.a = 1f;
 
         return color;
+    }
+
+    public void Quit()
+    {
+        if (InterfaceInstance.Instance != null)
+        {
+            InterfaceInstance.Instance.QuitGame();
+        }
     }
 }
