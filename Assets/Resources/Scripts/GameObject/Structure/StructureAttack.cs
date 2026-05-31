@@ -87,7 +87,7 @@ public class StructureAttack : MonoBehaviour
             if (attackerSnapshot == null || attackerSnapshot.currentHealth <= 0)
                 return;
 
-            attackerSnapshot.TakeDamage(attackDamage);
+            attackerSnapshot.TakeDamage(attackDamage, null, structureSnapshot.playerId);
 
             UnitsAnimation anim = attackerSnapshot.GetComponent<UnitsAnimation>();
             if (anim != null)
