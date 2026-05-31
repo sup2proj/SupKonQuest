@@ -84,16 +84,17 @@ public class MovementManager : NetworkBehaviour
     {
         if (SelectionManager.Instance == null)
             HandleMouseClick();
-
-        // Seul le Serveur (l'Hôte) a le droit de faire bouger l'objet ou de calculer le chemin NavMesh.
-        // Les Clients se contentent de regarder l'objet bouger grâce au NetworkTransform !
         if (NetworkManager.Singleton != null && IsClient && !IsServer)
         {
-            UpdateMovementAnimation(); // Le client gère juste ses animations visuelles
+            UpdateMovementAnimation();
             return;
         }
 
         HandleMovement();
+
+        bool enforceOnThisInstance = (NetworkManager.Singleton == null) || IsServer;
+        if (enforceOnThisInstance)
+            EnforceMapBounds();
     }
 
     /// <summary>
@@ -558,6 +559,43 @@ public class MovementManager : NetworkBehaviour
     private bool CanUseNavMeshAgent() 
     { 
         return agent != null && agent.enabled && agent.isOnNavMesh; 
+    }
+
+    /// <summary>
+    /// Empêche l'unité de sortir des limites de la carte en clampant sa position
+    /// sur la grille générée par le MapGenerator. Si un NavMeshAgent est utilisé
+    /// on effectue un Warp pour maintenir la cohérence du pathfinding.
+    /// Cette opération doit être exécutée uniquement côté serveur (autorité).
+    /// </summary>
+    private void EnforceMapBounds()
+    {
+        MapGenerator map = GetMapGenerator();
+        if (map == null || map.tileSize <= 0f || map.mapWidth <= 0 || map.mapHeight <= 0)
+            return;
+
+        float minX = 0f;
+        float minZ = 0f;
+        float maxX = (map.mapWidth - 1) * map.tileSize;
+        float maxZ = (map.mapHeight - 1) * map.tileSize;
+
+        Vector3 pos = transform.position;
+        float clampedX = Mathf.Clamp(pos.x, minX, maxX);
+        float clampedZ = Mathf.Clamp(pos.z, minZ, maxZ);
+
+        if (!Mathf.Approximately(clampedX, pos.x) || !Mathf.Approximately(clampedZ, pos.z))
+        {
+            pos.x = clampedX;
+            pos.z = clampedZ;
+
+            if (CanUseNavMeshAgent())
+            {
+                agent.Warp(pos);
+            }
+            else
+            {
+                transform.position = pos;
+            }
+        }
     }
 
     public System.Action<Transform> OnMovementComplete;
