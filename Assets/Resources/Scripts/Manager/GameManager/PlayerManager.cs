@@ -178,7 +178,7 @@ public class PlayerManager : MonoBehaviour
             case 6: return Color.cyan;
             case 7: return new Color(1f, 0.5f, 0f, 1f); // orange
             case 8: return new Color(0.6f, 0f, 1f, 1f); // violet
-            default: return Color.brown;
+            default: return Color.hotPink;
         }
     }
 
