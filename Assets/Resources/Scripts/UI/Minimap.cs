@@ -36,11 +36,6 @@ public class Minimap : MonoBehaviour, IPointerDownHandler, IDragHandler
         {
             SetMapImage(AutoLauncher.pendingMapFolder);
         }
-        else
-        {
-            Debug.LogWarning("[Minimap] pendingMapFolder vide. Chargement de la carte par défaut : TEST");
-            // SetMapImage("TEST");
-        }
         isInitialized = (mainCamera is not null && cameraViewport is not null && minimapRectTransform is not null);
     }
 
