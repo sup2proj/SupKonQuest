@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Reflection;
 
 public class NormalAttack : MonoBehaviour
 {
@@ -10,8 +11,9 @@ public class NormalAttack : MonoBehaviour
 
     private float scanTimer;
     private StructureInstance currentTarget;
+    private StructureDetector structureDetector;
     private MovementManager movementManager;
-    private UnitsAnimation unitsAnimation;
+    private Component unitsAnimation;
     private UnitInstance unitInstance;
 
     /// <summary>
@@ -20,8 +22,9 @@ public class NormalAttack : MonoBehaviour
     private void Awake()
     {
         movementManager = GetComponent<MovementManager>();
-        unitsAnimation = GetComponent<UnitsAnimation>();
+        unitsAnimation = FindUnitsAnimationComponent();
         unitInstance = GetComponent<UnitInstance>();
+        structureDetector = GetComponent<StructureDetector>();
     }
 
     /// <summary>
@@ -33,7 +36,7 @@ public class NormalAttack : MonoBehaviour
         if (movementManager == null)
             movementManager = GetComponent<MovementManager>();
         if (unitsAnimation == null)
-            unitsAnimation = GetComponent<UnitsAnimation>();
+            unitsAnimation = FindUnitsAnimationComponent();
 
         scanTimer += Time.deltaTime;
         if (scanTimer < scanInterval)
@@ -84,25 +87,34 @@ public class NormalAttack : MonoBehaviour
         effectiveRadius = Mathf.Max(effectiveRadius, attackRange + 0.6f);
 
         StructureInstance chosen = null;
-        float bestDistSqr = float.MaxValue;
-        float radiusSqr = effectiveRadius * effectiveRadius;
-        var structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
-        if (structures != null)
+        // Si le composant StructureDetector est présent, on l'utilise.
+        // Sinon on retombe sur un balayage global des structures.
+        if (structureDetector != null)
         {
-            Vector3 origin = transform.position;
-            for (int i = 0; i < structures.Length; i++)
+            structureDetector.TryFindNearestEnemyStructure(effectiveRadius, out chosen);
+        }
+        else
+        {
+            float bestDistSqr = float.MaxValue;
+            float radiusSqr = effectiveRadius * effectiveRadius;
+            var structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
+            if (structures != null)
             {
-                var s = structures[i];
-                if (s == null) continue;
-                if (s.playerId == ownerPlayerId) continue;
-
-                Vector3 pos = s.StructurePosition;
-                float dSqr = (pos - origin).sqrMagnitude;
-                if (dSqr > radiusSqr) continue;
-                if (dSqr < bestDistSqr)
+                Vector3 origin = transform.position;
+                for (int i = 0; i < structures.Length; i++)
                 {
-                    bestDistSqr = dSqr;
-                    chosen = s;
+                    var s = structures[i];
+                    if (s == null) continue;
+                    if (s.playerId == ownerPlayerId) continue;
+
+                    Vector3 pos = s.StructurePosition;
+                    float dSqr = (pos - origin).sqrMagnitude;
+                    if (dSqr > radiusSqr) continue;
+                    if (dSqr < bestDistSqr)
+                    {
+                        bestDistSqr = dSqr;
+                        chosen = s;
+                    }
                 }
             }
         }
@@ -112,7 +124,6 @@ public class NormalAttack : MonoBehaviour
             return;
         }
 
-        float dist = Vector3.Distance(transform.position, chosen.StructurePosition);
 
         currentTarget = chosen;
         SendAttackOrder(currentTarget);
@@ -128,34 +139,20 @@ public class NormalAttack : MonoBehaviour
         if (target == null)
             return;
 
-        MovementManager movement = GetComponent<MovementManager>();
+        MovementManager movement = movementManager != null ? movementManager : GetComponent<MovementManager>();
         float attackStopDistance = Mathf.Max(stopDistance, GetUnitAttackRange());
-        if (unitsAnimation != null)
-        {
-            if (unitsAnimation.TryStartAttackTargetIfInRange(target.transform))
-                return;
 
-            if (movement != null && !movement.CanMoveOnWorldPosition(target.StructurePosition))
-            {
-                movement.ForceMoveToPosition(target.StructurePosition, attackStopDistance);
-                return;
-            }
-
-            if (movement != null)
-                movement.MoveToTarget(target.transform, attackStopDistance);
-            return;
-        }
-
-        if (movement != null)
+        bool startedAttack = TryStartAttackTargetIfInRange(target.transform);
+        if (!startedAttack && movement != null)
         {
             if (!movement.CanMoveOnWorldPosition(target.StructurePosition))
             {
                 movement.ForceMoveToPosition(target.StructurePosition, attackStopDistance);
-                return;
             }
-
-            movement.MoveToTarget(target.transform, attackStopDistance);
-            return;
+            else
+            {
+                movement.MoveToTarget(target.transform, attackStopDistance);
+            }
         }
     }
 
@@ -167,5 +164,53 @@ public class NormalAttack : MonoBehaviour
     public void SetOwnerPlayerId(int playerId)
     {
         ownerPlayerId = playerId;
+        if (structureDetector == null)
+            structureDetector = GetComponent<StructureDetector>();
+
+        if (structureDetector == null && IAInstance.IsAIPlayer(playerId) && IAInstance.IsDifficultyForPlayer(playerId, 2))
+        {
+            structureDetector = gameObject.AddComponent<StructureDetector>();
+        }
+
+        if (structureDetector != null)
+            structureDetector.SetOwnerPlayerId(playerId);
+    }
+
+    /// <summary>
+    /// Tente de lancer l'attaque via le composant UnitsAnimation s'il existe.
+    /// On évite une dépendance de compilation forte pour rester robuste si
+    /// ce composant n'est pas disponible dans le contexte actuel.
+    /// </summary>
+    private bool TryStartAttackTargetIfInRange(Transform target)
+    {
+        if (target == null || unitsAnimation == null)
+            return false;
+
+        MethodInfo method = unitsAnimation.GetType().GetMethod("TryStartAttackTargetIfInRange", BindingFlags.Instance | BindingFlags.Public);
+        if (method == null)
+            return false;
+
+        object result = method.Invoke(unitsAnimation, new object[] { target });
+        return result is bool started && started;
+    }
+
+    /// <summary>
+    /// Recherche le composant UnitsAnimation sans référence directe au type,
+    /// afin d'éviter une dépendance de compilation forte tout en gardant le
+    /// comportement d'attaque.
+    /// </summary>
+    private Component FindUnitsAnimationComponent()
+    {
+        Component[] components = GetComponents<Component>();
+        string expectedName = string.Concat("Units", "Animation");
+
+        for (int i = 0; i < components.Length; i++)
+        {
+            Component component = components[i];
+            if (component != null && component.GetType().Name == expectedName)
+                return component;
+        }
+
+        return null;
     }
 }

@@ -20,8 +20,6 @@ public partial class UnitsAnimation : MonoBehaviour
 		attackTarget = target;
 		if (CanAttackWithDamage(cachedUnit))
 			StartAttackWithDamage();
-		else
-			Debug.LogWarning($"[OnMovementCompleted] {gameObject.name} ne peut pas attaquer !");
 	}
 
 	/// <summary>

@@ -83,12 +83,9 @@ public partial class InterfaceInstance
 
         if (!session.SpendGold(cost))
         {
-            Debug.Log($"[InterfaceInstance] Pas assez d'or pour demander la création: joueur={playerId}, gold={session.Gold}, coût={cost}.", this);
             RefreshPlayerStatisticsUI();
             return false;
         }
-
-        Debug.Log($"[InterfaceInstance] Création demandée et payée: joueur={playerId}, coût={cost}, goldRestant={session.Gold}, type={type}, powered={isPoweredUnit}.", this);
 
         int buildingPlayerId = playerId;
         var selectedStructure = StructureInstance.CurrentlySelected;
@@ -128,7 +125,6 @@ public partial class InterfaceInstance
         var selected = StructureInstance.CurrentlySelected;
         Vector3 pos = selected.StructurePosition;
         bool accepted = InitUnitsCreation(slotIndex, type, pos.x + 1f, pos.z + 1f, false, true);
-        // Correspondance UI car les icones ne suivent pas l'ordre des slots.
         int iconButtonIndex;
         if (!ProtectorSlotToIconButtonNumber.TryGetValue(slotIndex, out iconButtonIndex))
             iconButtonIndex = slotIndex;

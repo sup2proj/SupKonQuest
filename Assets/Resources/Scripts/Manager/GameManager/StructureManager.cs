@@ -133,7 +133,6 @@ public class StructureManager : MonoBehaviour
             instance.SetProtectorSourceStructure(sourceStructure);
         BoatTransport.GetOrAdd(instance);
         
-        // S'assurer que le composant MovementManager est présent sur l'unité
         if (unitGO.GetComponent<MovementManager>() == null)
         {
             unitGO.AddComponent<MovementManager>();

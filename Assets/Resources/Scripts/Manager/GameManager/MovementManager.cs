@@ -17,7 +17,6 @@ public class MovementManager : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed = 3.5f;
     public float stoppingDistance = 0.3f;
-    public float rotationSpeed = 12f;
 
     private Vector3 movement;
     private Vector3 targetPosition;
@@ -104,8 +103,6 @@ public class MovementManager : MonoBehaviour
 
         if (CanUseNavMeshAgent())
             HandleNavMeshMovement();
-        else
-            HandleTransformMovement();
 
         UpdateMovementAnimation();
     }
@@ -172,38 +169,6 @@ public class MovementManager : MonoBehaviour
 
         if (notifyComplete)
             NotifyMovementComplete();
-    }
-
-    /// <summary>
-    /// Met à jour le déplacement manuel basé sur le transform.
-    /// </summary>
-    private void HandleTransformMovement()
-    {
-        if (!isMovingToTarget)
-        {
-            movement = Vector3.zero;
-            return;
-        }
-
-        if (followTarget != null && followTargetPosition)
-            targetPosition = followTarget.position;
-
-        Vector3 toTarget = targetPosition - transform.position;
-        toTarget.y = 0f;
-
-        if (toTarget.magnitude <= stoppingDistance)
-        {
-            isMovingToTarget = false;
-            movement = Vector3.zero;
-            NotifyMovementComplete();
-            return;
-        }
-
-        movement = toTarget.normalized;
-
-        transform.position += movement * GetUnitSpeed() * Time.deltaTime;
-        Quaternion targetRotation = Quaternion.LookRotation(movement, Vector3.up);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
     /// <summary>
@@ -325,7 +290,6 @@ public class MovementManager : MonoBehaviour
             ApplyAgentDestination(destination);
     }
     
-    // On va chercher le point le plus proche pour que les unités n'aillent pas dans l'eau.
     /// <summary>
     /// Cherche un point d'approche valide autour d'une cible pour éviter les zones interdites.
     /// </summary>
@@ -474,8 +438,6 @@ public class MovementManager : MonoBehaviour
             return false;
 
         bool allowed = IsGroundAllowed(tile.groundType);
-        if (!allowed)
-            Debug.Log($"[MovementManager] Destination refusee: unit={GetUnitTypeName()}, tile={tile.groundType}, position={worldPosition}.", this);
 
         return allowed;
     }
@@ -486,16 +448,6 @@ public class MovementManager : MonoBehaviour
     private bool IsGroundAllowed(GroundType groundType)
     {
         return IsBoatUnit() ? groundType == GroundType.Water : groundType != GroundType.Water;
-    }
-
-    /// <summary>
-    /// Retourne le nom de type de l'unité courante pour les journaux.
-    /// </summary>
-    private string GetUnitTypeName()
-    {
-        return unitInstance != null && unitInstance.unitData != null
-            ? unitInstance.unitData.type.ToString()
-            : "Unknown";
     }
 
     /// <summary>
@@ -552,14 +504,6 @@ public class MovementManager : MonoBehaviour
     private bool CanUseNavMeshAgent()
     {
         return agent != null && agent.enabled && agent.isOnNavMesh;
-    }
-
-    /// <summary>
-    /// Retourne la direction actuelle de déplacement.
-    /// </summary>
-    public Vector3 GetMovementDirection()
-    {
-        return movement;
     }
 
     public System.Action<Transform> OnMovementComplete;

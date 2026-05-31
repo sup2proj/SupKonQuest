@@ -161,7 +161,6 @@ public class NeutralUnits : MonoBehaviour
             if (candidate.playerId == unit.playerId)
                 continue;
 
-            // Neutral units cannot attack protector units
             if (candidate.unitData != null && candidate.unitData.isProtector)
                 continue;
 

@@ -1,16 +1,16 @@
 {
   "startPoints": [
-    { "x": 8, "y": 8, "owner": -1 },
-    { "x": 24, "y": 8, "owner": -1 },
-    { "x": 24, "y": 24, "owner": -1 }
+    { "x": 8, "y": 8, "owner": -1, "territory": "Valombre", "territoryId": 1},
+    { "x": 24, "y": 8, "owner": -1, "territory": "Briseterre", "territoryId": 2 },
+    { "x": 24, "y": 24, "owner": -1, "territory": "Sombrelune", "territoryId": 3 }
   ],
   "castles": [
     { "x": 13, "y": 13, "owner": -1 },
     { "x": 18, "y": 13, "owner": -1 },
     { "x": 18, "y": 18, "owner": -1 }
   ],
-  "arsenals": [
-    { "x": 15, "y": 16, "owner": -1 }
+  "harbours": [
+    { "x": 15, "y": 16, "owner": -1, "territory" : "Petroville"}
   ],
   "special": [
     { "x": 0, "y": 0, "owner": -1 },

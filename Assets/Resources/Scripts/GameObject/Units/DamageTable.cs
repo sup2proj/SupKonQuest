@@ -97,7 +97,6 @@ public class DamageTable : ScriptableObject
     /// </summary>
     public float GetMultiplier(UnitInstance attacker, UnitInstance target, StructureInstance targetStructure = null)
     {
-        Debug.Log($"[DamageTable] Calculating multiplier for {attacker?.name} attacking {target?.name}");
         if (attacker == null || target == null ||
             attacker.unitData == null || target.unitData == null)
             return 1f;

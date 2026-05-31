@@ -14,9 +14,6 @@ public class PanelInMiddle : MonoBehaviour
 
     public bool HasAssignedPanelReferences => background != null || winOrDefeatTextField != null;
 
-    /// <summary>
-    /// Cache le panneau au démarrage.
-    /// </summary>
     private void Awake()
     {
         Hide();

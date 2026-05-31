@@ -7,7 +7,7 @@ public class AutoLauncher : MonoBehaviour
     public static AutoLauncher Instance { get; private set; }
 
     private static bool launchRequested;
-    private static string pendingMapFolder = "TEST";
+    public static string pendingMapFolder = "TEST";
     private static int pendingAiCount = 1;
     private static int pendingAiDifficulty = 2;
 
@@ -91,9 +91,6 @@ public class AutoLauncher : MonoBehaviour
         CreateGame(pendingMapFolder, pendingAiCount, pendingAiDifficulty);
     }
 
-    /// <summary>
-    /// Crée et lance la partie : génère la map, configure les camps et la caméra.
-    /// </summary>
     /// <summary>
     /// Crée et lance la partie : génère la map, configure les camps et la caméra.
     /// </summary>

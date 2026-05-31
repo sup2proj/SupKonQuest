@@ -1,7 +1,31 @@
 ﻿using UnityEngine;
 
-public static class StructureDetector
+public class StructureDetector : MonoBehaviour
 {
+    [Header("Detector")]
+    [SerializeField, Min(0.01f)] private float detectionRadius = 4f;
+    [SerializeField] private int ownerPlayerId = 1;
+
+    /// <summary>
+    /// Définit l'identifiant du joueur propriétaire utilisé pour ignorer
+    /// les structures amies lors de la détection.
+    /// </summary>
+    public void SetOwnerPlayerId(int id)
+    {
+        ownerPlayerId = id;
+    }
+
+    /// <summary>
+    /// Tente de trouver la structure ennemie la plus proche autour de ce
+    /// composant en utilisant la logique interne (enveloppe autour des
+    /// méthodes statiques existantes).
+    /// </summary>
+    public bool TryFindNearestEnemyStructure(float radius, out StructureInstance target)
+    {
+        target = FindNearestEnemyStructureInRadius(transform.position, radius, ownerPlayerId);
+        return target != null;
+    }
+
     /// <summary>
     /// Recherche la structure ennemie la plus proche de <paramref name="origin"/>
     /// à l'intérieur du rayon <paramref name="radius"/> et excluant les
@@ -45,25 +69,5 @@ public static class StructureDetector
         }
 
         return best;
-    }
-
-    /// <summary>
-    /// Tentative de recherche d'une structure ennemie proche. Si trouvée,
-    /// la cible est écrite dans <paramref name="target"/> et la méthode
-    /// retourne true.
-    /// </summary>
-    /// <param name="origin">Position depuis laquelle la recherche est effectuée.</param>
-    /// <param name="radius">Rayon de recherche.</param>
-    /// <param name="ownerPlayerId">Identifiant du joueur à ignorer (propre joueur).</param>
-    /// <param name="target">Sortie contenant la structure trouvée ou null.</param>
-    /// <returns>True si une structure ennemie a été trouvée.</returns>
-    public static bool TryFindNearestEnemyStructureInRadius(
-        Vector3 origin,
-        float radius,
-        int ownerPlayerId,
-        out StructureInstance target)
-    {
-        target = FindNearestEnemyStructureInRadius(origin, radius, ownerPlayerId);
-        return target != null;
     }
 }

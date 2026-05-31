@@ -28,16 +28,13 @@ public partial class InterfaceInstance
          if (buffSlots == null || index < 0 || index >= buffSlots.Length || buffSlots[index] == null)
              return;
 
-         // Chercher le bon Spells basé sur le type de slot (0-2=Support, 3=Healer)
          Spells targetSpells = null;
          if (index < 3 && IsSelectedUnitSupport())
          {
-             // Chercher un Support dans la sélection
              targetSpells = FindSpellsOfType(UnitsType.Support);
          }
          else if (index == 3 && IsSelectedUnitHealer())
          {
-             // Chercher un Healer dans la sélection
              targetSpells = FindSpellsOfType(UnitsType.Healer);
          }
 

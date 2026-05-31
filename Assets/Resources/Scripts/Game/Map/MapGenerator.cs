@@ -69,16 +69,6 @@ public class MapGenerator : MonoBehaviour
     }
 
     /// <summary>
-    /// Méthode Start (placeholder) — la génération est déclenchée explicitement via LoadAndGenerate.
-    /// </summary>
-    void Start()
-    {
-        // LoadAndGenerate("EUROPE");
-        // LoadAndGenerate("TEST");
-        // LoadAndGenerate("LOL");
-    }
-
-    /// <summary>
     /// Charge les ressources de la carte depuis le dossier et génère la géométrie, place les structures
     /// et bake le NavMesh. Appelle OnMapReady lorsque terminé.
     /// </summary>
@@ -86,15 +76,11 @@ public class MapGenerator : MonoBehaviour
     {
         SetupResources();
 
-        // Si la surface n'est pas assignée, on la crée dynamiquement
         if (navMeshSurface == null)
         {
             GameObject navObj = new GameObject("DynamicNavMesh");
             navObj.transform.SetParent(this.transform);
             navMeshSurface = navObj.AddComponent<NavMeshSurface>();
-
-            // FIX : utiliser RenderMeshes plutôt que PhysicsColliders
-            // car les MeshColliders des tuiles sont supprimés pour les performances
             navMeshSurface.useGeometry = UnityEngine.AI.NavMeshCollectGeometry.RenderMeshes;
             navMeshSurface.collectObjects = Unity.AI.Navigation.CollectObjects.All;
         }
@@ -106,7 +92,6 @@ public class MapGenerator : MonoBehaviour
         string path = "Maps/" + folderName + "/";
         mapLayout = UnityEngine.Resources.Load<Texture2D>(path + "MapLayout");
         
-        // Vérifier s'il y a des données modifiées stockées par StructureAttribution
         MapJsonData jsonData = null;
         if (StructureAttribution.LastModifiedJsonData != null)
         {
@@ -123,13 +108,11 @@ public class MapGenerator : MonoBehaviour
             PlaceStructures(jsonData);
             AddNature();
 
-            // Bake en dernier, après que toute la géométrie soit en place
             if (navMeshSurface != null)
             {
                 navMeshSurface.BuildNavMesh();
             }
 
-            // Notifier que la map est prête (les unités peuvent maintenant spawner)
             OnMapReady?.Invoke();
 
             Debug.Log($"Monde '{folderName}' généré avec succès !");

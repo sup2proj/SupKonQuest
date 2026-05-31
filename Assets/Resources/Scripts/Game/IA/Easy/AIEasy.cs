@@ -28,7 +28,6 @@ public class AIEasy : MonoBehaviour
         if (mapGenerator == null)
             mapGenerator = MapGenerator.Instance != null ? MapGenerator.Instance : FindFirstObjectByType<MapGenerator>();
 
-        // Créer automatiquement EasyProduction s'il n'existe pas
         if (easyProduction == null)
         {
             easyProduction = GetComponent<EasyProduction>();
@@ -55,7 +54,7 @@ public class AIEasy : MonoBehaviour
 
     /// <summary>
     /// Tick principal : maintient les références, initialise la production
-    /// et exécute la logique de production périodique de l'IA ultra-facile.
+    /// et exécute la logique de production périodique de l'IA facile.
     /// </summary>
     private void Update()
     {

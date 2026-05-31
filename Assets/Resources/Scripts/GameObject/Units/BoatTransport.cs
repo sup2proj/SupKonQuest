@@ -316,7 +316,6 @@ public class BoatTransport : MonoBehaviour
             playerId = unit.playerId,
         });
 
-        Debug.Log($"[BoatTransport] {unit.name} embarque dans {boatUnit.name}. Capacite: {transportedUnits.Count}/{GetMaxTransportCapacity()}.", this);
         return true;
     }
 
@@ -330,14 +329,12 @@ public class BoatTransport : MonoBehaviour
 
         if (StructureManager.Instance == null)
         {
-            Debug.LogWarning("[BoatTransport] Debarquement impossible: StructureManager.Instance est null.", this);
             return false;
         }
 
         List<Vector3> exitPositions = FindClosestLandExitPositions(transportedUnits.Count);
         if (exitPositions.Count == 0)
         {
-            Debug.LogWarning($"[BoatTransport] Debarquement impossible: aucun sol accessible trouve autour de {boatUnit.name}.", this);
             return false;
         }
 
@@ -366,7 +363,6 @@ public class BoatTransport : MonoBehaviour
             spawnedCount++;
         }
 
-        Debug.Log($"[BoatTransport] {boatUnit.name} debarque {spawnedCount} unite(s).", this);
         return spawnedCount > 0;
     }
 
