@@ -32,7 +32,6 @@ public class PlayerManager : MonoBehaviour
             if (!sessionsById.ContainsKey(i))
                 CreateSessionForPlayer(i, autoStartGold, startUnitCount: 0, startStructureCount: 1);
         }
-        // Create default sessions based on autoCreatePlayerCount and set active player to 1.
         SetActivePlayer(1);
     }
 

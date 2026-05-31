@@ -84,24 +84,18 @@ public class AutoLauncher : MonoBehaviour
         CreateGame(pendingMapFolder, pendingAiCount, pendingAiDifficulty);
     }
 
-    /// <summary>
-    /// Crée et lance la partie : génère la map, configure les camps et la caméra.
-    /// </summary>
+
     /// <summary>
     /// Crée et lance la partie : génère la map, configure les camps et la caméra.
     /// </summary>
     public void CreateGame(string mapFolderName = "TEST", int aiCount = 1, int aiDifficulty = 2)
     {
-        // On utilise la graine demandée via Request(), sinon on en génère une au hasard
         int mapSeed = pendingMapSeed != -1 ? pendingMapSeed : UnityEngine.Random.Range(10000, 99999);
         
-        // On synchronise la matrice de l'aléatoire
         UnityEngine.Random.InitState(mapSeed);
-        // L'ID réseau (0 pour l'Hôte, 1, 2, 3... pour les Clients)
         ulong myClientId = Unity.Netcode.NetworkManager.Singleton != null ? Unity.Netcode.NetworkManager.Singleton.LocalClientId : 0;
         string localPlayerName = "Player_" + myClientId; 
 
-        // On crée une liste de la taille exacte du nombre de joueurs présents
         string[] playerList = new string[pendingHumanCount];
         for (int i = 0; i < pendingHumanCount; i++)
         {
@@ -140,7 +134,6 @@ public class AutoLauncher : MonoBehaviour
 
         camMovement.SetUpCamera(mapGenerator.mapWidth, mapGenerator.mapHeight, startCameraPositionX, startCameraPositionY);
 
-        // Seul l'Hôte (ou le mode local) a le droit de générer les IA
         if (NetworkManager.Singleton == null || NetworkManager.Singleton.IsServer)
         {
             InstantiateAIs(aiCount, aiDifficulty);

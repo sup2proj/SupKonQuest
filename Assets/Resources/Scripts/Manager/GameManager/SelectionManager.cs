@@ -212,16 +212,16 @@ public class SelectionManager : MonoBehaviour
 
         float unitSpacing = 1f; // distance entre deux unités voisines
 
-        // Cercle 0 : le centre lui-même
+        // le centre lui-même
         slots.Add(SampleNavMesh(center));
         if (slots.Count >= total) return slots;
 
-        // Cercles concentriques
+        // cercles interne
         int ring = 1;
         while (slots.Count < total)
         {
             float radius = ring * unitSpacing;
-            // Nombre d'unités qui tiennent sur ce cercle (circonférence / espacement)
+            // nombre d'unités qui tiennent sur ce cercle (circonférence / espacement)
             int unitsOnRing = Mathf.Max(1, Mathf.RoundToInt(2f * Mathf.PI * radius / unitSpacing));
             int toPlace = Mathf.Min(unitsOnRing, total - slots.Count);
 
