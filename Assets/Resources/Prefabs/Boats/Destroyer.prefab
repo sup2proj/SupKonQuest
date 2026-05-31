@@ -295,7 +295,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 4
   m_CollisionDetection: 0
 --- !u!114 &8455426616244343525
 MonoBehaviour:
@@ -310,9 +310,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectableObject
   SelectionMarker: {fileID: 1465032257198018013}
-  MyMeshRenderer: {fileID: 0}
-  RedMat: {fileID: 0}
-  GreenMat: {fileID: 0}
 --- !u!195 &1482387338201312061
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -350,7 +347,6 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 3.5
   stoppingDistance: 0.2
-  rotationSpeed: 12
 --- !u!114 &-9217333928778241609
 MonoBehaviour:
   m_ObjectHideFlags: 0

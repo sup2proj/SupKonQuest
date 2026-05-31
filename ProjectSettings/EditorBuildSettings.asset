@@ -24,16 +24,16 @@ EditorBuildSettings:
     path: Assets/TestNetwork/test.unity
     guid: e04338d0783ccaf49a5696f0844cca41
   - enabled: 1
-    path: Assets/TestNetwork/LoginScene.unity
+    path: Assets/Scenes/Network/LoginScene.unity
     guid: 64826db49dba3bf4fabf99eeb44d8510
   - enabled: 1
-    path: Assets/TestNetwork/MultiplayerScene.unity
+    path: Assets/Scenes/Network/MultiplayerScene.unity
     guid: e424bcd4c127abc4d8acb5046c999cea
   - enabled: 1
-    path: Assets/TestNetwork/LobbyRoomScene.unity
+    path: Assets/Scenes/Network/LobbyRoomScene.unity
     guid: 9170f7f901935fd4396ed09c0bd06594
   - enabled: 1
-    path: Assets/TestNetwork/JoinLobbyScene.unity
+    path: Assets/Scenes/Network/JoinLobbyScene.unity
     guid: 40f87980d8cb3374a98a80a83b498981
   - enabled: 1
     path: Assets/Scenes/Game.unity
