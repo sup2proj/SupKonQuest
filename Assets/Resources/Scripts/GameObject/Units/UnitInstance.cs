@@ -52,6 +52,13 @@ public class UnitInstance : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
+        if (IsServer)
+        {
+            netPlayerId.Value = playerId;
+            netMaxHealth.Value = unitData != null ? unitData.maxHealth : 100f;
+            netHealth.Value = currentHealth;
+        }
+
         netHealth.OnValueChanged += (oldValue, newValue) => 
         {
             currentHealth = newValue;
@@ -112,7 +119,7 @@ public class UnitInstance : NetworkBehaviour
         isNeutral = unitData.isNeutral;
         currentHealth = unitData.maxHealth;
         
-        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+        if (IsSpawned && IsServer)
         {
             netPlayerId.Value = playerId;
             netMaxHealth.Value = unitData.maxHealth;
