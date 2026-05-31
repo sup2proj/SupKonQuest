@@ -27,8 +27,8 @@
     { "x": 82, "y": 17, "owner": -1, "territory" : "Petroville"}
   ],
   "special":[
-    { "x": 47, "y": 40, "owner": -1},
-    { "x": 83, "y": 69, "owner": -1},
-    { "x": 62, "y": 124, "owner": -1}
+    { "x": 47, "y": 40, "owner": -1,"territory" : "Neutral"},
+    { "x": 83, "y": 69, "owner": -1,"territory" : "Neutral"},
+    { "x": 62, "y": 124, "owner": -1,"territory" : "Neutral"}
   ]
 }

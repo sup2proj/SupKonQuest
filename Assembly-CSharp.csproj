@@ -200,7 +200,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\QuickOutline\Resources\Shaders\OutlineFill.shader" />
     <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
-    <None Include="Assets\Resources\Maps\TEST\MapData.json" />
+    <None Include="Assets\Resources\Maps\QUICKGAME\MapData.json" />
     <None Include="Assets\Resources\Maps\EUROPE\MapData.json" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne.json" />
