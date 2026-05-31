@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
-using System.Collections;
 using System.IO;
 
 /// <summary>
@@ -41,12 +40,12 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Récupère dynamiquement les noms des dossiers dans l'éditeur. 
-    /// En Build, il conserve la dernière liste détectée sans écraser les données.
+    /// Récupère dynamiquement les noms des dossiers dans l'éditeur et écrit un index.
+    /// En Build, il lit simplement le fichier index généré.
     /// </summary>
     void LoadFoldersOnly()
     {
-        #if UNITY_EDITOR
+    #if UNITY_EDITOR
         if (Directory.Exists(path))
         {
             string[] rawDirectories = Directory.GetDirectories(path);
@@ -55,23 +54,26 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
             for (int i = 0; i < rawDirectories.Length; i++)
             {
                 DirectoryInfo dirInfo = new DirectoryInfo(rawDirectories[i]);
-                mapNames[i] = dirInfo.Name; // Stocke proprement "EUROPE", "LOL", "TEST", etc.
+                mapNames[i] = dirInfo.Name;
             }
+            string indexPath = Path.Combine(path, "map_index.txt");
+            File.WriteAllLines(indexPath, mapNames);
             
-            // Force Unity à sauvegarder la liste détectée dans la scène pour le build final
             UnityEditor.EditorUtility.SetDirty(this);
-            Debug.Log($"[Succès Éditeur] {mapNames.Length} dossiers de cartes détectés de manière dynamique !");
+            Debug.Log($"[Éditeur] {mapNames.Length} cartes détectées et indexées dans map_index.txt !");
+        }
+    #else
+        TextAsset indexFile = Resources.Load<TextAsset>("Maps/map_index");
+        if (indexFile != null)
+        {
+            mapNames = indexFile.text.Split(new[] { "\r\n", "\r", "\n" }, System.StringSplitOptions.RemoveEmptyEntries);
+            Debug.Log($"[Build] {mapNames.Length} cartes chargées avec succès depuis l'index textuel !");
         }
         else
         {
-            Debug.LogError("Le dossier spécifié n'existe pas : " + path);
+            Debug.LogError("[Build] Impossible de trouver le fichier Maps/map_index.txt dans les Resources !");
         }
-        #else
-        // En mode Build final (itch.io), le tableau 'mapNames' contiendra automatiquement 
-        // les données détectées lors de ta dernière session dans l'éditeur. 
-        // C'est 100% dynamique pour l'équipe de dev à chaque modification !
-        Debug.Log($"[Build Runtime] Chargement de {mapNames.Length} cartes depuis l'index sauvegardé.");
-        #endif
+    #endif
     }
     
     /// <summary>
