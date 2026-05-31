@@ -339,7 +339,6 @@ public class LobbyRoomManager : MonoBehaviour
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
             Debug.Log("Serveur Relay créé ! Code : " + joinCode);
 
-            // Graine aléatoire pour la map
             int randomSeed = UnityEngine.Random.Range(10000, 99999);
 
             UpdateLobbyOptions options = new UpdateLobbyOptions
@@ -389,7 +388,6 @@ public class LobbyRoomManager : MonoBehaviour
                         RelayServerData relayServerData = new RelayServerData(joinAllocation, "udp");
                         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                         
-                        // Le Client lit la carte, la graine ET transmet le nombre de joueurs
                         string mapFolder = currentLobby.Data.ContainsKey("Map") ? currentLobby.Data["Map"].Value : "TEST";
                         int mapSeed = currentLobby.Data.ContainsKey("MapSeed") ? int.Parse(currentLobby.Data["MapSeed"].Value) : -1;
                         AutoLauncher.Request(mapFolder, currentLobby.Players.Count, 0, 2, mapSeed);

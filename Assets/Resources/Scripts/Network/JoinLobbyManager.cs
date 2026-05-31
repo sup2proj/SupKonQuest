@@ -32,7 +32,7 @@ public class JoinLobbyManager : MonoBehaviour
         try
         {
             QueryLobbiesOptions options = new QueryLobbiesOptions();
-            options.Count = 25; // On veut maximum 25 résultats
+            options.Count = 25;
 
             options.Filters = new List<QueryFilter>
             {
