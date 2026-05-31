@@ -1628,6 +1628,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6227379065120323495}
   - component: {fileID: 39464292089507293}
+  - component: {fileID: 7501139811564732770}
   - component: {fileID: 584295807139649269}
   - component: {fileID: -1801458887589098818}
   - component: {fileID: 8132909324860242768}
@@ -1635,6 +1636,7 @@ GameObject:
   - component: {fileID: -520817025780228395}
   - component: {fileID: 5084714448291577116}
   - component: {fileID: 3449588668785832655}
+  - component: {fileID: 2495184162646508018}
   m_Layer: 0
   m_Name: Infantry
   m_TagString: Units
@@ -1683,6 +1685,31 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7501139811564732770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6712554670935715101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1047364429
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &584295807139649269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1695,6 +1722,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a11725f9924d45cc9bc5e09a380c22e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitsSoldierInstance
+  ShowTopMostFoldoutHeaderGroup: 1
   unitData: {fileID: 11400000, guid: 886f33ae739a84c94bbc7ae7538d7169, type: 2}
   objectModel: {fileID: 2597432588625706430}
   circleUnderFeet: {fileID: 2615190501803727386}
@@ -1702,6 +1730,22 @@ MonoBehaviour:
   healthBar: {fileID: 2731449005562521216}
   currentHealth: 0
   playerId: 0
+  isNeutral: 0
+  netPlayerId:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: -1
+  netMaxHealth:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 100
+  netHealth:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 100
 --- !u!54 &-1801458887589098818
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1742,6 +1786,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnitsAnimation
   animator: {fileID: 0}
+  cannonBallPrefab: {fileID: 0}
+  cannonBallSpeed: 3
 --- !u!114 &-7223385642623911744
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1793,6 +1839,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::chevalierAnimation
   animator: {fileID: 0}
+  cannonBallPrefab: {fileID: 0}
+  cannonBallSpeed: 3
 --- !u!114 &3449588668785832655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1805,9 +1853,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d40990706b6cdd144bc3fd249b44a5dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MovementManager
+  ShowTopMostFoldoutHeaderGroup: 1
   moveSpeed: 3.5
   stoppingDistance: 0.3
   rotationSpeed: 12
+--- !u!114 &2495184162646508018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6712554670935715101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkTransform
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AutoOwnerAuthorityTickOffset: 1
+  PositionInterpolationType: 0
+  RotationInterpolationType: 0
+  ScaleInterpolationType: 0
+  PositionLerpSmoothing: 1
+  PositionMaxInterpolationTime: 0.1
+  RotationLerpSmoothing: 1
+  RotationMaxInterpolationTime: 0.1
+  ScaleLerpSmoothing: 1
+  ScaleMaxInterpolationTime: 0.1
+  AuthorityMode: 0
+  TickSyncChildren: 0
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &6837486392623418950
 GameObject:
   m_ObjectHideFlags: 0

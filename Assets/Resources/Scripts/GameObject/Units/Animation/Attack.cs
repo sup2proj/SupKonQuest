@@ -133,7 +133,7 @@ public partial class UnitsAnimation : MonoBehaviour
             {
                 if (targetUnit != null)
                 {
-                    targetUnit.TakeDamage(attack);
+					targetUnit.TakeDamage(attack, attackerUnit);
                     UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
                     if (targetAnimation != null && attackerUnit != null)
                         targetAnimation.AttackTheAttacker(transform);
@@ -186,7 +186,7 @@ public partial class UnitsAnimation : MonoBehaviour
                 if (dist <= impactRadius)
                 {
                     float damageMultiplier = 1f + (impactRadius - dist);
-                    hitUnit.TakeDamage(attack * damageMultiplier);
+					hitUnit.TakeDamage(attack * damageMultiplier, attackerSnapshot);
                     UnitsAnimation anim = hitUnit.GetComponent<UnitsAnimation>();
                     if (anim != null)
                         anim.AttackTheAttacker(transform);
@@ -260,8 +260,11 @@ public partial class UnitsAnimation : MonoBehaviour
 	/// </summary>
 	private void SetAttackAnimationState(bool isAttacking)
 	{
-		if (animator != null)
-			animator.SetBool("isAttacking", isAttacking);
+		if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null)
+		{
+			return;
+		}
+		animator.SetBool("isAttacking", isAttacking);
 	}
 
 	/// <summary>
@@ -506,7 +509,7 @@ public partial class UnitsAnimation : MonoBehaviour
 		{
 			if (targetUnit != null && targetUnit.currentHealth > 0)
 			{
-				targetUnit.TakeDamage(attack);
+				targetUnit.TakeDamage(attack, attackerSnapshot);
 				UnitsAnimation anim = targetUnit.GetComponent<UnitsAnimation>();
 				if (anim != null)
 					anim.AttackTheAttacker(transform);
@@ -553,7 +556,7 @@ public partial class UnitsAnimation : MonoBehaviour
 				if (dist <= impactRadius)
 				{
 					float damageMultiplier = 1f + (impactRadius - dist);
-					hitUnit.TakeDamage(attack * damageMultiplier);
+								hitUnit.TakeDamage(attack * damageMultiplier, attackerSnapshot);
 					UnitsAnimation anim = hitUnit.GetComponent<UnitsAnimation>();
 					if (anim != null)
 						anim.AttackTheAttacker(transform);

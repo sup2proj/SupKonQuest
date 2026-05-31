@@ -39,20 +39,16 @@ public class Defeat : MonoBehaviour
         if (PlayerStillHasStructure(playerIdToCheck))
             return false;
 
-        ApplyDefeat(playerIdToCheck);
+        ApplyDefeat(playerIdToCheck, "il n'a plus de structures");
         return true;
     }
 
     /// <summary>
-    /// Affiche le panneau de défaite pour le joueur spécifié si c'est le joueur actif.
+    /// Affiche le panneau de défaite pour le joueur spécifié.
     /// </summary>
     public static void ShowDefeatForPlayer(int playerId)
     {
         if (playerId <= 0)
-            return;
-
-        PlayerManager playerManager = PlayerManager.Instance;
-        if (playerManager != null && playerManager.GetActivePlayerId() != playerId)
             return;
 
         if (InterfaceInstance.Instance != null)
@@ -69,8 +65,8 @@ public class Defeat : MonoBehaviour
             playerManager = FindFirstObjectByType<PlayerManager>();
 
         PlayerSession session = playerManager != null ? playerManager.GetSession(playerId) : null;
-        if (session != null)
-            return session.StructureCount > 0;
+        if (session != null && session.StructureCount > 0)
+            return true;
 
         StructureInstance[] structures = Object.FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
         if (structures == null)
@@ -125,10 +121,10 @@ public class Defeat : MonoBehaviour
     /// <summary>
     /// Applique la défaite à un joueur : convertit ses unités en neutres, nettoie la sélection et notifie.
     /// </summary>
-    private static void ApplyDefeat(int playerId)
+    private static void ApplyDefeat(int playerId, string reason)
     {
         defeatedPlayers.Add(playerId);
-        Debug.Log($"[Defeat] Le joueur {playerId} a perdu : il n'a plus de structures.");
+        Debug.Log($"[Defeat] Le joueur {playerId} a perdu : {reason}.");
 
         bool defeatedPlayerWasAi = IAInstance.IsAIPlayer(playerId);
         NeutralUnits.ConvertPlayerUnitsToNeutral(playerId, defeatedPlayerWasAi);
@@ -138,9 +134,6 @@ public class Defeat : MonoBehaviour
             SelectionManager.Instance.ClearCurrentSelection();
 
         ShowDefeatForPlayer(playerId);
-
-
-        TryDeclareWinnerFromRemainingPlayers();
     }
 
     /// <summary>

@@ -10,14 +10,14 @@ public class AIEasy : MonoBehaviour
     [SerializeField] private PlayerManager playerManager;
     [SerializeField] private StructureManager structureManager;
     [SerializeField] private MapGenerator mapGenerator;
-    [SerializeField] private EasyProduction easyProduction;
+    [SerializeField] private ProductionEasyNormal productionEasyNormal;
 
     private float decisionTimer;
     private int playerId = -1;
 
     /// <summary>
     /// Initialisation des références singletons et création automatique du
-    /// composant <see cref="EasyProduction"/> si nécessaire.
+    /// composant <see cref="ProductionEasyNormal"/> si nécessaire.
     /// </summary>
     private void Awake()
     {
@@ -28,13 +28,12 @@ public class AIEasy : MonoBehaviour
         if (mapGenerator == null)
             mapGenerator = MapGenerator.Instance != null ? MapGenerator.Instance : FindFirstObjectByType<MapGenerator>();
 
-        if (easyProduction == null)
+        if (productionEasyNormal == null)
         {
-            easyProduction = GetComponent<EasyProduction>();
-            if (easyProduction == null)
+            productionEasyNormal = GetComponent<ProductionEasyNormal>();
+            if (productionEasyNormal == null)
             {
-                easyProduction = gameObject.AddComponent<EasyProduction>();
-                Debug.Log("[AIEasy] EasyProduction créé automatiquement.");
+                productionEasyNormal = gameObject.AddComponent<ProductionEasyNormal>();
             }
         }
     }
@@ -48,8 +47,8 @@ public class AIEasy : MonoBehaviour
         if (playerManager != null)
             playerId = playerManager.GetActivePlayerId();
 
-        if (easyProduction != null)
-            easyProduction.Initialize(playerManager, structureManager, mapGenerator, playerId);
+        if (productionEasyNormal != null)
+            productionEasyNormal.Initialize(playerManager, structureManager, mapGenerator, playerId);
     }
 
     /// <summary>
@@ -73,14 +72,14 @@ public class AIEasy : MonoBehaviour
         if (playerId < 0)
             playerId = playerManager.GetActivePlayerId();
 
-        if (easyProduction == null)
-            easyProduction = GetComponent<EasyProduction>();
+        if (productionEasyNormal == null)
+            productionEasyNormal = GetComponent<ProductionEasyNormal>();
 
-        if (easyProduction != null)
+        if (productionEasyNormal != null)
         {
-            easyProduction.Initialize(playerManager, structureManager, mapGenerator, playerId);
-            easyProduction.SetMapReady(true);
-            easyProduction.Tick();
+            productionEasyNormal.Initialize(playerManager, structureManager, mapGenerator, playerId);
+            productionEasyNormal.SetMapReady(true);
+            productionEasyNormal.Tick();
         }
 
         decisionTimer += Time.deltaTime;

@@ -219,7 +219,7 @@ public class LaunchingLocalNewGameManager : MonoBehaviour
          string selectedMap = mapNames[currentMapIndex];
          int selectedDifficulty = currentDiffIndex + 1;
          
-         AutoLauncher.Request(selectedMap, aiCount, selectedDifficulty);
+         AutoLauncher.Request(selectedMap, 1, aiCount, selectedDifficulty);
          SceneManager.LoadScene("Game");
      }
 

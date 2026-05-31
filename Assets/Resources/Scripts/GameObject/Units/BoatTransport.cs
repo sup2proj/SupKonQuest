@@ -128,6 +128,9 @@ public class BoatTransport : MonoBehaviour
     /// </summary>
     public static bool IsBoatUnit(UnitInstance unit)
     {
+        if (unit == null || unit.unitData == null)
+            return false;
+            
         switch (unit.unitData.type)
         {
             case UnitsType.Fregate:

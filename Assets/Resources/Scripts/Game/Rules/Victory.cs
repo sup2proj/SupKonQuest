@@ -17,7 +17,7 @@ public class Victory : MonoBehaviour
 
         if (TryGetSoloPlayerId(out int soloPlayerId))
         {
-            DeclareWinner(soloPlayerId, "il ne reste plus qu'un seul joueur");
+            DeclareWinner(soloPlayerId);
             return;
         }
 
@@ -34,7 +34,7 @@ public class Victory : MonoBehaviour
 
         if (TerritoryControlUtility.TryGetWinnerByTerritories(territoriesToWin, out int territoryWinnerId))
         {
-            DeclareWinner(territoryWinnerId, $"a controle {territoriesToWin} territoires");
+            DeclareWinner(territoryWinnerId);
             return true;
         }
 
@@ -53,7 +53,7 @@ public class Victory : MonoBehaviour
         if (controlledTerritories < territoriesToWin)
             return false;
 
-        DeclareWinner(playerId, $"a controle {controlledTerritories} territoires");
+        DeclareWinner(playerId);
         return true;
     }
 
@@ -65,8 +65,13 @@ public class Victory : MonoBehaviour
         if (HasWinner || playerId <= 0)
             return false;
 
-        DeclareWinner(playerId, "il est le dernier joueur avec des structures");
-        return true;
+        if (IsOnlyPlayerWithStructures(playerId))
+        {
+            DeclareWinner(playerId);
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -87,16 +92,11 @@ public class Victory : MonoBehaviour
     /// <summary>
     /// Déclare formellement le gagnant, met à jour l'état et affiche le panneau de victoire.
     /// </summary>
-    private void DeclareWinner(int playerId, string reason)
+    private void DeclareWinner(int playerId)
     {
         HasWinner = true;
         WinnerPlayerId = playerId;
-        InterfaceInstance interfaceInstance = InterfaceInstance.Instance;
-        if (interfaceInstance == null)
-            interfaceInstance = FindFirstObjectByType<InterfaceInstance>(FindObjectsInactive.Include);
-
-        if (interfaceInstance != null)
-            interfaceInstance.ShowVictoryPanel(playerId);
+        ShowVictoryPanelWithReason(playerId, "Dernier joueur encore en vie ou victoire détectée dans Update()");
     }
     
     /// <summary>
@@ -113,12 +113,8 @@ public class Victory : MonoBehaviour
         if (TerritoryControlUtility.CountControlledTerritories(playerIdToCheck) < defaultTerritoriesToWin)
             return false;
 
-        InterfaceInstance interfaceInstance = InterfaceInstance.Instance;
-        if (interfaceInstance == null)
-            interfaceInstance = FindFirstObjectByType<InterfaceInstance>(FindObjectsInactive.Include);
-
-        if (interfaceInstance != null)
-            interfaceInstance.ShowVictoryPanel(playerIdToCheck);
+        Debug.Log($"[Victory] Affichage du panel de victoire pour le joueur {playerIdToCheck} : contrôle d'au moins {defaultTerritoriesToWin} territoires sans instance Victory active.");
+        ShowVictoryPanelDirectly(playerIdToCheck);
 
         return true;
     }
@@ -133,13 +129,68 @@ public class Victory : MonoBehaviour
         if (victory != null)
             return victory.TryDeclareWinnerIfOnlyPlayerWithStructures(playerIdToCheck);
 
+        if (IsOnlyPlayerWithStructures(playerIdToCheck))
+        {
+            Debug.Log($"[Victory] Affichage du panel de victoire pour le joueur {playerIdToCheck} : dernier joueur encore avec des structures (fallback).");
+            ShowVictoryPanelDirectly(playerIdToCheck);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Retourne true si et seulement si le joueur donné est le seul à posséder des structures.
+    /// </summary>
+    private static bool IsOnlyPlayerWithStructures(int playerId)
+    {
+        if (playerId <= 0)
+            return false;
+
+        var sessions = Object.FindObjectsByType<PlayerSession>(FindObjectsSortMode.None);
+        if (sessions == null || sessions.Length == 0)
+            return false;
+
+        int aliveCount = 0;
+        int lastAliveId = -1;
+        for (int i = 0; i < sessions.Length; i++)
+        {
+            var s = sessions[i];
+            if (s == null) continue;
+            if (s.StructureCount > 0)
+            {
+                aliveCount++;
+                lastAliveId = s.Id;
+                if (aliveCount > 1)
+                    break;
+            }
+        }
+
+        return aliveCount == 1 && lastAliveId == playerId;
+    }
+
+    /// <summary>
+    /// Affiche le panneau de victoire avec la raison.
+    /// </summary>
+    private static void ShowVictoryPanelWithReason(int playerId, string reason)
+    {
+        Debug.Log($"[Victory] Affichage du panel de victoire pour le joueur {playerId} : {reason}");
+        ShowVictoryPanelDirectly(playerId);
+    }
+
+    /// <summary>
+    /// Essaie d'afficher le panneau de victoire.
+    /// </summary>
+    private static void ShowVictoryPanelDirectly(int playerId)
+    {
         InterfaceInstance interfaceInstance = InterfaceInstance.Instance;
         if (interfaceInstance == null)
             interfaceInstance = FindFirstObjectByType<InterfaceInstance>(FindObjectsInactive.Include);
 
         if (interfaceInstance != null)
-            interfaceInstance.ShowVictoryPanel(playerIdToCheck);
-
-        return true;
+        {
+            interfaceInstance.ShowVictoryPanel(playerId);
+            return;
+        }
     }
 }

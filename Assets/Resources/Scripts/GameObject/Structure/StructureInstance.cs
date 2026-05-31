@@ -107,7 +107,6 @@ public partial class StructureInstance : MonoBehaviour
             healthBar.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
         }
 
-        // Gestion centralisee des clics (une seule fois par frame)
         if (Instance == this)
         {
             HandleGlobalStructureClick();
@@ -117,8 +116,6 @@ public partial class StructureInstance : MonoBehaviour
     /// <summary>
     /// Gestion centralisee des clics sur les structures
     /// Cette methode n'est executee qu'une fois par frame (par l'Instance principale)
-    /// </summary>
-    /// <summary>
     /// Détecte le clic global sur les structures et sélectionne la plus proche.
     /// </summary>
     private void HandleGlobalStructureClick()
@@ -170,6 +167,7 @@ public partial class StructureInstance : MonoBehaviour
     }
 
     /// <summary>
+    /// Appele quand cette structure est cliquee
     /// Traite la sélection d'une structure après un clic.
     /// </summary>
     private void OnStructureClicked()
@@ -212,8 +210,6 @@ public partial class StructureInstance : MonoBehaviour
         if (StructureManager.Instance == null)
             return;
 
-        // If this enqueue is for a protector and the structure belongs to the IA player,
-        // enforce maxQueueSize to avoid infinite protector spawns.
         if (isProtector)
         {
             if (IAInstance.IsAIPlayer(playerId))
@@ -267,6 +263,35 @@ public partial class StructureInstance : MonoBehaviour
                         isProtector,
                         this
                     );
+
+                    if (Unity.Netcode.NetworkManager.Singleton != null && 
+                        Unity.Netcode.NetworkManager.Singleton.IsClient && 
+                        !Unity.Netcode.NetworkManager.Singleton.IsServer)
+                    {
+                        NetworkSpawner.Instance.RequestSpawnUnitServerRpc(
+                            playerId, 
+                            data.type, 
+                            spawnPosition.x, 
+                            spawnPosition.z, 
+                            false,
+                            isProtector
+                        );
+                        spawned = true;
+                    }
+                    else
+                    {
+                        spawned = StructureManager.Instance.SpawnUnitByTypeAtPosition(
+                            playerId,
+                            data.type,
+                            spawnPosition.x,
+                            spawnPosition.z,
+                            false,
+                            isProtector,
+                            this
+                        );
+                    }
+
+                    Debug.Log($"[StructureInstance] {name} : Spawn queued unit {data.type} (protector={isProtector}) -> {(spawned ? "OK" : "FAILED")}");
                 }
             }
 
@@ -279,6 +304,8 @@ public partial class StructureInstance : MonoBehaviour
     /// </summary>
     public void Selected()
     {
+        Debug.Log($"Structure {name} selectionnee (Type: {structureType}).");
+
         if (currentlySelected != null && currentlySelected != this)
         {
             currentlySelected.UnSelected();
@@ -288,6 +315,9 @@ public partial class StructureInstance : MonoBehaviour
 
         if (outline != null)
             outline.enabled = true;
+        else
+            Debug.LogWarning($"[StructureInstance] Composant Outline manquant sur {name}.");
+
         ActionInterface.SetSelectedStructure(this, structurePosition);
         ActionInterface.ShowStructureButtons(structureType);
 
@@ -383,7 +413,9 @@ public partial class StructureInstance : MonoBehaviour
         return GetUnitsWithinRadius(unitsFarRadius);
     }
 
+    
     /// <summary>
+    /// Centralise l'application du nom de territoire et adapte la couleur selon le playerId
     /// Applique ou met à jour le nom du territoire affiché par la structure.
     /// </summary>
     public void ApplyTerritoryName(string territory)
