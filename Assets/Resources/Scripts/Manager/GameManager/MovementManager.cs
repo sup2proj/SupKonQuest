@@ -102,7 +102,6 @@ public class MovementManager : NetworkBehaviour
     /// </summary>
     private void HandleMouseClick()
     {
-        // Seul le propriétaire de l'unité peut lui donner des ordres
         if (unitInstance == null || unitInstance.playerId != PlayerManager.Instance.GetActivePlayerId()) 
             return;
 
@@ -123,12 +122,11 @@ public class MovementManager : NetworkBehaviour
     }
 
     /// <summary>
-    /// (RÉSEAU) Envoie une requête radio au serveur pour déplacer cette unité vers des coordonnées précises.
+    /// Envoie une requête radio au serveur pour déplacer cette unité vers des coordonnées précises.
     /// </summary>
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     public void RequestMoveToPositionServerRpc(Vector3 destination, float stopDistance)
     {
-        // Le Serveur reçoit l'ordre et le fait exécuter !
         MoveToPosition(destination, stopDistance);
     }
 

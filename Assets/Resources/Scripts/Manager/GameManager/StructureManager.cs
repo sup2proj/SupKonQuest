@@ -40,7 +40,7 @@ public class StructureManager : MonoBehaviour
         }
     }
 
-    // Enregistre une structure dans l'index interne et lui assigne les métadonnées de territoire
+
     /// <summary>
     /// Enregistre une structure dans l'index des structures d'un territoire.
     /// </summary>
