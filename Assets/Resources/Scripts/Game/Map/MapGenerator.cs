@@ -11,7 +11,6 @@ public class MapGenerator : MonoBehaviour
 {
     public static MapGenerator Instance { get; private set; }
 
-    private readonly Color32 _colorGrass = new Color32(10, 170, 0, 255);
     private readonly Color32 _colorDirt = new Color32(170, 160, 0, 255);
     private readonly Color32 _colorSnow = new Color32(255, 255, 255, 255);
     private readonly Color32 _colorWater = new Color32(0, 10, 170, 255);
@@ -158,11 +157,6 @@ public class MapGenerator : MonoBehaviour
                 floor.name = $"Tile_{x}_{y}";
                 floor.tag = "Ground";
                 ConfigureTileNavigation(floor, gData.type);
-
-                // FIX : ne pas détruire le MeshCollider — il est nécessaire pour les raycasts
-                // (clic de déplacement des unités) et pour NavMeshSurface en mode PhysicsColliders.
-                // Si tu veux absolument les supprimer, garde useGeometry = RenderMeshes ci-dessus.
-                // Destroy(floor.GetComponent<MeshCollider>()); // ← ligne supprimée
             }
         }
         Vector3 bgPosition = new Vector3(mapWidth/2, (float)-0.01, mapHeight/2);
@@ -230,19 +224,18 @@ public class MapGenerator : MonoBehaviour
     /// </summary>
     void PlaceStructures(MapJsonData data)
     {
-        SpawnStructureGroup(data.startPoints, StructureCastle, StructureType.Structure, 1, spawnProtectorOnStart: true);
-        SpawnStructureGroup(data.castles, StructureCastle, StructureType.Structure, 1);
-        SpawnStructureGroup(data.harbours, StructureHarbour, StructureType.Harbour, 1);
-        SpawnStructureGroup(data.special, StructureSpecial, StructureType.NeutralStructure, 1, spawnProtectorOnStart: true);
+        SpawnStructureGroup(data.startPoints, StructureCastle, StructureType.Structure, spawnProtectorOnStart: true);
+        SpawnStructureGroup(data.castles, StructureCastle, StructureType.Structure);
+        SpawnStructureGroup(data.harbours, StructureHarbour, StructureType.Harbour);
+        SpawnStructureGroup(data.special, StructureSpecial, StructureType.NeutralStructure, spawnProtectorOnStart: true);
     }
 
     /// <summary>
     /// Instancie un groupe de structures à partir d'une liste de PointData en initialisant les StructureInstance.
     /// </summary>
-    void SpawnStructureGroup(List<PointData> points, GameObject prefab, StructureType type, int income, bool spawnProtectorOnStart = false)
+    void SpawnStructureGroup(List<PointData> points, GameObject prefab, StructureType type, bool spawnProtectorOnStart = false)
     {
         if (points == null || prefab == null) return;
-        int h = mapLayout.height;
 
         foreach (PointData p in points)
         {

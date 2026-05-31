@@ -492,10 +492,6 @@ public class MovementManager : NetworkBehaviour
             return false;
             
         return IsGroundAllowed(tile.groundType);
-
-        bool allowed = IsGroundAllowed(tile.groundType);
-
-        return allowed;
     }
 
     /// <summary>

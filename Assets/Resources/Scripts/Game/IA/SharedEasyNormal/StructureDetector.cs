@@ -3,7 +3,6 @@
 public class StructureDetector : MonoBehaviour
 {
     [Header("Detector")]
-    [SerializeField, Min(0.01f)] private float detectionRadius = 4f;
     [SerializeField] private int ownerPlayerId = 1;
 
     /// <summary>

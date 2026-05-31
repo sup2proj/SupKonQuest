@@ -21,8 +21,6 @@ public class StructureAttack : MonoBehaviour
         structureInstance = GetComponent<StructureInstance>();
 
         cannonBallPrefab = Resources.Load<GameObject>("Prefabs/Units/CannonBall/Cannonball");
-        if (cannonBallPrefab == null)
-            Debug.LogError("[StructureAttack] CannonBall prefab introuvable !");
     }
 
     /// <summary>

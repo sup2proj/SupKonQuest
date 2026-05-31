@@ -135,39 +135,4 @@ public class Defeat : MonoBehaviour
 
         ShowDefeatForPlayer(playerId);
     }
-
-    /// <summary>
-    /// Si un seul joueur reste avec des structures, déclenche la vérification de victoire correspondante.
-    /// </summary>
-    private static void TryDeclareWinnerFromRemainingPlayers()
-    {
-        PlayerSession[] sessions = Object.FindObjectsByType<PlayerSession>(FindObjectsSortMode.None);
-        if (sessions == null || sessions.Length == 0)
-            return;
-
-        int aliveCount = 0;
-        int lastAlivePlayerId = -1;
-
-        for (int i = 0; i < sessions.Length; i++)
-        {
-            PlayerSession session = sessions[i];
-            if (session == null)
-                continue;
-
-            int playerId = session.Id;
-            if (playerId <= 0)
-                continue;
-
-            if (!PlayerStillHasStructure(playerId))
-                continue;
-
-            aliveCount++;
-            lastAlivePlayerId = playerId;
-            if (aliveCount > 1)
-                return;
-        }
-
-        if (aliveCount == 1 && lastAlivePlayerId > 0)
-            Victory.CheckVictoryAfterElimination(lastAlivePlayerId);
-    }
 }

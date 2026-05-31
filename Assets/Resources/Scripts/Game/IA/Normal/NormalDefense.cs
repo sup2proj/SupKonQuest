@@ -12,7 +12,6 @@ public class NormalDefense : MonoBehaviour
     private StructureInstance structureInstance;
     private UnitInstance lastAttacker;
     private float defendUntilTime;
-    private bool isDefending;
 
     /// <summary>
     /// Récupère la référence à la <see cref="StructureInstance"/> associée.
@@ -40,7 +39,6 @@ public class NormalDefense : MonoBehaviour
 
         lastAttacker = attacker;
         defendUntilTime = Time.time + defendDuration;
-        isDefending = true;
 
         if (HasCombatAllyNearby())
         {
@@ -140,9 +138,6 @@ public class NormalDefense : MonoBehaviour
             if (u.playerId != structureInstance.playerId) continue;
             nearbyTypes.Add(u.unitData.type);
         }
-
-        string typesStr = nearbyTypes.Count > 0 ? string.Join(",", nearbyTypes.Select(t => t.ToString())) : "<none>";
-
         var allUnitDatas = StructureManager.Instance.unitData;
         if (allUnitDatas == null || allUnitDatas.Count == 0)
             return;

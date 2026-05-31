@@ -119,7 +119,7 @@ public class AutoLauncher : MonoBehaviour
         Camera mainCam = Camera.main;
         if (mainCam == null)
         {
-            mainCam = Object.FindObjectOfType<Camera>();
+            mainCam = Object.FindFirstObjectByType<Camera>();
         }
 
         if (mainCam == null)

@@ -263,19 +263,6 @@ public class ProductionEasyNormal : MonoBehaviour
     }
 
     /// <summary>
-    /// Tente de déterminer une position de spawn valide (fallback sur le centre
-    /// du générateur de carte actuellement).
-    /// </summary>
-    /// <param name="position">Sortie contenant la position de spawn choisie.</param>
-    /// <returns>True si une position a été fournie.</returns>
-    private bool TryGetSpawnPosition(out Vector3 position)
-    {
-        position = Vector3.zero;
-        position = new Vector3(mapGenerator.transform.position.x, 0f, mapGenerator.transform.position.z);
-        return true;
-    }
-
-    /// <summary>
     /// Indique si le type d'unité est un type naval (bateau) et doit être ignoré
     /// pour la production terrestre automatique.
     /// </summary>

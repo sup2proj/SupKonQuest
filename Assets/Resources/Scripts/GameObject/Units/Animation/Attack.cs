@@ -42,35 +42,6 @@ public partial class UnitsAnimation : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Tente de démarrer une attaque si la cible donnée est à portée.
-	/// </summary>
-	public bool TryStartAttackTargetIfInRange(Transform target)
-	{
-		if (target == null)
-			return false;
-
-		if (attackTarget == target && attackCoroutine != null)
-			return true;
-
-		if (!CanAttackWithDamage(cachedUnit))
-			return false;
-
-		Transform previousTarget = attackTarget;
-		attackTarget = target;
-		if (!IsTargetWithinAttackRange())
-		{
-			attackTarget = previousTarget;
-			return false;
-		}
-
-		if (movementManager != null)
-			movementManager.StopMovement();
-
-		StartAttackWithDamage();
-		return true;
-	}
-
-	/// <summary>
 	/// Boucle d'attaque principale pour les unités non-projetiles.
 	/// </summary>
 	private IEnumerator AttackLoopCoroutine()
@@ -126,7 +97,7 @@ public partial class UnitsAnimation : MonoBehaviour
             {
                 if (cannonBallPrefab != null && attackTarget != null)
                 {
-					MortarDamage(targetUnit, targetStructure, attackerUnit, attack);
+					MortarDamage(attackerUnit, attack);
 	            }
             }
             else
@@ -151,13 +122,10 @@ public partial class UnitsAnimation : MonoBehaviour
 	/// <summary>
     /// Déclenche le tir de mortier et applique ses dégâts de zone à l'impact.
     /// </summary>
-    private void MortarDamage(UnitInstance targetUnit, StructureInstance targetStructure, UnitInstance attackerUnit, float attack)
+    private void MortarDamage(UnitInstance attackerUnit, float attack)
     {
         Transform targetSnapshot = attackTarget;
-        UnitInstance targetUnitSnapshot = targetUnit;
-        StructureInstance targetStructureSnapshot = targetStructure;
         UnitInstance attackerSnapshot = attackerUnit;
-        Transform launcherTransform = transform;
 
         Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
         float impactRadius = 1.5f;
@@ -459,26 +427,6 @@ public partial class UnitsAnimation : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Applique les dégâts sur une unité ou structure et déclenche la riposte si nécessaire.
-	/// </summary>
-	private void ApplyAttackDamage(UnitInstance targetUnit, StructureInstance targetStructure, UnitInstance attackerUnit, float attack)
-	{
-		if (targetUnit != null)
-		{
-			targetUnit.TakeDamage(attack, attackerUnit);
-
-			UnitsAnimation targetAnimation = targetUnit.GetComponent<UnitsAnimation>();
-			if (targetAnimation != null && attackerUnit != null)
-				targetAnimation.AttackTheAttacker(transform);
-
-			return;
-		}
-
-		if (targetStructure != null)
-			targetStructure.TakeDamage(attack, attackerUnit);
-	}
-
-	/// <summary>
 	/// Délai / vitesse d'attaque (valeur utilisée pour temporiser les animations / tirs).
 	/// </summary>
 	private float GetAttackSpeed()
@@ -522,58 +470,6 @@ public partial class UnitsAnimation : MonoBehaviour
 		}, transform, 0f, 0.5f);
 
 		yield return new WaitForSeconds(halfDuration);
-	}
-
-	/// <summary>
-	/// Lance un projectile mortier et applique des dégâts de zone à l'impact.
-	/// </summary>
-	private void SpawnMortarProjectile(UnitInstance attackerUnit, UnitInstance targetUnit, StructureInstance targetStructure, float attack)
-	{
-		if (cannonBallPrefab == null || attackTarget == null)
-			return;
-
-		Transform targetSnapshot = attackTarget;
-		UnitInstance attackerSnapshot = attackerUnit;
-		Vector3 spawnPos = transform.position - transform.forward * 0.5f + Vector3.up * 0.5f;
-		float impactRadius = 1.5f;
-
-		CannonBall.Spawn(cannonBallPrefab, spawnPos, targetSnapshot, cannonBallSpeed, (impactPos) =>
-		{
-			GameObject impactZone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-			impactZone.transform.position = impactPos;
-			impactZone.transform.localScale = new Vector3(impactRadius * 2f, 0.05f, impactRadius * 2f);
-			impactZone.GetComponent<Collider>().enabled = false;
-			impactZone.GetComponent<Renderer>().material = Resources.Load<Material>("Materials/ImpactZone");
-			Destroy(impactZone, 1f);
-
-			UnitInstance[] allUnits = FindObjectsByType<UnitInstance>(FindObjectsSortMode.None);
-			foreach (UnitInstance hitUnit in allUnits)
-			{
-				if (hitUnit == null || hitUnit == attackerSnapshot || hitUnit.playerId == attackerSnapshot.playerId || hitUnit.currentHealth <= 0)
-					continue;
-
-				float dist = Vector3.Distance(hitUnit.transform.position, impactPos);
-				if (dist <= impactRadius)
-				{
-					float damageMultiplier = 1f + (impactRadius - dist);
-								hitUnit.TakeDamage(attack * damageMultiplier, attackerSnapshot);
-					UnitsAnimation anim = hitUnit.GetComponent<UnitsAnimation>();
-					if (anim != null)
-						anim.AttackTheAttacker(transform);
-				}
-			}
-
-			StructureInstance[] allStructures = FindObjectsByType<StructureInstance>(FindObjectsSortMode.None);
-			foreach (StructureInstance hitStructure in allStructures)
-			{
-				if (hitStructure == null || hitStructure.playerId == attackerSnapshot.playerId)
-					continue;
-
-				float dist = Vector3.Distance(hitStructure.transform.position, impactPos);
-				if (dist <= impactRadius)
-					hitStructure.TakeDamage(attack, attackerSnapshot);
-			}
-		}, transform, 5f);
 	}
 }
 

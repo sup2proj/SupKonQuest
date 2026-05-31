@@ -290,8 +290,6 @@ public partial class StructureInstance : MonoBehaviour
                             this
                         );
                     }
-
-                    Debug.Log($"[StructureInstance] {name} : Spawn queued unit {data.type} (protector={isProtector}) -> {(spawned ? "OK" : "FAILED")}");
                 }
             }
 
@@ -304,8 +302,6 @@ public partial class StructureInstance : MonoBehaviour
     /// </summary>
     public void Selected()
     {
-        Debug.Log($"Structure {name} selectionnee (Type: {structureType}).");
-
         if (currentlySelected != null && currentlySelected != this)
         {
             currentlySelected.UnSelected();
@@ -315,8 +311,6 @@ public partial class StructureInstance : MonoBehaviour
 
         if (outline != null)
             outline.enabled = true;
-        else
-            Debug.LogWarning($"[StructureInstance] Composant Outline manquant sur {name}.");
 
         ActionInterface.SetSelectedStructure(this, structurePosition);
         ActionInterface.ShowStructureButtons(structureType);
