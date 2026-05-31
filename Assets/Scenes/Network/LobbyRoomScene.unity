@@ -337,6 +337,7 @@ GameObject:
   - component: {fileID: 123654356}
   - component: {fileID: 123654358}
   - component: {fileID: 123654357}
+  - component: {fileID: 123654359}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -463,6 +464,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 123654355}
   m_CullTransparentMesh: 1
+--- !u!114 &123654359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 123654355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: +1 max player
+  frenchText: +1 max joueur
+  italianoText: +1 giocatore al massimo
 --- !u!1 &172577745
 GameObject:
   m_ObjectHideFlags: 0
@@ -474,6 +490,7 @@ GameObject:
   - component: {fileID: 172577746}
   - component: {fileID: 172577748}
   - component: {fileID: 172577747}
+  - component: {fileID: 172577749}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -520,7 +537,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Map EU
+  m_text: Next map
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b39269fd6cb84d64f84c7a599b701e09, type: 2}
   m_sharedMaterial: {fileID: -573867277670008306, guid: b39269fd6cb84d64f84c7a599b701e09, type: 2}
@@ -600,6 +617,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 172577745}
   m_CullTransparentMesh: 1
+--- !u!114 &172577749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 172577745}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Next map
+  frenchText: Map suivante
+  italianoText: Mappa successivaS
 --- !u!1 &252891415
 GameObject:
   m_ObjectHideFlags: 0
@@ -760,7 +792,7 @@ GameObject:
   - component: {fileID: 255461801}
   - component: {fileID: 255461804}
   m_Layer: 5
-  m_Name: MapTestBtn
+  m_Name: MapPreBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -783,7 +815,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -200, y: 0}
+  m_AnchoredPosition: {x: -200, y: 20}
   m_SizeDelta: {x: 180, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &255461801
@@ -832,8 +864,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1008551695}
         m_TargetAssemblyTypeName: LobbyRoomManager, Assembly-CSharp
-        m_MethodName: ChangeMap
-        m_Mode: 5
+        m_MethodName: PreviousMap
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1601,6 +1633,7 @@ RectTransform:
   - {fileID: 882798234}
   - {fileID: 943641018}
   - {fileID: 700285893}
+  - {fileID: 1266171150}
   - {fileID: 400941644}
   - {fileID: 1447326812}
   - {fileID: 1968633341}
@@ -2165,7 +2198,7 @@ GameObject:
   - component: {fileID: 866439596}
   - component: {fileID: 866439599}
   m_Layer: 5
-  m_Name: MapEUBtn
+  m_Name: MapNextBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2188,7 +2221,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 200, y: 0}
+  m_AnchoredPosition: {x: 200, y: 20}
   m_SizeDelta: {x: 180, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &866439596
@@ -2237,8 +2270,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1008551695}
         m_TargetAssemblyTypeName: LobbyRoomManager, Assembly-CSharp
-        m_MethodName: ChangeMap
-        m_Mode: 5
+        m_MethodName: NextMap
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2918,6 +2951,10 @@ MonoBehaviour:
   sendChatBtn: {fileID: 35761328}
   hostControlsPanel: {fileID: 1968633340}
   startGameBtn: {fileID: 401878614}
+  mapImageDisplay: {fileID: 1266171152}
+  mapNames:
+  - Europe
+  - Test
 --- !u!1 &1037145381
 GameObject:
   m_ObjectHideFlags: 0
@@ -3332,6 +3369,102 @@ MonoBehaviour:
   englishText: Chat history
   frenchText: Historique
   italianoText: Cronologia
+--- !u!1 &1266171149
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1266171150}
+  - component: {fileID: 1266171153}
+  - component: {fileID: 1266171152}
+  - component: {fileID: 1266171151}
+  m_Layer: 5
+  m_Name: MapImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1266171150
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266171149}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.29999998, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 442358772}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 959.99994, y: 672.7949}
+  m_SizeDelta: {x: 1000, y: 300}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1266171151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266171149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.LayoutElement
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: 300
+  m_PreferredWidth: -1
+  m_PreferredHeight: 300
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
+--- !u!114 &1266171152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266171149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1266171153
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266171149}
+  m_CullTransparentMesh: 1
 --- !u!1 &1362490034
 GameObject:
   m_ObjectHideFlags: 0
@@ -3343,6 +3476,7 @@ GameObject:
   - component: {fileID: 1362490035}
   - component: {fileID: 1362490037}
   - component: {fileID: 1362490036}
+  - component: {fileID: 1362490038}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -3389,7 +3523,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Map test
+  m_text: Previous map
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b39269fd6cb84d64f84c7a599b701e09, type: 2}
   m_sharedMaterial: {fileID: -573867277670008306, guid: b39269fd6cb84d64f84c7a599b701e09, type: 2}
@@ -3469,6 +3603,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1362490034}
   m_CullTransparentMesh: 1
+--- !u!114 &1362490038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362490034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: Previous map
+  frenchText: "Map pr\xE9cedente"
+  italianoText: Mappa precedente
 --- !u!1 &1387175645
 GameObject:
   m_ObjectHideFlags: 0
@@ -3480,6 +3629,7 @@ GameObject:
   - component: {fileID: 1387175646}
   - component: {fileID: 1387175648}
   - component: {fileID: 1387175647}
+  - component: {fileID: 1387175649}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -3606,6 +3756,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1387175645}
   m_CullTransparentMesh: 1
+--- !u!114 &1387175649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1387175645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 168dec3fd1131d94db7aaf43c3a4b390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocalizedText
+  englishText: -1 max player
+  frenchText: -1 max joueur
+  italianoText: -1 giocatore al massimo
 --- !u!1 &1422666924
 GameObject:
   m_ObjectHideFlags: 0

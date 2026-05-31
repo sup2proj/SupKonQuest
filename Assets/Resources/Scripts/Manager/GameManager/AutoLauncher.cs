@@ -10,6 +10,7 @@ public class AutoLauncher : MonoBehaviour
     public static string pendingMapFolder = "TEST";
     private static int pendingAiCount = 1;
     private static int pendingAiDifficulty = 2;
+    private static int pendingMapSeed = -1;
 
     /// <summary>
     /// Assure l'unicité de l'AutoLauncher et le conserve entre les scènes.
@@ -54,11 +55,13 @@ public class AutoLauncher : MonoBehaviour
     /// <summary>
     /// Demande le lancement d'une partie avec les paramètres fournis.
     /// </summary>
-    public static void Request(string folder, int aiCount = 1, int aiDifficulty = 2)
+    public static void Request(string folder, int humanCount, int aiCount = 1, int aiDifficulty = 2, int mapSeed = -1)
     {
         pendingMapFolder = string.IsNullOrWhiteSpace(folder) ? "TEST" : folder;
+        pendingHumanCount = Mathf.Max(1, humanCount);
         pendingAiCount = Mathf.Max(0, aiCount);
         pendingAiDifficulty = Mathf.Clamp(aiDifficulty, 1, 2);
+        pendingMapSeed = mapSeed;
         launchRequested = true;
 
         if (Instance == null)
@@ -74,17 +77,6 @@ public class AutoLauncher : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name != "Game") return;
-
-        // Si on est un Client réseau, on s'auto-autorise à générer la carte
-        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsClient && !NetworkManager.Singleton.IsServer)
-        {
-            if (LobbyRoomManager.JoinedLobby != null && LobbyRoomManager.JoinedLobby.Data.ContainsKey("Map"))
-            {
-                pendingMapFolder = LobbyRoomManager.JoinedLobby.Data["Map"].Value;
-                launchRequested = true;
-            }
-        }
-
         if (!launchRequested) return;
 
         launchRequested = false;
@@ -94,24 +86,26 @@ public class AutoLauncher : MonoBehaviour
     /// <summary>
     /// Crée et lance la partie : génère la map, configure les camps et la caméra.
     /// </summary>
+    /// <summary>
+    /// Crée et lance la partie : génère la map, configure les camps et la caméra.
+    /// </summary>
     public void CreateGame(string mapFolderName = "TEST", int aiCount = 1, int aiDifficulty = 2)
     {
-        // On récupère la graine (par défaut au hasard pour le local)
-        int mapSeed = UnityEngine.Random.Range(10000, 99999); 
-        
-        // Si on est en multijoueur, on prend la graine du Lobby !
-        if (LobbyRoomManager.JoinedLobby != null && LobbyRoomManager.JoinedLobby.Data.ContainsKey("MapSeed"))
-        {
-            mapSeed = int.Parse(LobbyRoomManager.JoinedLobby.Data["MapSeed"].Value);
-        }
+        // On utilise la graine demandée via Request(), sinon on en génère une au hasard
+        int mapSeed = pendingMapSeed != -1 ? pendingMapSeed : UnityEngine.Random.Range(10000, 99999);
         
         // On synchronise la matrice de l'aléatoire
         UnityEngine.Random.InitState(mapSeed);
-        Debug.Log($"[AutoLauncher] Génération avec la graine : {mapSeed}");
+        // L'ID réseau (0 pour l'Hôte, 1, 2, 3... pour les Clients)
+        ulong myClientId = Unity.Netcode.NetworkManager.Singleton != null ? Unity.Netcode.NetworkManager.Singleton.LocalClientId : 0;
+        string localPlayerName = "Player_" + myClientId; 
 
-        Debug.Log($"AutoLauncher.CreateGame called with mapFolderName='{mapFolderName}', aiCount={aiCount}, aiDifficulty={aiDifficulty}");
-        string localPlayerName = "toto";
-        string[] playerList = { "toto" };
+        // On crée une liste de la taille exacte du nombre de joueurs présents
+        string[] playerList = new string[pendingHumanCount];
+        for (int i = 0; i < pendingHumanCount; i++)
+        {
+            playerList[i] = "Player_" + i;
+        }
 
         StructureAttribution campAssignment = PrepareStructureAttribution(mapFolderName, aiCount);
         LogStartPointOwnersAfterAttribution();

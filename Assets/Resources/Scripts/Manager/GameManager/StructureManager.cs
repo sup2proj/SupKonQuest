@@ -112,6 +112,13 @@ public class StructureManager : MonoBehaviour
 
         Vector3 position = ResolveSpawnPosition(type, x, z, sourceStructure);
 
+        if (Unity.Netcode.NetworkManager.Singleton != null && 
+            Unity.Netcode.NetworkManager.Singleton.IsClient && 
+            !Unity.Netcode.NetworkManager.Singleton.IsServer)
+        {
+            return true; 
+        }
+
         GameObject unitGO = Instantiate(prefab, position, Quaternion.identity);
 
         if (isPoweredUnit)
@@ -123,24 +130,24 @@ public class StructureManager : MonoBehaviour
         UnitInstance instance = unitGO.GetComponent<UnitInstance>();
         if (instance == null)
         {
-            Debug.LogWarning($"[StructureManager] Le prefab {prefab.name} ne contient pas de UnitInstance component. Tentative d'ajouter dynamiquement.");
             instance = unitGO.AddComponent<UnitInstance>();
-            // Si UnitInstance attend des données à l'Awake/Start, c'est risqué, on logue.
         }
 
         instance.Initialize(runtimeData);
+        
         if (isProtector && sourceStructure != null)
+        {
             instance.SetProtectorSourceStructure(sourceStructure);
+            sourceStructure.AddProtectorUnit(instance);
+        }
+            
         BoatTransport.GetOrAdd(instance);
         
         if (unitGO.GetComponent<MovementManager>() == null)
         {
             unitGO.AddComponent<MovementManager>();
-            Debug.Log($"[StructureManager] MovementManager ajouté dynamiquement à {unitGO.name}");
         }
         
-        // Ajout automatique du système de déplacement IA pour les joueurs IA
-        // Ajouter MovementEasyNormal uniquement pour les unités IA normales (pas les protecteurs)
         if (IAInstance.IsAIPlayer(playerId) && !isProtector)
         {
             if (unitGO.GetComponent<MovementEasyNormal>() == null)
@@ -149,8 +156,14 @@ public class StructureManager : MonoBehaviour
             }
         }
 
-        if (isProtector && sourceStructure != null)
-            sourceStructure.AddProtectorUnit(instance);
+        if (Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsServer)
+        {
+            Unity.Netcode.NetworkObject netObj = unitGO.GetComponent<Unity.Netcode.NetworkObject>();
+            if (netObj != null && !netObj.IsSpawned)
+            {
+                netObj.Spawn();
+            }
+        }
 
         if (playerManager != null)
         {

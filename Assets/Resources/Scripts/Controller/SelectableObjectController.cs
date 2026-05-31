@@ -65,6 +65,7 @@ public class SelectableObject : MonoBehaviour
     /// </summary>
     public void DeselectMe()
     {
+        if (this == null || gameObject == null) return;
         Debug.Log("Deselected: " + gameObject.name);
         IsSelected = false;
         if (markerSprite != null)

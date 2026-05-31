@@ -100,15 +100,32 @@ public partial class InterfaceInstance
             else
             {
                 StructureInstance sourceStructure = StructureInstance.FindByInstanceId(req.sourceStructureId);
-                StructureManager.Instance.SpawnUnitByTypeAtPosition(
-                    req.buildingPlayerId,
-                    req.type,
-                    req.x,
-                    req.z,
-                    req.isPoweredUnit,
-                    req.isProtector,
-                    sourceStructure
-                );
+            
+                if (Unity.Netcode.NetworkManager.Singleton != null && 
+                    Unity.Netcode.NetworkManager.Singleton.IsClient && 
+                    !Unity.Netcode.NetworkManager.Singleton.IsServer)
+                {
+                    NetworkSpawner.Instance.RequestSpawnUnitServerRpc(
+                        req.buildingPlayerId,
+                        req.type,
+                        req.x,
+                        req.z,
+                        req.isPoweredUnit,
+                        req.isProtector
+                    );
+                }
+                else
+                {
+                    StructureManager.Instance.SpawnUnitByTypeAtPosition(
+                        req.buildingPlayerId,
+                        req.type,
+                        req.x,
+                        req.z,
+                        req.isPoweredUnit,
+                        req.isProtector,
+                        sourceStructure
+                    );
+                }
             }
 
             ShiftQueueLeft(req.sourceStructureId);

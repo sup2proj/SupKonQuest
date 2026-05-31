@@ -11,6 +11,7 @@ using Unity.Services.Relay.Models;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using System.IO;
 
 /// <summary>
 /// Gère la salle d'attente (Lobby Room) une fois qu'un joueur a créé ou rejoint une partie. Gère le chat, les paramètres de la partie, l'état "Prêt" des joueurs et la transition vers le jeu en réseau (Relay).
@@ -49,9 +50,19 @@ public class LobbyRoomManager : MonoBehaviour
     private string currentMap = "Europe";
     private int currentMaxPlayers = 4;
     private Dictionary<string, string> lastProcessedMessages = new Dictionary<string, string>();
+    
+    [Header("Interface (UI) Map")]
+    public Image mapImageDisplay;
+    
+    [Header("Map Rotation Settings")]
+    public string[] mapNames; 
+    private int currentMapIndex = 0;
+    private string mapPath;
 
     async void Start()
     {
+        mapPath = Path.Combine(Application.dataPath, "Resources", "Maps");
+        LoadFoldersOnly();
         if (IsHost)
         {
             hostControlsPanel.SetActive(true);
@@ -337,16 +348,17 @@ public class LobbyRoomManager : MonoBehaviour
                 {
                     { "GameStarted", new DataObject(DataObject.VisibilityOptions.Member, "True") },
                     { "RelayCode", new DataObject(DataObject.VisibilityOptions.Member, joinCode) },
-                    { "MapSeed", new DataObject(DataObject.VisibilityOptions.Member, randomSeed.ToString()) } // On sauvegarde la graine
+                    { "MapSeed", new DataObject(DataObject.VisibilityOptions.Member, randomSeed.ToString()) }
                 }
             };
             currentLobby = await LobbyService.Instance.UpdateLobbyAsync(currentLobby.Id, options);
             
-            RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
+            RelayServerData relayServerData = new RelayServerData(allocation, "udp");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             NetworkManager.Singleton.StartHost();
             
-            AutoLauncher.Request(currentLobby.Data["Map"].Value, 0, 2);            
+            string mapFolder = currentLobby.Data.ContainsKey("Map") ? currentLobby.Data["Map"].Value : "TEST";
+            AutoLauncher.Request(mapFolder, currentLobby.Players.Count, 0, 2, randomSeed);          
             NetworkManager.Singleton.SceneManager.LoadScene("Game", LoadSceneMode.Single);
         }
         catch (RelayServiceException e) { Debug.LogError("Erreur Relay : " + e.Message); }
@@ -374,9 +386,13 @@ public class LobbyRoomManager : MonoBehaviour
                         JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(relayCode);
                         Debug.Log("Client connecté au Relay");
                         
-                        RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+                        RelayServerData relayServerData = new RelayServerData(joinAllocation, "udp");
                         NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
                         
+                        // Le Client lit la carte, la graine ET transmet le nombre de joueurs
+                        string mapFolder = currentLobby.Data.ContainsKey("Map") ? currentLobby.Data["Map"].Value : "TEST";
+                        int mapSeed = currentLobby.Data.ContainsKey("MapSeed") ? int.Parse(currentLobby.Data["MapSeed"].Value) : -1;
+                        AutoLauncher.Request(mapFolder, currentLobby.Players.Count, 0, 2, mapSeed);
                         NetworkManager.Singleton.StartClient();
                     }
                     catch (RelayServiceException e) { Debug.LogError("Erreur Relay Client : " + e.Message); }
@@ -464,54 +480,80 @@ public class LobbyRoomManager : MonoBehaviour
     /// Met à jour toute l'interface visuelle (liste des joueurs, état du bouton "Lancer", chat, carte) en fonction des dernières données récupérées du serveur.
     /// </summary>
     private void RefreshUI()
+{
+    if (this == null || gameObject == null || playerListContainer == null) return;
+
+    if (currentLobby == null) return;
+
+    if (mapNameText != null)
+        mapNameText.SetDynamicTranslations("Map: " + currentLobby.Data["Map"].Value, "Carte : " + currentLobby.Data["Map"].Value, "Mappa : "+currentLobby.Data["Map"].Value);
+    
+    if (mapImageDisplay != null && currentLobby.Data.ContainsKey("Map"))
     {
-        if (currentLobby == null) return;
+        string currentMapName = currentLobby.Data["Map"].Value;
+        string resourcePath = "Maps/" + currentMapName + "/MapLayout";
+        
+        Texture2D loadedTexture = Resources.Load<Texture2D>(resourcePath);
 
-        if (mapNameText != null)
-            mapNameText.SetDynamicTranslations("Map: " + currentLobby.Data["Map"].Value, "Carte : " + currentLobby.Data["Map"].Value, "Mappa : "+currentLobby.Data["Map"].Value);
+        if (loadedTexture != null)
+        {
+            Sprite newSprite = Sprite.Create(
+                loadedTexture, 
+                new Rect(0, 0, loadedTexture.width, loadedTexture.height), 
+                new Vector2(0.5f, 0.5f)
+            );
             
-        if (maxPlayersText != null)
-            maxPlayersText.SetDynamicTranslations("Slots: " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers, "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers,"Posti : "+currentLobby.Players.Count + " / " + currentLobby.MaxPlayers);
-
-        foreach (Transform child in playerListContainer)
-        {
-            Destroy(child.gameObject);
+            mapImageDisplay.sprite = newSprite;
         }
-
-        int readyCount = 0;
-        string myId = AuthenticationService.Instance.PlayerId;
-
-        foreach (var player in currentLobby.Players)
+        else
         {
-            string playerName = player.Data != null && player.Data.ContainsKey("PlayerName") ? player.Data["PlayerName"].Value : player.Id;
-            bool isReady = player.Data != null && player.Data.ContainsKey("IsReady") && player.Data["IsReady"].Value == "True";
-            
-            if (isReady) readyCount++;
-
-            GameObject newPlayerItem = Instantiate(playerListItemPrefab, playerListContainer);
-            PlayerListItem itemScript = newPlayerItem.GetComponent<PlayerListItem>();
-            
-            bool isMe = (player.Id == myId);
-            itemScript.Setup(player.Id, playerName, isReady, IsHost, isMe);
+            Debug.LogWarning($"Impossible de charger l'image à l'emplacement : Resources/{resourcePath}");
+            mapImageDisplay.sprite = null;
         }
+    }
+        
+    if (maxPlayersText != null)
+        maxPlayersText.SetDynamicTranslations("Slots: " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers, "Places : " + currentLobby.Players.Count + " / " + currentLobby.MaxPlayers,"Posti : "+currentLobby.Players.Count + " / " + currentLobby.MaxPlayers);
 
-        if (IsHost && startGameBtn != null)
+    foreach (Transform child in playerListContainer)
+    {
+        Destroy(child.gameObject);
+    }
+
+    int readyCount = 0;
+    string myId = AuthenticationService.Instance.PlayerId;
+
+    foreach (var player in currentLobby.Players)
+    {
+        string playerName = player.Data != null && player.Data.ContainsKey("PlayerName") ? player.Data["PlayerName"].Value : player.Id;
+        bool isReady = player.Data != null && player.Data.ContainsKey("IsReady") && player.Data["IsReady"].Value == "True";
+        
+        if (isReady) readyCount++;
+
+        GameObject newPlayerItem = Instantiate(playerListItemPrefab, playerListContainer);
+        PlayerListItem itemScript = newPlayerItem.GetComponent<PlayerListItem>();
+        
+        bool isMe = (player.Id == myId);
+        itemScript.Setup(player.Id, playerName, isReady, IsHost, isMe);
+    }
+
+    if (IsHost && startGameBtn != null)
+    {
+        startGameBtn.interactable = (readyCount == currentLobby.Players.Count);
+    }
+    if (currentLobby.Data.ContainsKey("ChatLog"))
+    {
+        if (chatHistoryText.text != currentLobby.Data["ChatLog"].Value)
         {
-            startGameBtn.interactable = (readyCount == currentLobby.Players.Count);
-        }
-        if (currentLobby.Data.ContainsKey("ChatLog"))
-        {
-            if (chatHistoryText.text != currentLobby.Data["ChatLog"].Value)
+            chatHistoryText.text = currentLobby.Data["ChatLog"].Value;
+            Canvas.ForceUpdateCanvases();
+            if (chatScrollRect != null)
             {
-                chatHistoryText.text = currentLobby.Data["ChatLog"].Value;
-                Canvas.ForceUpdateCanvases();
-                if (chatScrollRect != null)
-                {
-                    chatScrollRect.verticalNormalizedPosition = 0f;
-                }
+                chatScrollRect.verticalNormalizedPosition = 0f;
             }
         }
     }
+}
 
     /// <summary>
     /// Gère le retour forcé au menu multijoueur (en cas d'expulsion ou de perte de connexion) et sauvegarde la raison exacte pour l'afficher proprement au joueur à son retour au menu.
@@ -529,5 +571,68 @@ public class LobbyRoomManager : MonoBehaviour
         PlayerPrefs.SetString("DisconnectReasonFR", reasonFR);
         PlayerPrefs.SetString("DisconnectReasonIT", reasonIT);
         SceneManager.LoadScene("MultiplayerScene");
+    }
+    /// <summary>
+    /// Récupère dynamiquement les noms des dossiers de cartes dans l'éditeur. 
+    /// En Build, il conserve la dernière liste détectée sans écraser les données.
+    /// </summary>
+    void LoadFoldersOnly()
+    {
+        #if UNITY_EDITOR
+        if (Directory.Exists(mapPath))
+        {
+            string[] rawDirectories = Directory.GetDirectories(mapPath);
+            mapNames = new string[rawDirectories.Length];
+
+            for (int i = 0; i < rawDirectories.Length; i++)
+            {
+                DirectoryInfo dirInfo = new DirectoryInfo(rawDirectories[i]);
+                mapNames[i] = dirInfo.Name;
+            }
+            
+            UnityEditor.EditorUtility.SetDirty(this);
+            Debug.Log($"[Lobby Room] {mapNames.Length} dossiers de cartes détectés de manière dynamique !");
+        }
+        else
+        {
+            Debug.LogError("Le dossier spécifié n'existe pas : " + mapPath);
+        }
+        #else
+        // En mode Build final, le tableau 'mapNames' contiendra automatiquement 
+        // les données détectées lors de ta dernière session dans l'éditeur.
+        Debug.Log($"[Lobby Build] Chargement de {mapNames.Length} cartes depuis l'index sauvegardé.");
+        #endif
+    }
+    
+    /// <summary>
+    /// Passe à la carte suivante et met à jour le salon.
+    /// </summary>
+    public void NextMap()
+    {
+        if (!IsHost || currentLobby == null || mapNames == null || mapNames.Length == 0) return;
+
+        currentMapIndex++;
+        if (currentMapIndex > mapNames.Length - 1)
+        {
+            currentMapIndex = 0;
+        }
+
+        ChangeMap(mapNames[currentMapIndex]);
+    }
+    
+    /// <summary>
+    /// Revient à la carte précédente et met à jour le salon.
+    /// </summary>
+    public void PreviousMap()
+    {
+        if (!IsHost || currentLobby == null || mapNames == null || mapNames.Length == 0) return;
+
+        currentMapIndex--;
+        if (currentMapIndex < 0)
+        {
+            currentMapIndex = mapNames.Length - 1;
+        }
+
+        ChangeMap(mapNames[currentMapIndex]);
     }
 }
