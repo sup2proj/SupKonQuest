@@ -74,7 +74,7 @@ MonoBehaviour:
   cannonBallPrefab: {fileID: 0}
   cannonBallSpeed: 5
   attackRange: 5
-  attackDamage: 50
+  attackDamage: 5
   attackCooldown: 3
 --- !u!1 &6671406994162845979
 GameObject:
