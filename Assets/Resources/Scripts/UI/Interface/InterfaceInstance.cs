@@ -159,6 +159,18 @@ public partial class InterfaceInstance : MonoBehaviour
          WireBuffSlotClicks();
          WirePlayersListClicks();
          WireProtectorSlotClicks();
+
+         if (playerManager == null)
+             ResolvePlayerManager();
+
+         if (activePlayerIndex < 0)
+         {
+             if (playerManager != null)
+                 activePlayerIndex = Mathf.Max(0, playerManager.GetActivePlayerId() - 1);
+             else
+                 activePlayerIndex = 0;
+         }
+
          RefreshPlayerStatisticsUI();
          
          // Initialiser tabMenuStatistics masqué
