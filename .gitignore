@@ -1,9 +1,0 @@
-﻿Console/
-.DS_Store
-Library/
-Logs/
-Temp/
-UserSettings/Layouts/
-Build/
-*.log
-*.pid
