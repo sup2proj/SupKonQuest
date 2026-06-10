@@ -11,7 +11,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
 
         <script src="https://cdn.tailwindcss.com"></script>
-
+    
         <style>
             body { font-family: 'Cinzel', serif !important; }
             ::-webkit-scrollbar { display: none; }
@@ -55,9 +55,9 @@
             </div>
         </div>
 
-        <div id="main-content" class="hidden min-h-screen w-full flex items-center justify-center p-2 opacity-0 transition-opacity duration-1000 ease-in overflow-y-hidden overflow-x-hidden z-20 relative">
+        <div id="main-content" class="hidden min-h-screen w-full flex items-start pt-6 md:items-center md:pt-0 justify-center p-2 opacity-0 transition-opacity duration-1000 ease-in overflow-y-hidden overflow-x-hidden z-20 relative">
 
-            <div id="papyrus-parchemin" class="relative w-full max-w-2xl text-stone-900 p-4 md:p-12 flex flex-col justify-between mx-auto my-auto h-auto max-h-[80vh] md:max-h-none overflow-y-auto"
+            <div id="papyrus-parchemin" class="relative w-full max-w-2xl text-stone-900 p-4 md:p-12 flex flex-col justify-between mx-auto my-auto h-auto max-h-[85vh] md:max-h-none overflow-y-auto"
                  style="background-image: url('./assets/papyrus.png'); background-repeat: no-repeat; background-size: 100% 100%; background-position: center; filter: drop-shadow(0px 0px 30px rgba(0, 0, 0, 0.75));">
 
                 <div class="text-center pt-4">
@@ -118,11 +118,26 @@
 
             function triggerUnitSpawn() {
                 if (!isTransitioned) return;
+
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+                if (isIOS || isSafari) {
+                    return;
+                }
+
                 const rect = papyrus.getBoundingClientRect();
                 unit.style.top = `${Math.random() * (rect.bottom - 96 - rect.top) + rect.top}px`;
                 unit.classList.remove('animate-walk-right', 'animate-walk-left', 'hidden');
                 unit.currentTime = 0;
-                unit.play();
+
+                unit.load();
+
+                const playPromise = unit.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {}).catch(error => { console.log("Playback prevented"); });
+                }
+
                 const walkToLeft = Math.random() < 0.5;
                 unit.style.transform = walkToLeft ? 'scaleX(-1)' : 'none';
                 void unit.offsetWidth;
